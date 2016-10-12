@@ -2,11 +2,14 @@
 
 #include "CoreUObject.h"
 #include "UnrealEd.h"
+#include "ScopedTransaction.h"
 
 #include "Kismet2/BlueprintEditorUtils.h"
 
 #include "GraphEditor.h"
 #include "GraphEditorActions.h"
+#include "EdGraph/EdGraphNode.h"
+
 #include "SDockTab.h"
 #include "SNodePanel.h"
 #include "IDetailsView.h"

@@ -6,6 +6,8 @@
 UGenericGraph::UGenericGraph()
 {
 	NodeType = UGenericGraphNode::StaticClass();
+
+	EdGraph = nullptr;
 }
 
 UGenericGraph::~UGenericGraph()

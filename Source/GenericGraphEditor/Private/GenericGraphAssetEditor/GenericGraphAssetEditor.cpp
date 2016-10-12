@@ -148,6 +148,7 @@ FString FGenericGraphAssetEditor::GetDocumentationLink() const
 void FGenericGraphAssetEditor::AddReferencedObjects(FReferenceCollector& Collector)
 {
 	Collector.AddReferencedObject(EditingGraph);
+	Collector.AddReferencedObject(EditingEdGraph);
 }
 
 TSharedRef<SDockTab> FGenericGraphAssetEditor::SpawnTab_Viewport(const FSpawnTabArgs& Args)
@@ -221,12 +222,21 @@ void FGenericGraphAssetEditor::BindCommands()
 
 void FGenericGraphAssetEditor::CreateEdGraph()
 {
-	EditingEdGraph = CastChecked<UEdGraph>(FBlueprintEditorUtils::CreateNewGraph(EditingGraph, NAME_None, UEdGraph::StaticClass(), UGenericGraphAssetGraphSchema::StaticClass()));
-	EditingEdGraph->bAllowDeletion = false;
+	if (EditingGraph->EdGraph == nullptr)
+	{
+		EditingEdGraph = CastChecked<UEdGraph>(FBlueprintEditorUtils::CreateNewGraph(EditingGraph, NAME_None, UEdGraph::StaticClass(), UGenericGraphAssetGraphSchema::StaticClass()));
+		EditingEdGraph->bAllowDeletion = false;
 
-	// Give the schema a chance to fill out any required nodes (like the results node)
-	const UEdGraphSchema* Schema = EditingEdGraph->GetSchema();
-	Schema->CreateDefaultNodesForGraph(*EditingEdGraph);
+		// Give the schema a chance to fill out any required nodes (like the results node)
+		const UEdGraphSchema* Schema = EditingEdGraph->GetSchema();
+		Schema->CreateDefaultNodesForGraph(*EditingEdGraph);
+
+		EditingGraph->EdGraph = EditingEdGraph;
+	}
+	else
+	{
+		EditingEdGraph = EditingGraph->EdGraph;
+	}
 }
 
 void FGenericGraphAssetEditor::OnSelectedNodesChanged(const TSet<class UObject*>& NewSelection)
