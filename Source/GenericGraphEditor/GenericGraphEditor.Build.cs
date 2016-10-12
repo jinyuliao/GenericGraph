@@ -33,7 +33,13 @@ namespace UnrealBuildTool.Rules
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
-                    "GenericGraphRuntime"
+                    "GenericGraphRuntime",
+                    "AssetTools",
+                    "PropertyEditor",
+                    "Slate",
+                    "SlateCore",
+                    "GraphEditor",
+                    "EditorStyle"
 					// ... add private dependencies that you statically link with here ...
 				}
 				);
@@ -42,7 +48,7 @@ namespace UnrealBuildTool.Rules
 				new string[]
 				{
 					// ... add any modules that your module loads dynamically here ...
-				}
+                }
 				);
 		}
 	}

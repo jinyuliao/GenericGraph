@@ -3,6 +3,7 @@
 #include "GenericGraphNode.h"
 #include "GenericGraph.generated.h"
 
+// test comment
 UCLASS(Blueprintable)
 class GENERICGRAPHRUNTIME_API UGenericGraph : public UObject
 {
