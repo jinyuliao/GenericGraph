@@ -2,6 +2,8 @@
 
 #include "GenericGraphNode.generated.h"
 
+class UGenericGraph;
+
 UCLASS(Blueprintable)
 class GENERICGRAPHRUNTIME_API UGenericGraphNode : public UObject
 {
@@ -10,4 +12,6 @@ class GENERICGRAPHRUNTIME_API UGenericGraphNode : public UObject
 public:
 	UGenericGraphNode();
 	virtual ~UGenericGraphNode();
+
+	UGenericGraph* GetGraph();
 };

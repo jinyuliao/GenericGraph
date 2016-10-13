@@ -14,8 +14,8 @@ namespace UnrealBuildTool.Rules
 
 			PrivateIncludePaths.AddRange(
 				new string[] {
-					"GenericGraphEditor/Private",
-					// ... add other private include paths required here ...
+                    // ... add other private include paths required here ...
+                    "GenericGraphEditor/Private",
 				}
 				);
 
@@ -35,11 +35,13 @@ namespace UnrealBuildTool.Rules
 				{
                     "GenericGraphRuntime",
                     "AssetTools",
-                    "PropertyEditor",
                     "Slate",
                     "SlateCore",
                     "GraphEditor",
-                    "EditorStyle"
+                    "PropertyEditor",
+                    "EditorStyle",
+                    "Kismet",
+                    "KismetWidgets",
 					// ... add private dependencies that you statically link with here ...
 				}
 				);

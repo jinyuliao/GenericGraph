@@ -2,10 +2,26 @@
 
 #include "GenericGraphEditorPrivatePCH.h"
 #include "GenericGraphAssetTypeActions.h"
+#include "GenericGraphAssetEditor/GenericGraphEdNode.h"
+#include "GenericGraphAssetEditor/SGenericGraphEdNode.h"
 
 DEFINE_LOG_CATEGORY(GenericGraphEditor)
 
 #define LOCTEXT_NAMESPACE "GenericGraphEditor"
+
+class FGraphPanelNodeFactory_GenericGraph : public FGraphPanelNodeFactory
+{
+	virtual TSharedPtr<class SGraphNode> CreateNode(UEdGraphNode* Node) const override
+	{
+		if (UGenericGraphEdNode* GraphEdNode = Cast<UGenericGraphEdNode>(Node))
+		{
+			return SNew(SGenericGraphEdNode, GraphEdNode);
+		}
+		return nullptr;
+	}
+};
+
+TSharedPtr<FGraphPanelNodeFactory> GraphPanelNodeFactory_GenericGraph;
 
 class FGenericGraphEditor : public IGenericGraphEditor
 {
@@ -26,6 +42,9 @@ IMPLEMENT_MODULE( FGenericGraphEditor, UGenericGraphEditor )
 
 void FGenericGraphEditor::StartupModule()
 {
+	GraphPanelNodeFactory_GenericGraph = MakeShareable(new FGraphPanelNodeFactory_GenericGraph());
+	FEdGraphUtilities::RegisterVisualNodeFactory(GraphPanelNodeFactory_GenericGraph);
+
 	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
 
 	GenericGraphAssetCategoryBit = AssetTools.RegisterAdvancedAssetCategory(FName(TEXT("GenericGraph")), LOCTEXT("GenericGraphAssetCategory", "GenericGraph"));
@@ -44,6 +63,12 @@ void FGenericGraphEditor::ShutdownModule()
 		{
 			AssetTools.UnregisterAssetTypeActions(CreatedAssetTypeActions[Index].ToSharedRef());
 		}
+	}
+
+	if (GraphPanelNodeFactory_GenericGraph.IsValid())
+	{
+		FEdGraphUtilities::UnregisterVisualNodeFactory(GraphPanelNodeFactory_GenericGraph);
+		GraphPanelNodeFactory_GenericGraph.Reset();
 	}
 }
 

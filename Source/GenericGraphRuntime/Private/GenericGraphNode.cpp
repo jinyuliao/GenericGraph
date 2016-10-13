@@ -13,4 +13,9 @@ UGenericGraphNode::~UGenericGraphNode()
 
 }
 
+UGenericGraph* UGenericGraphNode::GetGraph()
+{
+	return Cast<UGenericGraph>(GetOuter());
+}
+
 #undef LOCTEXT_NAMESPACE

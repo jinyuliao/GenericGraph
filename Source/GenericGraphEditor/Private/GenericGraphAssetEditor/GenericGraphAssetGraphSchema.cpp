@@ -6,8 +6,6 @@
 
 UEdGraphNode* FGenericGraphAssetSchemaAction_NewNode::PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode /*= true*/)
 {
-	check(NodeData);
-
 	UGenericGraph* Graph = CastChecked<UGenericGraph>(ParentGraph->GetOuter());
 
 	const FScopedTransaction Transaction(LOCTEXT("GenericGraphEditorNewNode", "Generic Graph Editor: New Node"));
@@ -55,17 +53,36 @@ void UGenericGraphAssetGraphSchema::GetGraphContextActions(FGraphContextMenuBuil
 	TSharedPtr<FGenericGraphAssetSchemaAction_NewNode> NewNodeAction(new FGenericGraphAssetSchemaAction_NewNode(LOCTEXT("GenericGraphNodeAction", "Generic Graph Node"), Desc, AddToolTip.ToString(), 0));
 
 	UGenericGraph* Graph = Cast<UGenericGraph>(GetOuter());
-	if (Graph != nullptr)
-	{
-		NewNodeAction->NodeData = Graph->NodeType;
-	}
-	else
-	{
-		NewNodeAction->NodeData = UObject::StaticClass();
-		LOG_WARNING(TEXT("UGenericGraphAssetGraphSchema::GetGraphContextActions outer is null"));
-	}
+
+	check(Graph != nullptr);
 
 	ContextMenuBuilder.AddAction(NewNodeAction);
+}
+
+void UGenericGraphAssetGraphSchema::GetContextMenuActions(const UEdGraph* CurrentGraph, const UEdGraphNode* InGraphNode, const UEdGraphPin* InGraphPin, class FMenuBuilder* MenuBuilder, bool bIsDebugging) const
+{
+	if (InGraphPin)
+	{
+		MenuBuilder->BeginSection("GenericGraphAssetGraphSchemaNodeActions", LOCTEXT("PinActionsMenuHeader", "Pin Actions"));
+		{
+			// Only display the 'Break Link' option if there is a link to break!
+			if (InGraphPin->LinkedTo.Num() > 0)
+			{
+				MenuBuilder->AddMenuEntry(FGraphEditorCommands::Get().BreakPinLinks);
+			}
+		}
+		MenuBuilder->EndSection();
+	}
+	else if(InGraphNode != nullptr)
+	{
+		MenuBuilder->BeginSection("GenericGraphAssetGraphSchemaNodeActions", LOCTEXT("NodeActionsMenuHeader", "Node Actions"));
+		{
+			MenuBuilder->AddMenuEntry(FGraphEditorCommands::Get().BreakNodeLinks);
+		}
+		MenuBuilder->EndSection();
+	}
+
+	Super::GetContextMenuActions(CurrentGraph, InGraphNode, InGraphPin, MenuBuilder, bIsDebugging);
 }
 
 #undef LOCTEXT_NAMESPACE

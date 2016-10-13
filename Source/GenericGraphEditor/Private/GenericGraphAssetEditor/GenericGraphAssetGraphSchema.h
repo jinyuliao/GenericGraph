@@ -8,27 +8,15 @@ struct FGenericGraphAssetSchemaAction_NewNode : public FEdGraphSchemaAction
 {
 	GENERATED_USTRUCT_BODY();
 
-	/** Class of node we want to create */
-	UPROPERTY()
-	class UClass* NodeData;
-
 	FGenericGraphAssetSchemaAction_NewNode()
 		: FEdGraphSchemaAction()
-		, NodeData(NULL)
 	{}
 
 	FGenericGraphAssetSchemaAction_NewNode(const FText& InNodeCategory, const FText& InMenuDesc, const FString& InToolTip, const int32 InGrouping)
 		: FEdGraphSchemaAction(InNodeCategory, InMenuDesc, InToolTip, InGrouping) 
-		, NodeData(NULL)
 	{}
 
-	//~ Begin FEdGraphSchemaAction Interface
 	virtual UEdGraphNode* PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode = true) override;
-	//~ End FEdGraphSchemaAction Interface
-
-private:
-	/** Connects new node to output of selected nodes */
-	void ConnectToSelectedNodes(USoundNode* NewNodeclass, UEdGraph* ParentGraph) const;
 };
 // 
 // /** Action to add nodes to the graph based on selected objects*/
@@ -101,7 +89,7 @@ class UGenericGraphAssetGraphSchema : public UEdGraphSchema
 
 	//~ Begin EdGraphSchema Interface
  	virtual void GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const override;
-// 	virtual void GetContextMenuActions(const UEdGraph* CurrentGraph, const UEdGraphNode* InGraphNode, const UEdGraphPin* InGraphPin, class FMenuBuilder* MenuBuilder, bool bIsDebugging) const override;
+ 	virtual void GetContextMenuActions(const UEdGraph* CurrentGraph, const UEdGraphNode* InGraphNode, const UEdGraphPin* InGraphPin, class FMenuBuilder* MenuBuilder, bool bIsDebugging) const override;
 // 	virtual void CreateDefaultNodesForGraph(UEdGraph& Graph) const override;
 // 	virtual const FPinConnectionResponse CanCreateConnection(const UEdGraphPin* A, const UEdGraphPin* B) const override;
 // 	virtual bool TryCreateConnection(UEdGraphPin* A, UEdGraphPin* B) const override;

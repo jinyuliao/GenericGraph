@@ -9,6 +9,16 @@
 #include "GraphEditor.h"
 #include "GraphEditorActions.h"
 #include "EdGraph/EdGraphNode.h"
+#include "EdGraphUtilities.h"
+#include "GraphEditorSettings.h"
+
+#include "Editor/UnrealEd/Public/Kismet2/BlueprintEditorUtils.h"
+
+#include "SGraphNode.h"
+#include "SGraphPin.h"
+#include "SInlineEditableTextBlock.h"
+#include "SCommentBubble.h"
+#include "SLevelOfDetailBranchNode.h"
 
 #include "SDockTab.h"
 #include "SNodePanel.h"
