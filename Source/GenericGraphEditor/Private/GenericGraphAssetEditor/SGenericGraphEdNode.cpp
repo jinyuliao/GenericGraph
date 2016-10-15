@@ -2,6 +2,53 @@
 #include "SGenericGraphEdNode.h"
 #include "GenericGraphColors.h"
 
+//////////////////////////////////////////////////////////////////////////
+class SGenericGraphPin : public SGraphPin
+{
+public:
+	SLATE_BEGIN_ARGS(SGenericGraphPin) {}
+	SLATE_END_ARGS()
+
+	void Construct(const FArguments& InArgs, UEdGraphPin* InPin)
+	{
+		this->SetCursor(EMouseCursor::Default);
+
+		bShowLabel = true;
+
+		GraphPinObj = InPin;
+		check(GraphPinObj != nullptr);
+
+		const UEdGraphSchema* Schema = GraphPinObj->GetSchema();
+		check(Schema);
+
+		SBorder::Construct(SBorder::FArguments()
+			.BorderImage(this, &SGenericGraphPin::GetPinBorder)
+			.BorderBackgroundColor(this, &SGenericGraphPin::GetPinColor)
+			.OnMouseButtonDown(this, &SGenericGraphPin::OnPinMouseDown)
+			.Cursor(this, &SGenericGraphPin::GetPinCursor)
+			.Padding(FMargin(10.0f))
+		);
+	}
+
+protected:
+	virtual FSlateColor GetPinColor() const override
+	{
+		return GenericGraphColors::Pin::Default;
+	}
+
+	virtual TSharedRef<SWidget>	GetDefaultValueWidget() override
+	{
+		return SNew(STextBlock);
+	}
+
+	const FSlateBrush* GetPinBorder() const
+	{
+		return FEditorStyle::GetBrush(TEXT("Graph.StateNode.Body"));
+	}
+};
+
+
+//////////////////////////////////////////////////////////////////////////
 void SGenericGraphEdNode::Construct(const FArguments& InArgs, UGenericGraphEdNode* InNode)
 {
 	GraphNode = InNode;
@@ -11,7 +58,15 @@ void SGenericGraphEdNode::Construct(const FArguments& InArgs, UGenericGraphEdNod
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 void SGenericGraphEdNode::UpdateGraphNode()
 {
-	const FMargin NodePadding = FMargin(8.0f);
+	const FMargin NodePadding = FMargin(2.0f);
+
+	InputPins.Empty();
+	OutputPins.Empty();
+
+	// Reset variables that are going to be exposed, in case we are refreshing an already setup node.
+	RightNodeBox.Reset();
+	LeftNodeBox.Reset();
+	OutputPinBox.Reset();
 
 	TSharedPtr<SErrorText> ErrorText;
 	TSharedPtr<STextBlock> DescriptionText;
@@ -110,13 +165,13 @@ void SGenericGraphEdNode::UpdateGraphNode()
 											.HighDetail()
 											[
 												SNew(SHorizontalBox)
-												+ SHorizontalBox::Slot()
-												.AutoWidth()
-												.VAlign(VAlign_Center)
-												[
-													SNew(SImage)
-													.Image(this, &SGenericGraphEdNode::GetNameIcon)
-												]
+// 												+ SHorizontalBox::Slot()
+// 												.AutoWidth()
+// 												.VAlign(VAlign_Center)
+// 												[
+// 													SNew(SImage)
+// 													.Image(this, &SGenericGraphEdNode::GetNameIcon)
+// 												]
 												+ SHorizontalBox::Slot()
 												.Padding(FMargin(4.0f, 0.0f, 4.0f, 0.0f))
 												[
@@ -173,31 +228,6 @@ void SGenericGraphEdNode::UpdateGraphNode()
 						]
 					]
 				]
-
-				// Drag marker overlay
-				+ SOverlay::Slot()
-				.HAlign(HAlign_Fill)
-				.VAlign(VAlign_Top)
-				[
-					SNew(SBorder)
-					.BorderBackgroundColor(GenericGraphColors::Action::DragMarker)
-					.ColorAndOpacity(GenericGraphColors::Action::DragMarker)
-					.BorderImage(FEditorStyle::GetBrush("BTEditor.Graph.BTNode.Body"))
-					.Visibility(this, &SGenericGraphEdNode::GetDragOverMarkerVisibility)
-					[
-						SNew(SBox)
-						.HeightOverride(4)
-					]
-				]
-
-				// Blueprint indicator overlay
-// 				+ SOverlay::Slot()
-// 				.HAlign(HAlign_Left)
-// 				.VAlign(VAlign_Top)
-// 				[
-// 					SNew(SImage)
-// 					.Image(FEditorStyle::GetBrush(TEXT("BTEditor.Graph.BTNode.Blueprint")))
-// 				]
 			]
 		];
 
@@ -229,6 +259,59 @@ void SGenericGraphEdNode::UpdateGraphNode()
 	ErrorReporting->SetError(ErrorMsg);
 	CreatePinWidgets();
 }
+
+void SGenericGraphEdNode::CreatePinWidgets()
+{
+	UGenericGraphEdNode* StateNode = CastChecked<UGenericGraphEdNode>(GraphNode);
+
+	for (int32 PinIdx = 0; PinIdx < StateNode->Pins.Num(); PinIdx++)
+	{
+		UEdGraphPin* MyPin = StateNode->Pins[PinIdx];
+		if (!MyPin->bHidden)
+		{
+			TSharedPtr<SGraphPin> NewPin = SNew(SGenericGraphPin, MyPin);
+
+			AddPin(NewPin.ToSharedRef());
+		}
+	}
+}
+
+void SGenericGraphEdNode::AddPin(const TSharedRef<SGraphPin>& PinToAdd)
+{
+	PinToAdd->SetOwner(SharedThis(this));
+
+	const UEdGraphPin* PinObj = PinToAdd->GetPinObj();
+	const bool bAdvancedParameter = PinObj && PinObj->bAdvancedView;
+	if (bAdvancedParameter)
+	{
+		PinToAdd->SetVisibility( TAttribute<EVisibility>(PinToAdd, &SGraphPin::IsPinVisibleAsAdvanced) );
+	}
+
+	if (PinToAdd->GetDirection() == EEdGraphPinDirection::EGPD_Input)
+	{
+		LeftNodeBox->AddSlot()
+			.HAlign(HAlign_Fill)
+			.VAlign(VAlign_Fill)
+			.FillHeight(1.0f)
+			.Padding(20.0f,0.0f)
+			[
+				PinToAdd
+			];
+		InputPins.Add(PinToAdd);
+	}
+	else // Direction == EEdGraphPinDirection::EGPD_Output
+	{
+		OutputPinBox->AddSlot()
+			.HAlign(HAlign_Fill)
+			.VAlign(VAlign_Fill)
+			.FillWidth(1.0f)
+			[
+				PinToAdd
+			];
+		OutputPins.Add(PinToAdd);
+	}
+}
+
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
 FSlateColor SGenericGraphEdNode::GetBorderBackgroundColor() const

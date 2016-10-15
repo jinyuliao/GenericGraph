@@ -41,27 +41,42 @@ private:
 
 	void CreateEdGraph();
 
+	void CreateCommandList();
+
+	TSharedPtr<SGraphEditor> GetCurrGraphEditor();
+
+	FGraphPanelSelectionSet GetSelectedNodes();
+
+	// Delegates for graph editor commands
+	void SelectAllNodes();
+	bool CanSelectAllNodes();
+	void DeleteSelectedNodes();
+	bool CanDeleteNodes();
+	void DeleteSelectedDuplicatableNodes();
+	void CutSelectedNodes();
+	bool CanCutNodes();
+	void CopySelectedNodes();
+	bool CanCopyNodes();
+	void PasteNodes();
+	void PasteNodesHere(const FVector2D& Location);
+	bool CanPasteNodes();
+	void DuplicateNodes();
+	bool CanDuplicateNodes();
+
 	//////////////////////////////////////////////////////////////////////////
 	// graph editor event
 	void OnSelectedNodesChanged(const TSet<class UObject*>& NewSelection);
 
 	void OnNodeDoubleClicked(UEdGraphNode* Node);
 
-	/**
-	* Called when a node's title is committed for a rename
-	*
-	* @param	NewText				New title text
-	* @param	CommitInfo			How text was committed
-	* @param	NodeBeingChanged	The node being changed
-	*/
-	void OnNodeTitleCommitted(const FText& NewText, ETextCommit::Type CommitInfo, UEdGraphNode* NodeBeingChanged);
-
 private:
 	UGenericGraph* EditingGraph;
-	UEdGraph* EditingEdGraph;
 
 	TSharedPtr<SGraphEditor> ViewportWidget;
 	TSharedPtr<class IDetailsView> PropertyWidget;
+
+	/** The command list for this editor */
+	TSharedPtr<FUICommandList> GraphEditorCommands;
 };
 
 

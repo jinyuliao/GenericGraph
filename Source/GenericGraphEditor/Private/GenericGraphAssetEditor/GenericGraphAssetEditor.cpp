@@ -23,7 +23,6 @@ const FName FGenericGraphAssetEditorTabs::ViewportID(TEXT("Viewport"));
 FGenericGraphAssetEditor::FGenericGraphAssetEditor()
 {
 	EditingGraph = nullptr;
-	EditingEdGraph = nullptr;
 }
 
 FGenericGraphAssetEditor::~FGenericGraphAssetEditor()
@@ -36,6 +35,7 @@ void FGenericGraphAssetEditor::InitGenericGraphAssetEditor(const EToolkitMode::T
 	EditingGraph = Graph;
 	CreateEdGraph();
 
+	FGenericCommands::Register();
 	FGraphEditorCommands::Register();
 
 	BindCommands();
@@ -148,7 +148,7 @@ FString FGenericGraphAssetEditor::GetDocumentationLink() const
 void FGenericGraphAssetEditor::AddReferencedObjects(FReferenceCollector& Collector)
 {
 	Collector.AddReferencedObject(EditingGraph);
-	Collector.AddReferencedObject(EditingEdGraph);
+	Collector.AddReferencedObject(EditingGraph->EdGraph);
 }
 
 TSharedRef<SDockTab> FGenericGraphAssetEditor::SpawnTab_Viewport(const FSpawnTabArgs& Args)
@@ -196,15 +196,17 @@ TSharedRef<SGraphEditor> FGenericGraphAssetEditor::CreateViewportWidget()
 	FGraphAppearanceInfo AppearanceInfo;
 	AppearanceInfo.CornerText = LOCTEXT("AppearanceCornerText_GenericGraph", "Generic Graph");
 
+	CreateCommandList();
+
 	SGraphEditor::FGraphEditorEvents InEvents;
 	InEvents.OnSelectionChanged = SGraphEditor::FOnSelectionChanged::CreateSP(this, &FGenericGraphAssetEditor::OnSelectedNodesChanged);
-	InEvents.OnTextCommitted = FOnNodeTextCommitted::CreateSP(this, &FGenericGraphAssetEditor::OnNodeTitleCommitted);
 	InEvents.OnNodeDoubleClicked = FSingleNodeEvent::CreateSP(this, &FGenericGraphAssetEditor::OnNodeDoubleClicked);
 
 	return SNew(SGraphEditor)
+		.AdditionalCommands(GraphEditorCommands)
 		.IsEditable(true)
 		.Appearance(AppearanceInfo)
-		.GraphToEdit(EditingEdGraph)
+		.GraphToEdit(EditingGraph->EdGraph)
 		.GraphEvents(InEvents)
 		.AutoExpandActionMenu(true)
 		.ShowGraphStateOverlay(false);
@@ -224,19 +226,249 @@ void FGenericGraphAssetEditor::CreateEdGraph()
 {
 	if (EditingGraph->EdGraph == nullptr)
 	{
-		EditingEdGraph = CastChecked<UEdGraph>(FBlueprintEditorUtils::CreateNewGraph(EditingGraph, NAME_None, UEdGraph::StaticClass(), UGenericGraphAssetGraphSchema::StaticClass()));
-		EditingEdGraph->bAllowDeletion = false;
+		EditingGraph->EdGraph = CastChecked<UEdGraph>(FBlueprintEditorUtils::CreateNewGraph(EditingGraph, NAME_None, UEdGraph::StaticClass(), UGenericGraphAssetGraphSchema::StaticClass()));
+		EditingGraph->EdGraph->bAllowDeletion = false;
 
 		// Give the schema a chance to fill out any required nodes (like the results node)
-		const UEdGraphSchema* Schema = EditingEdGraph->GetSchema();
-		Schema->CreateDefaultNodesForGraph(*EditingEdGraph);
+		const UEdGraphSchema* Schema = EditingGraph->EdGraph->GetSchema();
+		Schema->CreateDefaultNodesForGraph(*EditingGraph->EdGraph);
+	}
+}
 
-		EditingGraph->EdGraph = EditingEdGraph;
-	}
-	else
+void FGenericGraphAssetEditor::CreateCommandList()
+{
+	if (GraphEditorCommands.IsValid())
 	{
-		EditingEdGraph = EditingGraph->EdGraph;
+		return;
 	}
+
+	GraphEditorCommands = MakeShareable(new FUICommandList);
+
+	// Can't use CreateSP here because derived editor are already implementing TSharedFromThis<FAssetEditorToolkit>
+	// however it should be safe, since commands are being used only within this editor
+	// if it ever crashes, this function will have to go away and be reimplemented in each derived class
+
+	GraphEditorCommands->MapAction(FGenericCommands::Get().SelectAll,
+		FExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::SelectAllNodes),
+		FCanExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CanSelectAllNodes)
+	);
+
+	GraphEditorCommands->MapAction(FGenericCommands::Get().Delete,
+		FExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::DeleteSelectedNodes),
+		FCanExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CanDeleteNodes)
+	);
+
+	GraphEditorCommands->MapAction(FGenericCommands::Get().Copy,
+		FExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CopySelectedNodes),
+		FCanExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CanCopyNodes)
+	);
+
+	GraphEditorCommands->MapAction(FGenericCommands::Get().Cut,
+		FExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CutSelectedNodes),
+		FCanExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CanCutNodes)
+	);
+
+	GraphEditorCommands->MapAction(FGenericCommands::Get().Paste,
+		FExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::PasteNodes),
+		FCanExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CanPasteNodes)
+	);
+
+	GraphEditorCommands->MapAction(FGenericCommands::Get().Duplicate,
+		FExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::DuplicateNodes),
+		FCanExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CanDuplicateNodes)
+	);
+}
+
+TSharedPtr<SGraphEditor> FGenericGraphAssetEditor::GetCurrGraphEditor()
+{
+	return ViewportWidget;
+}
+
+FGraphPanelSelectionSet FGenericGraphAssetEditor::GetSelectedNodes()
+{
+	FGraphPanelSelectionSet CurrentSelection;
+	TSharedPtr<SGraphEditor> FocusedGraphEd = GetCurrGraphEditor();
+	if (FocusedGraphEd.IsValid())
+	{
+		CurrentSelection = FocusedGraphEd->GetSelectedNodes();
+	}
+
+	return CurrentSelection;
+}
+
+void FGenericGraphAssetEditor::SelectAllNodes()
+{
+	TSharedPtr<SGraphEditor> CurrentGraphEditor = GetCurrGraphEditor();
+	if (CurrentGraphEditor.IsValid())
+	{
+		CurrentGraphEditor->SelectAllNodes();
+	}
+}
+
+bool FGenericGraphAssetEditor::CanSelectAllNodes()
+{
+	return true;
+}
+
+void FGenericGraphAssetEditor::DeleteSelectedNodes()
+{
+	TSharedPtr<SGraphEditor> CurrentGraphEditor = GetCurrGraphEditor();
+	if (!CurrentGraphEditor.IsValid())
+	{
+		return;
+	}
+
+	const FScopedTransaction Transaction(FGenericCommands::Get().Delete->GetDescription());
+	CurrentGraphEditor->GetCurrentGraph()->Modify();
+
+	const FGraphPanelSelectionSet SelectedNodes = CurrentGraphEditor->GetSelectedNodes();
+	CurrentGraphEditor->ClearSelectionSet();
+
+	for (FGraphPanelSelectionSet::TConstIterator NodeIt(SelectedNodes); NodeIt; ++NodeIt)
+	{
+		if (UEdGraphNode* Node = Cast<UEdGraphNode>(*NodeIt))
+		{
+			if (Node->CanUserDeleteNode())
+			{
+				Node->Modify();
+				Node->DestroyNode();
+			}
+		}
+	}
+
+	LOG_WARNING(TEXT("FGenericGraphAssetEditor::DeleteSelectedNodes Exec"));
+}
+
+bool FGenericGraphAssetEditor::CanDeleteNodes()
+{
+	// If any of the nodes can be deleted then we should allow deleting
+	const FGraphPanelSelectionSet SelectedNodes = GetSelectedNodes();
+	for (FGraphPanelSelectionSet::TConstIterator SelectedIter(SelectedNodes); SelectedIter; ++SelectedIter)
+	{
+		UEdGraphNode* Node = Cast<UEdGraphNode>(*SelectedIter);
+		if (Node != nullptr && Node->CanUserDeleteNode())
+		{
+			return true;
+		}
+	}
+
+	LOG_WARNING(TEXT("FGenericGraphAssetEditor::CanDeleteNodes Can't delete"));
+
+	return false;
+}
+
+void FGenericGraphAssetEditor::DeleteSelectedDuplicatableNodes()
+{
+	TSharedPtr<SGraphEditor> CurrentGraphEditor = GetCurrGraphEditor();
+	if (!CurrentGraphEditor.IsValid())
+	{
+		return;
+	}
+
+	const FGraphPanelSelectionSet OldSelectedNodes = CurrentGraphEditor->GetSelectedNodes();
+	CurrentGraphEditor->ClearSelectionSet();
+
+	for (FGraphPanelSelectionSet::TConstIterator SelectedIter(OldSelectedNodes); SelectedIter; ++SelectedIter)
+	{
+		UEdGraphNode* Node = Cast<UEdGraphNode>(*SelectedIter);
+		if (Node && Node->CanDuplicateNode())
+		{
+			CurrentGraphEditor->SetNodeSelection(Node, true);
+		}
+	}
+
+	// Delete the duplicatable nodes
+	DeleteSelectedNodes();
+
+	CurrentGraphEditor->ClearSelectionSet();
+
+	for (FGraphPanelSelectionSet::TConstIterator SelectedIter(OldSelectedNodes); SelectedIter; ++SelectedIter)
+	{
+		if (UEdGraphNode* Node = Cast<UEdGraphNode>(*SelectedIter))
+		{
+			CurrentGraphEditor->SetNodeSelection(Node, true);
+		}
+	}
+}
+
+void FGenericGraphAssetEditor::CutSelectedNodes()
+{
+	CopySelectedNodes();
+	DeleteSelectedDuplicatableNodes();
+}
+
+bool FGenericGraphAssetEditor::CanCutNodes()
+{
+	return CanCopyNodes() && CanDeleteNodes();
+}
+
+void FGenericGraphAssetEditor::CopySelectedNodes()
+{
+	// Export the selected nodes and place the text on the clipboard
+	FGraphPanelSelectionSet SelectedNodes = GetSelectedNodes();
+
+	FString ExportedText;
+
+	for (FGraphPanelSelectionSet::TIterator SelectedIter(SelectedNodes); SelectedIter; ++SelectedIter)
+	{
+		UEdGraphNode* Node = Cast<UEdGraphNode>(*SelectedIter);
+		if (Node == nullptr)
+		{
+			SelectedIter.RemoveCurrent();
+			continue;
+		}
+
+		Node->PrepareForCopying();
+	}
+
+	FEdGraphUtilities::ExportNodesToText(SelectedNodes, ExportedText);
+	FPlatformMisc::ClipboardCopy(*ExportedText);
+}
+
+bool FGenericGraphAssetEditor::CanCopyNodes()
+{
+	// If any of the nodes can be duplicated then we should allow copying
+	const FGraphPanelSelectionSet SelectedNodes = GetSelectedNodes();
+	for (FGraphPanelSelectionSet::TConstIterator SelectedIter(SelectedNodes); SelectedIter; ++SelectedIter)
+	{
+		UEdGraphNode* Node = Cast<UEdGraphNode>(*SelectedIter);
+		if (Node && Node->CanDuplicateNode())
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void FGenericGraphAssetEditor::PasteNodes()
+{
+	TSharedPtr<SGraphEditor> CurrentGraphEditor = GetCurrGraphEditor();
+	if (CurrentGraphEditor.IsValid())
+	{
+		PasteNodesHere(CurrentGraphEditor->GetPasteLocation());
+	}
+}
+
+void FGenericGraphAssetEditor::PasteNodesHere(const FVector2D& Location)
+{
+}
+
+bool FGenericGraphAssetEditor::CanPasteNodes()
+{
+	return false;
+}
+
+void FGenericGraphAssetEditor::DuplicateNodes()
+{
+	CopySelectedNodes();
+	PasteNodes();
+}
+
+bool FGenericGraphAssetEditor::CanDuplicateNodes()
+{
+	//return CanCopyNodes();
+	return false;
 }
 
 void FGenericGraphAssetEditor::OnSelectedNodesChanged(const TSet<class UObject*>& NewSelection)
@@ -245,11 +477,6 @@ void FGenericGraphAssetEditor::OnSelectedNodesChanged(const TSet<class UObject*>
 }
 
 void FGenericGraphAssetEditor::OnNodeDoubleClicked(UEdGraphNode* Node)
-{
-
-}
-
-void FGenericGraphAssetEditor::OnNodeTitleCommitted(const FText& NewText, ETextCommit::Type CommitInfo, UEdGraphNode* NodeBeingChanged)
 {
 
 }

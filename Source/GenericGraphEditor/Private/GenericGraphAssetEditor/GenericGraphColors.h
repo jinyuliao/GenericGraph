@@ -4,7 +4,7 @@ namespace GenericGraphColors
 {
 	namespace NodeBody
 	{
-		const FLinearColor Default(0.15f, 0.15f, 0.15f);
+		const FLinearColor Default(0.1f, 0.1f, 0.1f);
 		const FLinearColor Root(0.5f, 0.5f, 0.5f, 0.1f);
 		const FLinearColor Error(1.0f, 0.0f, 0.0f);
 	}

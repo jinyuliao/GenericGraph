@@ -12,6 +12,8 @@
 #include "EdGraphUtilities.h"
 #include "GraphEditorSettings.h"
 
+#include "GenericCommands.h"
+
 #include "Editor/UnrealEd/Public/Kismet2/BlueprintEditorUtils.h"
 
 #include "SGraphNode.h"
