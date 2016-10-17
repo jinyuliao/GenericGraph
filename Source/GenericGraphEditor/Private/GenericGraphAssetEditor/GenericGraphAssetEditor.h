@@ -63,11 +63,16 @@ private:
 	void DuplicateNodes();
 	bool CanDuplicateNodes();
 
+	void GraphSettings();
+	bool CanGraphSettings() const;
+
 	//////////////////////////////////////////////////////////////////////////
 	// graph editor event
 	void OnSelectedNodesChanged(const TSet<class UObject*>& NewSelection);
 
 	void OnNodeDoubleClicked(UEdGraphNode* Node);
+
+	void OnFinishedChangingProperties(const FPropertyChangedEvent& PropertyChangedEvent);
 
 private:
 	UGenericGraph* EditingGraph;

@@ -5,7 +5,7 @@
 
 UGenericGraphNode::UGenericGraphNode()
 {
-
+	NodeType = AActor::StaticClass();
 }
 
 UGenericGraphNode::~UGenericGraphNode()

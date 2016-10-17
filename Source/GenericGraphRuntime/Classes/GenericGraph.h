@@ -3,7 +3,6 @@
 #include "GenericGraphNode.h"
 #include "GenericGraph.generated.h"
 
-// test comment
 UCLASS(Blueprintable)
 class GENERICGRAPHRUNTIME_API UGenericGraph : public UObject
 {
@@ -14,7 +13,7 @@ public:
 	virtual ~UGenericGraph();
 
 	UPROPERTY(EditAnywhere, Category = "GenericGraph")
-	TSubclassOf<UGenericGraphNode> NodeType;
+	TSubclassOf<UObject> NodeFilter;
 
 	UPROPERTY(EditAnywhere, Category = "GenericGraph")
 	FString Name;

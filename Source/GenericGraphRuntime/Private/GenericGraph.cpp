@@ -5,7 +5,7 @@
 
 UGenericGraph::UGenericGraph()
 {
-	NodeType = UGenericGraphNode::StaticClass();
+	NodeFilter = UObject::StaticClass();
 
 	EdGraph = nullptr;
 }

@@ -10,6 +10,19 @@ void UGenericGraphEdNode::AllocateDefaultPins()
 	CreatePin(EGPD_Output, UGenericGraphEditorTypes::PinCategory_MultipleNodes, TEXT(""), NULL, false, false, TEXT("Out"));
 }
 
+FText UGenericGraphEdNode::GetNodeTitle(ENodeTitleType::Type TitleType) const
+{
+	if (GenericGraphNode == nullptr)
+	{
+		return Super::GetNodeTitle(TitleType);
+	}
+	else
+	{
+		UClass* C = *GenericGraphNode->NodeType;
+		return FText::FromString(C->GetName());
+	}
+}
+
 void UGenericGraphEdNode::SetGenericGraphNode(UGenericGraphNode* InNode)
 {
 	GenericGraphNode = InNode;
@@ -19,12 +32,9 @@ FText UGenericGraphEdNode::GetDescription() const
 {
 	UGenericGraph* Graph = GenericGraphNode->GetGraph();
 
-	return FText::FromString(Graph->NodeType->GetClass()->GetDescription());
+	UClass* C = *GenericGraphNode->NodeType;
 
-// 	FString StoredClassName = Graph->NodeType->GetClass()->GetName();
-// 	StoredClassName.RemoveFromEnd(TEXT("_C"));
-// 
-// 	return FText::FromString(StoredClassName);
+	return FText::FromString(C->GetDescription());
 }
 
 #undef LOCTEXT_NAMESPACE

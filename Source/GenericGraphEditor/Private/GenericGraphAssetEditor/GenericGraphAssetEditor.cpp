@@ -1,6 +1,7 @@
 #include "GenericGraphEditorPrivatePCH.h"
 #include "GenericGraphAssetEditor.h"
 #include "GenericGraphAssetGraphSchema.h"
+#include "GenericGraphEditorCommands.h"
 
 #define LOCTEXT_NAMESPACE "GenericGraphAssetEditor"
 
@@ -37,6 +38,7 @@ void FGenericGraphAssetEditor::InitGenericGraphAssetEditor(const EToolkitMode::T
 
 	FGenericCommands::Register();
 	FGraphEditorCommands::Register();
+	FGenericGraphEditorCommands::Register();
 
 	BindCommands();
 
@@ -189,6 +191,9 @@ void FGenericGraphAssetEditor::CreateInternalWidgets()
 	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 	PropertyWidget = PropertyModule.CreateDetailView(Args);
 	PropertyWidget->SetObject(EditingGraph);
+
+	//PropertyWidget->SetIsPropertyEditingEnabledDelegate(FIsPropertyEditingEnabled::CreateSP(this, &FGenericGraphAssetEditor::IsPropertyEditable));
+	PropertyWidget->OnFinishedChangingProperties().AddSP(this, &FGenericGraphAssetEditor::OnFinishedChangingProperties);
 }
 
 TSharedRef<SGraphEditor> FGenericGraphAssetEditor::CreateViewportWidget()
@@ -214,7 +219,28 @@ TSharedRef<SGraphEditor> FGenericGraphAssetEditor::CreateViewportWidget()
 
 void FGenericGraphAssetEditor::ExtendToolbar()
 {
+	struct Local
+	{
+		static void FillToolbar(FToolBarBuilder& ToolbarBuilder)
+		{
+			ToolbarBuilder.BeginSection("Toolbar");
+			{
+				ToolbarBuilder.AddToolBarButton(FGenericGraphEditorCommands::Get().GraphSettings);
+			}
+			ToolbarBuilder.EndSection();
+		}
+	};
 
+	TSharedPtr<FExtender> ToolbarExtender = MakeShareable(new FExtender);
+
+	ToolbarExtender->AddToolBarExtension(
+		"Asset",
+		EExtensionHook::After,
+		GetToolkitCommands(),
+		FToolBarExtensionDelegate::CreateStatic(&Local::FillToolbar)
+	);
+
+	AddToolbarExtender(ToolbarExtender);
 }
 
 void FGenericGraphAssetEditor::BindCommands()
@@ -247,6 +273,10 @@ void FGenericGraphAssetEditor::CreateCommandList()
 	// Can't use CreateSP here because derived editor are already implementing TSharedFromThis<FAssetEditorToolkit>
 	// however it should be safe, since commands are being used only within this editor
 	// if it ever crashes, this function will have to go away and be reimplemented in each derived class
+
+	GraphEditorCommands->MapAction(FGenericGraphEditorCommands::Get().GraphSettings,
+		FExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::GraphSettings),
+		FCanExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CanGraphSettings));
 
 	GraphEditorCommands->MapAction(FGenericCommands::Get().SelectAll,
 		FExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::SelectAllNodes),
@@ -471,14 +501,48 @@ bool FGenericGraphAssetEditor::CanDuplicateNodes()
 	return false;
 }
 
+void FGenericGraphAssetEditor::GraphSettings()
+{
+	PropertyWidget->SetObject(EditingGraph);
+
+	LOG_WARNING(TEXT("FGenericGraphAssetEditor::GraphSettings"));
+}
+
+bool FGenericGraphAssetEditor::CanGraphSettings() const
+{
+	return true;
+}
+
 void FGenericGraphAssetEditor::OnSelectedNodesChanged(const TSet<class UObject*>& NewSelection)
 {
+	TArray<UObject*> Selection;
 
+	for (UObject* SelectionEntry : NewSelection)
+	{
+		Selection.Add(SelectionEntry);
+	}
+
+	if (Selection.Num() == 1)
+	{
+		PropertyWidget->SetObject(Selection[0]);
+	}
+	else
+	{
+		PropertyWidget->SetObject(nullptr);
+	}
 }
 
 void FGenericGraphAssetEditor::OnNodeDoubleClicked(UEdGraphNode* Node)
 {
+	
+}
 
+void FGenericGraphAssetEditor::OnFinishedChangingProperties(const FPropertyChangedEvent& PropertyChangedEvent)
+{
+	if (EditingGraph == nullptr)
+		return;
+
+	EditingGraph->EdGraph->GetSchema()->ForceVisualizationCacheClear();
 }
 
 #undef LOCTEXT_NAMESPACE

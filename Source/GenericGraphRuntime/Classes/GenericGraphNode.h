@@ -13,5 +13,8 @@ public:
 	UGenericGraphNode();
 	virtual ~UGenericGraphNode();
 
+	UPROPERTY(EditAnywhere, Category = "GenericGraphNode")
+	TSubclassOf<UObject> NodeType;
+
 	UGenericGraph* GetGraph();
 };

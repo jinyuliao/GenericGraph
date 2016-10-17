@@ -12,6 +12,7 @@ public:
 	UGenericGraphNode* GenericGraphNode;
 
 	virtual void AllocateDefaultPins() override;
+	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const;
 
 	void SetGenericGraphNode(UGenericGraphNode* InNode);
 

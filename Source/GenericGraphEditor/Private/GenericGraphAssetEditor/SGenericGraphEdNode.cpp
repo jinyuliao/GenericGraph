@@ -196,14 +196,14 @@ void SGenericGraphEdNode::UpdateGraphNode()
 											]
 										]
 									]
-									+ SVerticalBox::Slot()
-									.AutoHeight()
-									[
-										// DESCRIPTION MESSAGE
-										SAssignNew(DescriptionText, STextBlock)
-										.Visibility(this, &SGenericGraphEdNode::GetDescriptionVisibility)
-										.Text(this, &SGenericGraphEdNode::GetDescription)
-									]
+// 									+ SVerticalBox::Slot()
+// 									.AutoHeight()
+// 									[
+// 										// DESCRIPTION MESSAGE
+// 										SAssignNew(DescriptionText, STextBlock)
+// 										.Visibility(this, &SGenericGraphEdNode::GetDescriptionVisibility)
+// 										.Text(this, &SGenericGraphEdNode::GetDescription)
+// 									]
 								]
 							]
 						]
@@ -337,7 +337,8 @@ FText SGenericGraphEdNode::GetDescription() const
 
 EVisibility SGenericGraphEdNode::GetDescriptionVisibility() const
 {
-	return (GetCurrentLOD() > EGraphRenderingLOD::LowDetail) ? EVisibility::Visible : EVisibility::Collapsed;
+	//return (GetCurrentLOD() > EGraphRenderingLOD::LowDetail) ? EVisibility::Visible : EVisibility::Collapsed;
+	return EVisibility::Hidden;
 }
 
 const FSlateBrush* SGenericGraphEdNode::GetNameIcon() const

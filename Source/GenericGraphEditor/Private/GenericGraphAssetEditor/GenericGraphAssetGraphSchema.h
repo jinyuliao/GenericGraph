@@ -45,6 +45,12 @@ class UGenericGraphAssetGraphSchema : public UEdGraphSchema
 // 	virtual void DroppedAssetsOnNode(const TArray<FAssetData>& Assets, const FVector2D& GraphPosition, UEdGraphNode* Node) const override;
 // 	virtual int32 GetNodeSelectionCount(const UEdGraph* Graph) const override;
 // 	virtual TSharedPtr<FEdGraphSchemaAction> GetCreateCommentAction() const override;
+	virtual bool IsCacheVisualizationOutOfDate(int32 InVisualizationCacheID) const override;
+	virtual int32 GetCurrentVisualizationCacheID() const override;
+	virtual void ForceVisualizationCacheClear() const override;
 	//~ End EdGraphSchema Interface
+
+private:
+	static int32 CurrentCacheRefreshID;
 };
 

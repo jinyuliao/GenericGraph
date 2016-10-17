@@ -5,6 +5,8 @@
 
 #define LOCTEXT_NAMESPACE "GenericGraphAssetSchema"
 
+int32 UGenericGraphAssetGraphSchema::CurrentCacheRefreshID = 0;
+
 UEdGraphNode* FGenericGraphAssetSchemaAction_NewNode::PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode /*= true*/)
 {
 	UGenericGraph* Graph = CastChecked<UGenericGraph>(ParentGraph->GetOuter());
@@ -184,6 +186,21 @@ void UGenericGraphAssetGraphSchema::BreakSinglePinLink(UEdGraphPin* SourcePin, U
 	const FScopedTransaction Transaction(NSLOCTEXT("UnrealEd", "GraphEd_BreakSinglePinLink", "Break Pin Link"));
 
 	Super::BreakSinglePinLink(SourcePin, TargetPin);
+}
+
+bool UGenericGraphAssetGraphSchema::IsCacheVisualizationOutOfDate(int32 InVisualizationCacheID) const
+{
+	return CurrentCacheRefreshID != InVisualizationCacheID;
+}
+
+int32 UGenericGraphAssetGraphSchema::GetCurrentVisualizationCacheID() const
+{
+	return CurrentCacheRefreshID;
+}
+
+void UGenericGraphAssetGraphSchema::ForceVisualizationCacheClear() const
+{
+	++CurrentCacheRefreshID;
 }
 
 #undef LOCTEXT_NAMESPACE
