@@ -5,14 +5,28 @@
 
 UGenericGraph::UGenericGraph()
 {
-	NodeFilter = UObject::StaticClass();
-
+#if WITH_EDITORONLY_DATA
 	EdGraph = nullptr;
+#endif
 }
 
 UGenericGraph::~UGenericGraph()
 {
 
+}
+
+void UGenericGraph::ClearGraph()
+{
+	for (int i = 0; i < AllNodes; ++i)
+	{
+		UGenericGraphNode* Node = AllNodes[i];
+
+		Node->ParentNodes.Reset();
+		Node->ChildrenNodes.Reset();
+	}
+
+	AllNodes.Reset();
+	RootNodes.Reset();
 }
 
 #undef LOCTEXT_NAMESPACE

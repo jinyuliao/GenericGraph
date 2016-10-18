@@ -12,17 +12,23 @@ public:
 	UGenericGraph();
 	virtual ~UGenericGraph();
 
-	UPROPERTY(EditAnywhere, Category = "GenericGraph")
-	TSubclassOf<UObject> NodeFilter;
-
+	//////////////////////////////////////////////////////////////////////////
+	// uproperties
 	UPROPERTY(EditAnywhere, Category = "GenericGraph")
 	FString Name;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = "GenericGraph")
+	TArray<UGenericGraphNode*> RootNodes;
+
+	UPROPERTY(BlueprintReadOnly, Category = "GenericGraph")
 	TArray<UGenericGraphNode*> AllNodes;
 
 #if WITH_EDITORONLY_DATA
 	UPROPERTY()
 	class UEdGraph* EdGraph;
 #endif
+
+	//////////////////////////////////////////////////////////////////////////
+	// ufunctions
+	void ClearGraph();
 };

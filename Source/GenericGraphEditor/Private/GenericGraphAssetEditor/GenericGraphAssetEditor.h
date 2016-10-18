@@ -22,6 +22,7 @@ public:
 	virtual FLinearColor GetWorldCentricTabColorScale() const override;
 	virtual FString GetWorldCentricTabPrefix() const override;
 	virtual FString GetDocumentationLink() const override;
+	virtual void SaveAsset_Execute() override;
 	// End of FAssetEditorToolkit
 
 	// FSerializableObject interface
@@ -46,6 +47,8 @@ private:
 	TSharedPtr<SGraphEditor> GetCurrGraphEditor();
 
 	FGraphPanelSelectionSet GetSelectedNodes();
+
+	void RebuildGenericGraph();
 
 	// Delegates for graph editor commands
 	void SelectAllNodes();
@@ -74,8 +77,13 @@ private:
 
 	void OnFinishedChangingProperties(const FPropertyChangedEvent& PropertyChangedEvent);
 
+	void OnPackageSaved(const FString& PackageFileName, UObject* Outer);
+
 private:
 	UGenericGraph* EditingGraph;
+
+	/** Handle to the registered OnPackageSave delegate */
+	FDelegateHandle OnPackageSavedDelegateHandle;
 
 	TSharedPtr<SGraphEditor> ViewportWidget;
 	TSharedPtr<class IDetailsView> PropertyWidget;

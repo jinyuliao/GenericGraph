@@ -13,8 +13,20 @@ public:
 	UGenericGraphNode();
 	virtual ~UGenericGraphNode();
 
+	//////////////////////////////////////////////////////////////////////////
+	// uproperties
 	UPROPERTY(EditAnywhere, Category = "GenericGraphNode")
 	TSubclassOf<UObject> NodeType;
 
+	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphNode")
+	TArray<UGenericGraphNode*> ParentNodes;
+
+	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphNode")
+	TArray<UGenericGraphNode*> ChildrenNodes;
+
+	//////////////////////////////////////////////////////////////////////////
+	// ufunctions
+
+	//////////////////////////////////////////////////////////////////////////
 	UGenericGraph* GetGraph();
 };

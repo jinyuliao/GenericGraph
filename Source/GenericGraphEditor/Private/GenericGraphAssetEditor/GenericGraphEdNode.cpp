@@ -10,6 +10,18 @@ void UGenericGraphEdNode::AllocateDefaultPins()
 	CreatePin(EGPD_Output, UGenericGraphEditorTypes::PinCategory_MultipleNodes, TEXT(""), NULL, false, false, TEXT("Out"));
 }
 
+void UGenericGraphEdNode::NodeConnectionListChanged()
+{
+	Super::NodeConnectionListChanged();
+
+	GetGenericGraphEdGraph()->RebuildGenericGraph();
+}
+
+UGenericGraphEdGraph* UGenericGraphEdNode::GetGenericGraphEdGraph()
+{
+	return Cast<UGenericGraphEdGraph>(GetGraph());
+}
+
 FText UGenericGraphEdNode::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
 	if (GenericGraphNode == nullptr)

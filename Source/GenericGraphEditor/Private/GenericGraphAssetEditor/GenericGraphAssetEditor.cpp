@@ -2,6 +2,7 @@
 #include "GenericGraphAssetEditor.h"
 #include "GenericGraphAssetGraphSchema.h"
 #include "GenericGraphEditorCommands.h"
+#include "GenericGraphEdGraph.h"
 
 #define LOCTEXT_NAMESPACE "GenericGraphAssetEditor"
 
@@ -24,11 +25,13 @@ const FName FGenericGraphAssetEditorTabs::ViewportID(TEXT("Viewport"));
 FGenericGraphAssetEditor::FGenericGraphAssetEditor()
 {
 	EditingGraph = nullptr;
+
+	OnPackageSavedDelegateHandle = UPackage::PackageSavedEvent.AddRaw(this, &FGenericGraphAssetEditor::OnPackageSaved);
 }
 
 FGenericGraphAssetEditor::~FGenericGraphAssetEditor()
 {
-
+	UPackage::PackageSavedEvent.Remove(OnPackageSavedDelegateHandle);
 }
 
 void FGenericGraphAssetEditor::InitGenericGraphAssetEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UGenericGraph* Graph)
@@ -147,6 +150,16 @@ FString FGenericGraphAssetEditor::GetDocumentationLink() const
 	return TEXT("");
 }
 
+void FGenericGraphAssetEditor::SaveAsset_Execute()
+{
+	if (EditingGraph != nullptr)
+	{
+		RebuildGenericGraph();
+	}
+
+	FAssetEditorToolkit::SaveAsset_Execute();
+}
+
 void FGenericGraphAssetEditor::AddReferencedObjects(FReferenceCollector& Collector)
 {
 	Collector.AddReferencedObject(EditingGraph);
@@ -252,7 +265,7 @@ void FGenericGraphAssetEditor::CreateEdGraph()
 {
 	if (EditingGraph->EdGraph == nullptr)
 	{
-		EditingGraph->EdGraph = CastChecked<UEdGraph>(FBlueprintEditorUtils::CreateNewGraph(EditingGraph, NAME_None, UEdGraph::StaticClass(), UGenericGraphAssetGraphSchema::StaticClass()));
+		EditingGraph->EdGraph = CastChecked<UGenericGraphEdGraph>(FBlueprintEditorUtils::CreateNewGraph(EditingGraph, NAME_None, UGenericGraphEdGraph::StaticClass(), UGenericGraphAssetGraphSchema::StaticClass()));
 		EditingGraph->EdGraph->bAllowDeletion = false;
 
 		// Give the schema a chance to fill out any required nodes (like the results node)
@@ -324,6 +337,20 @@ FGraphPanelSelectionSet FGenericGraphAssetEditor::GetSelectedNodes()
 	}
 
 	return CurrentSelection;
+}
+
+void FGenericGraphAssetEditor::RebuildGenericGraph()
+{
+	if (EditingGraph == nullptr)
+	{
+		LOG_WARNING(TEXT("FGenericGraphAssetEditor::RebuildGenericGraph EditingGraph is nullptr"));
+		return;
+	}
+
+	UGenericGraphEdGraph* EdGraph = Cast<UGenericGraphEdGraph>(EditingGraph->EdGraph);
+	check(EdGraph != nullptr);
+
+	EdGraph->RebuildGenericGraph();
 }
 
 void FGenericGraphAssetEditor::SelectAllNodes()
@@ -542,7 +569,14 @@ void FGenericGraphAssetEditor::OnFinishedChangingProperties(const FPropertyChang
 	if (EditingGraph == nullptr)
 		return;
 
+	RebuildGenericGraph();
+
 	EditingGraph->EdGraph->GetSchema()->ForceVisualizationCacheClear();
+}
+
+void FGenericGraphAssetEditor::OnPackageSaved(const FString& PackageFileName, UObject* Outer)
+{
+	RebuildGenericGraph();
 }
 
 #undef LOCTEXT_NAMESPACE

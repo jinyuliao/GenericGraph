@@ -12,6 +12,10 @@ public:
 	UGenericGraphNode* GenericGraphNode;
 
 	virtual void AllocateDefaultPins() override;
+	virtual void NodeConnectionListChanged() override;
+
+	UGenericGraphEdGraph* GetGenericGraphEdGraph();
+
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const;
 
 	void SetGenericGraphNode(UGenericGraphNode* InNode);
