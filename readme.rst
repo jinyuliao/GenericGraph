@@ -20,3 +20,11 @@ usage
 Sample
 ------
 
+Coming soon
+
+install
+-------
+
+#. clone this project to ${YourProject}/Plugins/
+#. generate project file
+#. compile
