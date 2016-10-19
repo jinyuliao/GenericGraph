@@ -24,17 +24,12 @@ class UGenericGraphAssetGraphSchema : public UEdGraphSchema
 {
 	GENERATED_BODY()
 
-	/** Check whether connecting these pins would cause a loop */
-	bool ConnectionCausesLoop(const UEdGraphPin* InputPin, const UEdGraphPin* OutputPin) const;
-
 	void GetBreakLinkToSubMenuActions(class FMenuBuilder& MenuBuilder, class UEdGraphPin* InGraphPin);
 
 	//~ Begin EdGraphSchema Interface
  	virtual void GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const override;
  	virtual void GetContextMenuActions(const UEdGraph* CurrentGraph, const UEdGraphNode* InGraphNode, const UEdGraphPin* InGraphPin, class FMenuBuilder* MenuBuilder, bool bIsDebugging) const override;
-// 	virtual void CreateDefaultNodesForGraph(UEdGraph& Graph) const override;
  	virtual const FPinConnectionResponse CanCreateConnection(const UEdGraphPin* A, const UEdGraphPin* B) const override;
-// 	virtual bool TryCreateConnection(UEdGraphPin* A, UEdGraphPin* B) const override;
 	virtual class FConnectionDrawingPolicy* CreateConnectionDrawingPolicy(int32 InBackLayerID, int32 InFrontLayerID, float InZoomFactor, const FSlateRect& InClippingRect, class FSlateWindowElementList& InDrawElements, class UEdGraph* InGraphObj) const override;
  	virtual FLinearColor GetPinTypeColor(const FEdGraphPinType& PinType) const override;
  	virtual void BreakNodeLinks(UEdGraphNode& TargetNode) const override;

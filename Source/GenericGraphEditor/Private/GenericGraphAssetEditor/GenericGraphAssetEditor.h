@@ -1,6 +1,5 @@
 #pragma once
 
-
 class FGenericGraphAssetEditor : public FAssetEditorToolkit, public FNotifyHook, public FGCObject
 {
 public:

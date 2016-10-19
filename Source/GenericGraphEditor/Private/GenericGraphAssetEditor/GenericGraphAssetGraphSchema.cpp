@@ -7,6 +7,53 @@
 
 int32 UGenericGraphAssetGraphSchema::CurrentCacheRefreshID = 0;
 
+class FNodeVisitorCycleChecker
+{
+public:
+	/** Check whether a loop in the graph would be caused by linking the passed-in nodes */
+	bool CheckForLoop(UEdGraphNode* StartNode, UEdGraphNode* EndNode)
+	{
+		VisitedNodes.Add(StartNode);
+
+		return TraverseInputNodesToRoot(EndNode);
+	}
+
+private:
+	bool TraverseInputNodesToRoot(UEdGraphNode* Node)
+	{
+		VisitedNodes.Add(Node);
+
+		for (int32 PinIndex = 0; PinIndex < Node->Pins.Num(); ++PinIndex)
+		{
+			UEdGraphPin* MyPin = Node->Pins[PinIndex];
+
+			if (MyPin->Direction == EGPD_Output)
+			{
+				for (int32 LinkedPinIndex = 0; LinkedPinIndex < MyPin->LinkedTo.Num(); ++LinkedPinIndex)
+				{
+					UEdGraphPin* OtherPin = MyPin->LinkedTo[LinkedPinIndex];
+					if (OtherPin)
+					{
+						UEdGraphNode* OtherNode = OtherPin->GetOwningNode();
+						if (VisitedNodes.Contains(OtherNode))
+						{
+							return false;
+						}
+						else
+						{
+							return TraverseInputNodesToRoot(OtherNode);
+						}
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+	TSet<UEdGraphNode*> VisitedNodes;
+};
+
 UEdGraphNode* FGenericGraphAssetSchemaAction_NewNode::PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode /*= true*/)
 {
 	UGenericGraph* Graph = CastChecked<UGenericGraph>(ParentGraph->GetOuter());
@@ -15,7 +62,7 @@ UEdGraphNode* FGenericGraphAssetSchemaAction_NewNode::PerformAction(class UEdGra
 	ParentGraph->Modify();
 	Graph->Modify();
 
-	UGenericGraphNode* NewNode = NewObject<UGenericGraphNode>(Graph, UGenericGraphNode::StaticClass());
+	UGenericGraphNode* NewNode = NewObject<UGenericGraphNode>(Graph, Graph->NodeType);
 
 	Graph->AllNodes.Add(NewNode);
 
@@ -23,18 +70,6 @@ UEdGraphNode* FGenericGraphAssetSchemaAction_NewNode::PerformAction(class UEdGra
 	UGenericGraphEdNode* GraphNode = NodeCreator.CreateNode(true);
 	GraphNode->SetGenericGraphNode(NewNode);
 	NodeCreator.Finalize();
-
-	// If this node allows >0 children but by default has zero - create a connector for starters
-// 	if (NewNode->GetMaxChildNodes() > 0 && NewNode->ChildNodes.Num() == 0)
-// 	{
-// 		NewNode->CreateStartingConnectors();
-// 	}
-// 
-// 	// Attempt to connect inputs to selected nodes, unless we're already dragging from a single output
-// 	if (FromPin == NULL || FromPin->Direction == EGPD_Input)
-// 	{
-// 		ConnectToSelectedNodes(NewNode, ParentGraph);
-// 	}
 
 	GraphNode->NodePosX = Location.X;
 	GraphNode->NodePosY = Location.Y;
@@ -152,6 +187,23 @@ const FPinConnectionResponse UGenericGraphAssetGraphSchema::CanCreateConnection(
 	if (A->GetOwningNode() == B->GetOwningNode())
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorSameNode", "Both are on the same node"));
+	}
+
+	// Compare the directions
+	if ((A->Direction == EGPD_Input) && (B->Direction == EGPD_Input))
+	{
+		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorInput", "Can't connect input node to input node"));
+	}
+	else if ((A->Direction == EGPD_Output) && (B->Direction == EGPD_Output))
+	{
+		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorOutput", "Can't connect output node to output node"));
+	}
+
+	// check for cycles
+	FNodeVisitorCycleChecker CycleChecker;
+	if (!CycleChecker.CheckForLoop(A->GetOwningNode(), B->GetOwningNode()))
+	{
+		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorCycle", "Can't create a graph cycle"));
 	}
 
 	return FPinConnectionResponse(CONNECT_RESPONSE_MAKE, LOCTEXT("PinConnect", "Connect nodes"));
