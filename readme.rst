@@ -3,14 +3,14 @@ GenericGraphPlugin
 
 Generic graph data struct plugin for ue4
 
-feature
+Feature
 -------
 
 * Custom asset type
 * UE4 BehaviorTree-like asset editor
 * Extendable graph node type
 
-usage
+Usage
 -----
 
 * SKill tree system
@@ -22,7 +22,7 @@ Sample
 
 Coming soon
 
-install
+Install
 -------
 
 #. clone this project to ${YourProject}/Plugins/
