@@ -15,8 +15,11 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// uproperties
-	UPROPERTY(EditAnywhere, Category = "GenericGraphNode")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GenericGraphNode")
 	TSubclassOf<UObject> NodeType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GenericGraphNode")
+	FString CustomNodeTitle;
 
 	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphNode")
 	TArray<UGenericGraphNode*> ParentNodes;
@@ -26,6 +29,8 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// ufunctions
+	UFUNCTION(BlueprintCallable, Category = "GenericGraphNode")
+	FString GetNodeTitle();
 
 	//////////////////////////////////////////////////////////////////////////
 	UGenericGraph* GetGraph();

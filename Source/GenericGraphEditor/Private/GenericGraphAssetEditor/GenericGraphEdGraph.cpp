@@ -48,7 +48,18 @@ void UGenericGraphEdGraph::RebuildGenericGraph()
 				UGenericGraphNode* ChildNode = ChildEdNode->GenericGraphNode;
 
 				GNode->ChildrenNodes.Add(ChildNode);
+
+				ChildNode->ParentNodes.Add(GNode);
 			}
+		}
+	}
+
+	for (int i = 0; i < G->AllNodes.Num(); ++i)
+	{
+		UGenericGraphNode* Node = G->AllNodes[i];
+		if (Node->ParentNodes.Num() == 0)
+		{
+			G->RootNodes.Add(Node);
 		}
 	}
 }

@@ -17,6 +17,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "GenericGraph")
 	FString Name;
 
+	UPROPERTY(EditAnywhere, Category = "GenericGraph")
+	TSubclassOf<UGenericGraphNode> NodeType;
+
 	UPROPERTY(BlueprintReadOnly, Category = "GenericGraph")
 	TArray<UGenericGraphNode*> RootNodes;
 
@@ -30,5 +33,8 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// ufunctions
+	UFUNCTION(BlueprintCallable, Category = "GenericGraph")
+	void Print(bool ToConsole = true, bool ToScreen = true);
+
 	void ClearGraph();
 };
