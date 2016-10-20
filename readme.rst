@@ -3,6 +3,8 @@ GenericGraphPlugin
 
 Generic graph data struct plugin for ue4
 
+.. image:: https://cloud.githubusercontent.com/assets/2009308/19542662/b917bed6-96a2-11e6-8bbb-24dea9295923.png
+
 Feature
 -------
 
