@@ -22,7 +22,7 @@ Usage
 Sample
 ------
 
-Coming soon
+SkillTree_
 
 Install
 -------
@@ -30,3 +30,5 @@ Install
 #. clone this project to ${YourProject}/Plugins/
 #. generate project file
 #. compile
+
+.. _SkillTree: https://github.com/jinyuliao/Sample_SkillSystem
