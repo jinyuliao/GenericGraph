@@ -54,6 +54,62 @@ void UGenericGraph::Print(bool ToConsole /*= true*/, bool ToScreen /*= true*/)
 	}
 }
 
+int UGenericGraph::GetLevelNum()
+{
+	int Level = 0;
+	TArray<UGenericGraphNode*> CurrLevelNodes = RootNodes;
+	TArray<UGenericGraphNode*> NextLevelNodes;
+
+	while (CurrLevelNodes.Num() != 0)
+	{
+		for (int i = 0; i < CurrLevelNodes.Num(); ++i)
+		{
+			UGenericGraphNode* Node = CurrLevelNodes[i];
+			check(Node != nullptr);
+
+			for (int j = 0; j < Node->ChildrenNodes.Num(); ++j)
+			{
+				NextLevelNodes.Add(Node->ChildrenNodes[j]);
+			}
+		}
+
+		CurrLevelNodes = NextLevelNodes;
+		NextLevelNodes.Reset();
+		++Level;
+	}
+
+	return Level;
+}
+
+void UGenericGraph::GetNodesByLevel(int Level, TArray<UGenericGraphNode*>& Nodes)
+{
+	int CurrLEvel = 0;
+	TArray<UGenericGraphNode*> NextLevelNodes;
+
+	Nodes = RootNodes;
+
+	while (Nodes.Num() != 0)
+	{
+		if (CurrLEvel == Level)
+			break;
+
+		for (int i = 0; i < Nodes.Num(); ++i)
+		{
+			UGenericGraphNode* Node = Nodes[i];
+			check(Node != nullptr);
+
+			for (int j = 0; j < Node->ChildrenNodes.Num(); ++j)
+			{
+				NextLevelNodes.Add(Node->ChildrenNodes[j]);
+			}
+		}
+
+		Nodes = NextLevelNodes;
+		NextLevelNodes.Reset();
+		++CurrLEvel;
+	}
+}
+
 void UGenericGraph::ClearGraph()
 {
 	for (int i = 0; i < AllNodes.Num(); ++i)

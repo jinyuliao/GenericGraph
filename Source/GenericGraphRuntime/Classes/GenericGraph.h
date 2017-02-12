@@ -36,5 +36,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GenericGraph")
 	void Print(bool ToConsole = true, bool ToScreen = true);
 
+	UFUNCTION(BlueprintCallable, Category = "GenericGraph")
+	int GetLevelNum();
+
+	UFUNCTION(BlueprintCallable, Category = "GenericGraph")
+	void GetNodesByLevel(int Level, TArray<UGenericGraphNode*>& Nodes);
+
 	void ClearGraph();
 };
