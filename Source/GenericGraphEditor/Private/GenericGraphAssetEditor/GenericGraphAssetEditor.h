@@ -1,5 +1,7 @@
 #pragma once
 
+class FGenericGraphAssetEditorToolbar;
+
 class FGenericGraphAssetEditor : public FAssetEditorToolkit, public FNotifyHook, public FGCObject
 {
 public:
@@ -24,6 +26,12 @@ public:
 	virtual void SaveAsset_Execute() override;
 	// End of FAssetEditorToolkit
 
+	//Toolbar
+	void UpdateToolbar();
+	TSharedPtr<class FGenericGraphAssetEditorToolbar> GetToolbarBuilder() { return ToolbarBuilder; }
+	void RegisterToolbarTab(const TSharedRef<class FTabManager>& TabManager);
+
+
 	// FSerializableObject interface
 	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
 	// End of FSerializableObject interface
@@ -35,7 +43,6 @@ private:
 	void CreateInternalWidgets();
 	TSharedRef<SGraphEditor> CreateViewportWidget();
 
-	void ExtendToolbar();
 
 	void BindCommands();
 
@@ -78,8 +85,12 @@ private:
 
 	void OnPackageSaved(const FString& PackageFileName, UObject* Outer);
 
+
 private:
 	UGenericGraph* EditingGraph;
+
+	//Toolbar
+	TSharedPtr<class FGenericGraphAssetEditorToolbar> ToolbarBuilder;
 
 	/** Handle to the registered OnPackageSave delegate */
 	FDelegateHandle OnPackageSavedDelegateHandle;
