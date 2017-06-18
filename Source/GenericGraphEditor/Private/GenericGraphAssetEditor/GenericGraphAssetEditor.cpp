@@ -1,8 +1,10 @@
 #include "GenericGraphEditorPrivatePCH.h"
 #include "GenericGraphAssetEditor.h"
+#include "GenericGraphAssetEditorToolbar.h"
 #include "GenericGraphAssetGraphSchema.h"
 #include "GenericGraphEditorCommands.h"
 #include "GenericGraphEdGraph.h"
+#include "AssetToolsModule.h"
 
 #define LOCTEXT_NAMESPACE "GenericGraphAssetEditor"
 
@@ -36,6 +38,7 @@ FGenericGraphAssetEditor::~FGenericGraphAssetEditor()
 
 void FGenericGraphAssetEditor::InitGenericGraphAssetEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UGenericGraph* Graph)
 {
+
 	EditingGraph = Graph;
 	CreateEdGraph();
 
@@ -43,9 +46,18 @@ void FGenericGraphAssetEditor::InitGenericGraphAssetEditor(const EToolkitMode::T
 	FGraphEditorCommands::Register();
 	FGenericGraphEditorCommands::Register();
 
+	if (!ToolbarBuilder.IsValid())
+	{
+		ToolbarBuilder = MakeShareable(new FGenericGraphAssetEditorToolbar(SharedThis(this)));
+	}
+
 	BindCommands();
 
 	CreateInternalWidgets();
+
+	TSharedPtr<FExtender> ToolbarExtender = MakeShareable(new FExtender);
+
+	ToolbarBuilder->AddGenericGraphToolbar(ToolbarExtender);
 
 	// Layout
 	const TSharedRef<FTabManager::FLayout> StandaloneDefaultLayout = FTabManager::NewLayout("Standalone_GenericGraphEditor_Layout_v1")
@@ -80,7 +92,6 @@ void FGenericGraphAssetEditor::InitGenericGraphAssetEditor(const EToolkitMode::T
 	const bool bCreateDefaultToolbar = true;
 	FAssetEditorToolkit::InitAssetEditor(Mode, InitToolkitHost, GenericGraphEditorAppName, StandaloneDefaultLayout, bCreateDefaultStandaloneMenu, bCreateDefaultToolbar, EditingGraph, false);
 
-	ExtendToolbar();
 	RegenerateMenusAndToolbars();
 }
 
@@ -230,35 +241,13 @@ TSharedRef<SGraphEditor> FGenericGraphAssetEditor::CreateViewportWidget()
 		.ShowGraphStateOverlay(false);
 }
 
-void FGenericGraphAssetEditor::ExtendToolbar()
-{
-	struct Local
-	{
-		static void FillToolbar(FToolBarBuilder& ToolbarBuilder)
-		{
-			ToolbarBuilder.BeginSection("Toolbar");
-			{
-				ToolbarBuilder.AddToolBarButton(FGenericGraphEditorCommands::Get().GraphSettings);
-			}
-			ToolbarBuilder.EndSection();
-		}
-	};
-
-	TSharedPtr<FExtender> ToolbarExtender = MakeShareable(new FExtender);
-
-	ToolbarExtender->AddToolBarExtension(
-		"Asset",
-		EExtensionHook::After,
-		GetToolkitCommands(),
-		FToolBarExtensionDelegate::CreateStatic(&Local::FillToolbar)
-	);
-
-	AddToolbarExtender(ToolbarExtender);
-}
 
 void FGenericGraphAssetEditor::BindCommands()
 {
-
+	ToolkitCommands->MapAction(FGenericGraphEditorCommands::Get().GraphSettings,
+		FExecuteAction::CreateSP(this, &FGenericGraphAssetEditor::GraphSettings),
+		FCanExecuteAction::CreateSP(this, &FGenericGraphAssetEditor::CanGraphSettings)
+	);
 }
 
 void FGenericGraphAssetEditor::CreateEdGraph()
@@ -549,7 +538,12 @@ void FGenericGraphAssetEditor::OnSelectedNodesChanged(const TSet<class UObject*>
 		Selection.Add(SelectionEntry);
 	}
 
-	if (Selection.Num() == 1)
+	if (Selection.Num() == 0) 
+	{
+		PropertyWidget->SetObject(EditingGraph);
+
+	}
+	else if (Selection.Num() == 1)
 	{
 		PropertyWidget->SetObject(Selection[0]);
 	}
@@ -579,4 +573,11 @@ void FGenericGraphAssetEditor::OnPackageSaved(const FString& PackageFileName, UO
 	RebuildGenericGraph();
 }
 
+void FGenericGraphAssetEditor::RegisterToolbarTab(const TSharedRef<class FTabManager>& InTabManager) 
+{
+	FAssetEditorToolkit::RegisterTabSpawners(InTabManager);
+}
+
+
 #undef LOCTEXT_NAMESPACE
+
