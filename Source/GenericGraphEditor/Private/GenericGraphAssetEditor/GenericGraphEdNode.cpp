@@ -48,4 +48,9 @@ FText UGenericGraphEdNode::GetDescription() const
 	return FText::FromString(C->GetDescription());
 }
 
+FLinearColor UGenericGraphEdNode::GetBackgroundColor() const
+{
+	return GenericGraphNode->BackgroundColor;
+}
+
 #undef LOCTEXT_NAMESPACE

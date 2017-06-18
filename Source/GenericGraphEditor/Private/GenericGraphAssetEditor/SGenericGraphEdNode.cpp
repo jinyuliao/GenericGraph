@@ -316,7 +316,8 @@ END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
 FSlateColor SGenericGraphEdNode::GetBorderBackgroundColor() const
 {
-	return GenericGraphColors::NodeBorder::HighlightAbortRange0;
+	UGenericGraphEdNode* MyNode = CastChecked<UGenericGraphEdNode>(GraphNode);
+	return MyNode ? MyNode->GetBackgroundColor() : GenericGraphColors::NodeBorder::HighlightAbortRange0;
 }
 
 FSlateColor SGenericGraphEdNode::GetBackgroundColor() const
