@@ -6,6 +6,7 @@
 UGenericGraphNode::UGenericGraphNode()
 {
 	NodeType = AActor::StaticClass();
+	BackgroundColor = FLinearColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 UGenericGraphNode::~UGenericGraphNode()
