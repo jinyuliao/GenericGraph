@@ -12,7 +12,7 @@ struct FGenericGraphAssetSchemaAction_NewNode : public FEdGraphSchemaAction
 		: FEdGraphSchemaAction()
 	{}
 
-	FGenericGraphAssetSchemaAction_NewNode(const FText& InNodeCategory, const FText& InMenuDesc, const FString& InToolTip, const int32 InGrouping)
+	FGenericGraphAssetSchemaAction_NewNode(const FText& InNodeCategory, const FText& InMenuDesc, const FText& InToolTip, const int32 InGrouping)
 		: FEdGraphSchemaAction(InNodeCategory, InMenuDesc, InToolTip, InGrouping) 
 	{}
 

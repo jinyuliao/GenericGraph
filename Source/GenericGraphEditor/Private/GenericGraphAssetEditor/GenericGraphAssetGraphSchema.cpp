@@ -132,7 +132,7 @@ void UGenericGraphAssetGraphSchema::GetGraphContextActions(FGraphContextMenuBuil
 
 	const FText AddToolTip = LOCTEXT("NewGenericGraphNodeTooltip", "Add node here");
 	const FText Desc = LOCTEXT("NewGenericGraphNodeTooltip", "Add Node");
-	TSharedPtr<FGenericGraphAssetSchemaAction_NewNode> NewNodeAction(new FGenericGraphAssetSchemaAction_NewNode(LOCTEXT("GenericGraphNodeAction", "Generic Graph Node"), Desc, AddToolTip.ToString(), 0));
+	TSharedPtr<FGenericGraphAssetSchemaAction_NewNode> NewNodeAction(new FGenericGraphAssetSchemaAction_NewNode(LOCTEXT("GenericGraphNodeAction", "Generic Graph Node"), Desc, AddToolTip, 0));
 
 	ContextMenuBuilder.AddAction(NewNodeAction);
 }
