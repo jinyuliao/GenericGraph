@@ -21,4 +21,6 @@ public:
 	void SetGenericGraphNode(UGenericGraphNode* InNode);
 
 	virtual FText GetDescription() const;
+
+	virtual FLinearColor GetBackgroundColor() const;
 };
