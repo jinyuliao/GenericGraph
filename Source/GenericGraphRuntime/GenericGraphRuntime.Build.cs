@@ -4,8 +4,8 @@ namespace UnrealBuildTool.Rules
 {
 	public class GenericGraphRuntime : ModuleRules
 	{
-		public GenericGraphRuntime(TargetInfo Target)
-		{
+		public GenericGraphRuntime(ReadOnlyTargetRules Target) : base(Target)
+        {
 			PublicIncludePaths.AddRange(
 				new string[] {
 					// ... add public include paths required here ...
