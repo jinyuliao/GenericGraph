@@ -28,9 +28,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphNode")
 	TArray<UGenericGraphNode*> ChildrenNodes;
 
-	UPROPERTY(Transient)
-	AActor* ActorOwner;
-
 #if WITH_EDITOR
 	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode")
 	FLinearColor BackgroundColor;
