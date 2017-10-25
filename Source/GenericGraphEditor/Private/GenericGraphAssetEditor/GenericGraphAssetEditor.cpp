@@ -5,6 +5,7 @@
 #include "GenericGraphEditorCommands.h"
 #include "GenericGraphEdGraph.h"
 #include "AssetToolsModule.h"
+#include "GenericPlatform/GenericPlatformApplicationMisc.h"
 
 #define LOCTEXT_NAMESPACE "GenericGraphAssetEditor"
 
@@ -468,7 +469,7 @@ void FGenericGraphAssetEditor::CopySelectedNodes()
 	}
 
 	FEdGraphUtilities::ExportNodesToText(SelectedNodes, ExportedText);
-	FPlatformMisc::ClipboardCopy(*ExportedText);
+	FGenericPlatformApplicationMisc::ClipboardCopy(*ExportedText);
 }
 
 bool FGenericGraphAssetEditor::CanCopyNodes()

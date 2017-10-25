@@ -42,6 +42,7 @@ namespace UnrealBuildTool.Rules
                     "EditorStyle",
                     "Kismet",
                     "KismetWidgets",
+                    "ApplicationCore",
 					// ... add private dependencies that you statically link with here ...
 				}
 				);
