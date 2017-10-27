@@ -1,6 +1,5 @@
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
-#include "GenericGraphEditorPrivatePCH.h"
 #include "GenericGraphAssetTypeActions.h"
 #include "GenericGraphAssetEditor/GenericGraphEdNode.h"
 #include "GenericGraphAssetEditor/SGenericGraphEdNode.h"

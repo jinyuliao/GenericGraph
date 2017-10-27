@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CoreMinimal.h"
 #include "GenericGraphAssetGraphSchema.generated.h"
 
 /** Action to add a node to the graph */

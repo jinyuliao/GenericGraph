@@ -6,7 +6,9 @@ namespace UnrealBuildTool.Rules
 	{
 		public GenericGraphRuntime(ReadOnlyTargetRules Target) : base(Target)
         {
-			PublicIncludePaths.AddRange(
+            PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+
+            PublicIncludePaths.AddRange(
 				new string[] {
 					// ... add public include paths required here ...
 				}

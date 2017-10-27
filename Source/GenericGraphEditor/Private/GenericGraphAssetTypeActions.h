@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CoreMinimal.h"
 #include "AssetTypeActions_Base.h"
 
 class FGenericGraphAssetTypeActions : public FAssetTypeActions_Base

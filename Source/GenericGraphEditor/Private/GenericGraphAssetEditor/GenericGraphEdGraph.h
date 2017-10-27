@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CoreMinimal.h"
 #include "GenericGraphEdGraph.generated.h"
 
 UCLASS()

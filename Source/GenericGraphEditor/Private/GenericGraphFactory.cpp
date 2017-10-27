@@ -1,4 +1,3 @@
-#include "GenericGraphEditorPrivatePCH.h"
 #include "GenericGraphFactory.h"
 
 #define LOCTEXT_NAMESPACE "GenericGraph"

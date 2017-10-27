@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CoreMinimal.h"
 #include "ConnectionDrawingPolicy.h"
 
 class FGenericGraphConnectionDrawingPolicy : public FConnectionDrawingPolicy

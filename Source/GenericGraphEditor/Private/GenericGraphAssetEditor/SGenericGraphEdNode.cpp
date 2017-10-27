@@ -1,6 +1,9 @@
-#include "GenericGraphEditorPrivatePCH.h"
 #include "SGenericGraphEdNode.h"
 #include "GenericGraphColors.h"
+#include "SLevelOfDetailBranchNode.h"
+#include "SInlineEditableTextBlock.h"
+#include "SCommentBubble.h"
+#include "SlateOptMacros.h"
 
 //////////////////////////////////////////////////////////////////////////
 class SGenericGraphPin : public SGraphPin

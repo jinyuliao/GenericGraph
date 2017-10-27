@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CoreMinimal.h"
+
 namespace GenericGraphColors
 {
 	namespace NodeBody

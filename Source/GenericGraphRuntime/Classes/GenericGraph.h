@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CoreMinimal.h"
 #include "GenericGraphNode.h"
 #include "GenericGraph.generated.h"
 

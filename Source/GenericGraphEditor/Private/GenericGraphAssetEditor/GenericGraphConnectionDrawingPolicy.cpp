@@ -1,4 +1,3 @@
-#include "GenericGraphEditorPrivatePCH.h"
 #include "GenericGraphConnectionDrawingPolicy.h"
 
 FGenericGraphConnectionDrawingPolicy::FGenericGraphConnectionDrawingPolicy(int32 InBackLayerID, int32 InFrontLayerID, float ZoomFactor, const FSlateRect& InClippingRect, FSlateWindowElementList& InDrawElements, UEdGraph* InGraphObj)

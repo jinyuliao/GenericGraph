@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CoreMinimal.h"
+
 class FGenericGraphEditorCommands : public TCommands<FGenericGraphEditorCommands>
 {
 public:

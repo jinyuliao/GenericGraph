@@ -1,6 +1,9 @@
 #pragma once
 
+#include "CoreMinimal.h"
+
 class FGenericGraphAssetEditorToolbar;
+class UGenericGraph;
 
 class FGenericGraphAssetEditor : public FAssetEditorToolkit, public FNotifyHook, public FGCObject
 {

@@ -1,11 +1,17 @@
-#include "GenericGraphEditorPrivatePCH.h"
 #include "GenericGraphAssetEditor.h"
+#include "GenericGraphEditorPrivatePCH.h"
 #include "GenericGraphAssetEditorToolbar.h"
 #include "GenericGraphAssetGraphSchema.h"
 #include "GenericGraphEditorCommands.h"
 #include "GenericGraphEdGraph.h"
 #include "AssetToolsModule.h"
 #include "GenericPlatform/GenericPlatformApplicationMisc.h"
+#include "GenericCommands.h"
+#include "GraphEditorActions.h"
+#include "IDetailsView.h"
+#include "PropertyEditorModule.h"
+#include "Editor/UnrealEd/Public/Kismet2/BlueprintEditorUtils.h"
+#include "EdGraphUtilities.h"
 
 #define LOCTEXT_NAMESPACE "GenericGraphAssetEditor"
 

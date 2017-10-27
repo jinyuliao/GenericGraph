@@ -1,5 +1,5 @@
-#include "GenericGraphRuntimePrivatePCH.h"
 #include "GenericGraph.h"
+#include "GenericGraphRuntimePrivatePCH.h"
 
 #define LOCTEXT_NAMESPACE "GenericGraph"
 

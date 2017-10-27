@@ -19,16 +19,9 @@ Usage
 * Civilization-like technologies system
 * etc
 
-Sample
-------
-
-SkillTree_
-
 Install
 -------
 
 #. clone this project to ${YourProject}/Plugins/
 #. generate project file
 #. compile
-
-.. _SkillTree: https://github.com/jinyuliao/Sample_SkillSystem

@@ -1,6 +1,10 @@
 #pragma once
 
+#include "CoreMinimal.h"
+#include "EdGraph/EdGraphNode.h"
 #include "GenericGraphEdNode.generated.h"
+
+class UGenericGraphNode;
 
 UCLASS(MinimalAPI)
 class UGenericGraphEdNode : public UEdGraphNode
