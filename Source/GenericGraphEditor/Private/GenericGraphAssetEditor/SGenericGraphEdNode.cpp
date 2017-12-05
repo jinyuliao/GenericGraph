@@ -168,13 +168,6 @@ void SGenericGraphEdNode::UpdateGraphNode()
 											.HighDetail()
 											[
 												SNew(SHorizontalBox)
-// 												+ SHorizontalBox::Slot()
-// 												.AutoWidth()
-// 												.VAlign(VAlign_Center)
-// 												[
-// 													SNew(SImage)
-// 													.Image(this, &SGenericGraphEdNode::GetNameIcon)
-// 												]
 												+ SHorizontalBox::Slot()
 												.Padding(FMargin(4.0f, 0.0f, 4.0f, 0.0f))
 												[
@@ -199,14 +192,6 @@ void SGenericGraphEdNode::UpdateGraphNode()
 											]
 										]
 									]
-// 									+ SVerticalBox::Slot()
-// 									.AutoHeight()
-// 									[
-// 										// DESCRIPTION MESSAGE
-// 										SAssignNew(DescriptionText, STextBlock)
-// 										.Visibility(this, &SGenericGraphEdNode::GetDescriptionVisibility)
-// 										.Text(this, &SGenericGraphEdNode::GetDescription)
-// 									]
 								]
 							]
 						]
@@ -314,8 +299,25 @@ void SGenericGraphEdNode::AddPin(const TSharedRef<SGraphPin>& PinToAdd)
 		OutputPins.Add(PinToAdd);
 	}
 }
-
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
+
+bool SGenericGraphEdNode::IsNameReadOnly() const
+{
+	return false;
+}
+
+void SGenericGraphEdNode::OnNameTextCommited(const FText& InText, ETextCommit::Type CommitInfo)
+{
+	SGraphNode::OnNameTextCommited(InText, CommitInfo);
+
+	UGenericGraphEdNode* MyNode = CastChecked<UGenericGraphEdNode>(GraphNode);
+
+	if (MyNode != nullptr)
+	{
+		MyNode->GenericGraphNode->SetCustomNodeTitle(InText);
+		UpdateGraphNode();
+	}
+}
 
 FSlateColor SGenericGraphEdNode::GetBorderBackgroundColor() const
 {

@@ -5,7 +5,10 @@
 UGenericGraphNode::UGenericGraphNode()
 {
 	NodeType = AActor::StaticClass();
-	BackgroundColor = FLinearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+#if WITH_EDITOR
+	BackgroundColor = FLinearColor::Black;
+#endif
 }
 
 UGenericGraphNode::~UGenericGraphNode()
@@ -13,7 +16,7 @@ UGenericGraphNode::~UGenericGraphNode()
 
 }
 
-FString UGenericGraphNode::GetNodeTitle()
+FText UGenericGraphNode::GetNodeTitle_Implementation()
 {
 	if (CustomNodeTitle.IsEmpty())
 	{
@@ -22,12 +25,17 @@ FString UGenericGraphNode::GetNodeTitle()
 		FString Title = C->GetName();
 		Title.RemoveFromEnd("_C");
 
-		return Title;
+		return FText::FromString(Title);
 	}
 	else
 	{
 		return CustomNodeTitle;
 	}
+}
+
+void UGenericGraphNode::SetCustomNodeTitle_Implementation(const FText& NewTitle)
+{
+	CustomNodeTitle = NewTitle;
 }
 
 UGenericGraph* UGenericGraphNode::GetGraph()

@@ -20,7 +20,7 @@ public:
 
 	UGenericGraphEdGraph* GetGenericGraphEdGraph();
 
-	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const;
+	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
 
 	void SetGenericGraphNode(UGenericGraphNode* InNode);
 

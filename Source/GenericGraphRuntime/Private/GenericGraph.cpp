@@ -30,7 +30,7 @@ void UGenericGraph::Print(bool ToConsole /*= true*/, bool ToScreen /*= true*/)
 			UGenericGraphNode* Node = CurrLevelNodes[i];
 			check(Node != nullptr);
 
-			FString Message = FString::Printf(TEXT("%s, Level %d"), *Node->GetNodeTitle(), Level);
+			FString Message = FString::Printf(TEXT("%s, Level %d"), *Node->GetNodeTitle().ToString(), Level);
 
 			if (ToConsole)
 			{

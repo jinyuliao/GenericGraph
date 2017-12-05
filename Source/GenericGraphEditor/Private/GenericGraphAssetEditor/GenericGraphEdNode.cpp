@@ -29,7 +29,7 @@ FText UGenericGraphEdNode::GetNodeTitle(ENodeTitleType::Type TitleType) const
 	}
 	else
 	{
-		return FText::FromString(GenericGraphNode->GetNodeTitle());
+		return GenericGraphNode->GetNodeTitle();
 	}
 }
 

@@ -14,14 +14,11 @@ public:
 	UGenericGraphNode();
 	virtual ~UGenericGraphNode();
 
-	//////////////////////////////////////////////////////////////////////////
-	// uproperties
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GenericGraphNode")
 	TSubclassOf<UObject> NodeType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GenericGraphNode")
-	FString CustomNodeTitle;
-
+	FText CustomNodeTitle;
 
 	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphNode")
 	TArray<UGenericGraphNode*> ParentNodes;
@@ -34,17 +31,19 @@ public:
 	FLinearColor BackgroundColor;
 #endif
 
-	//////////////////////////////////////////////////////////////////////////
-	// ufunctions
-	UFUNCTION(BlueprintCallable, Category = "GenericGraphNode")
-	FString GetNodeTitle();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "GenericGraphNode")
 	void EnterNode(AActor* OwnerActor);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "GenericGraphNode")
 	void ExitNode(AActor* OwnerActor);
 
-	//////////////////////////////////////////////////////////////////////////
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "GenericGraphNode")
+	FText GetNodeTitle();
+	FText GetNodeTitle_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "GenericGraphNode")
+	void SetCustomNodeTitle(const FText& NewTitle);
+	virtual void SetCustomNodeTitle_Implementation(const FText& NewTitle);
+
 	UGenericGraph* GetGraph();
 };
