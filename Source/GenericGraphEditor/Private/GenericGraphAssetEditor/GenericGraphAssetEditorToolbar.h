@@ -13,13 +13,9 @@ public:
 	FGenericGraphAssetEditorToolbar(TSharedPtr<FGenericGraphAssetEditor> InGenericGraphEditor)
 		: GenericGraphEditor(InGenericGraphEditor) {}
 
-	//void AddModesToolbar(TSharedPtr<FExtender> Extender);
-	//void AddDebuggerToolbar(TSharedPtr<FExtender> Extender);
 	void AddGenericGraphToolbar(TSharedPtr<FExtender> Extender);
 
 private:
-	//void FillModesToolbar(FToolBarBuilder& ToolbarBuilder);
-	//void FillDebuggerToolbar(FToolBarBuilder& ToolbarBuilder);
 	void FillGenericGraphToolbar(FToolBarBuilder& ToolbarBuilder);
 
 protected:

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenericGraphNode.h"
 #include "GenericGraphAssetGraphSchema.generated.h"
 
 /** Action to add a node to the graph */
@@ -9,15 +10,15 @@ struct FGenericGraphAssetSchemaAction_NewNode : public FEdGraphSchemaAction
 {
 	GENERATED_USTRUCT_BODY();
 
-	FGenericGraphAssetSchemaAction_NewNode()
-		: FEdGraphSchemaAction()
-	{}
+public:
+	FGenericGraphAssetSchemaAction_NewNode(){}
 
 	FGenericGraphAssetSchemaAction_NewNode(const FText& InNodeCategory, const FText& InMenuDesc, const FText& InToolTip, const int32 InGrouping)
-		: FEdGraphSchemaAction(InNodeCategory, InMenuDesc, InToolTip, InGrouping) 
-	{}
+		: FEdGraphSchemaAction(InNodeCategory, InMenuDesc, InToolTip, InGrouping) {}
 
 	virtual UEdGraphNode* PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode = true) override;
+
+	TSubclassOf<UGenericGraphNode> NodeType;
 };
 
 UCLASS(MinimalAPI)

@@ -29,6 +29,9 @@ public:
 #if WITH_EDITOR
 	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode")
 	FLinearColor BackgroundColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode")
+	FText ContextMenuName;
 #endif
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "GenericGraphNode")

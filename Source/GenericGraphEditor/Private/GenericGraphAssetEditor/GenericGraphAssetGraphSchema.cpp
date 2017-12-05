@@ -61,7 +61,7 @@ UEdGraphNode* FGenericGraphAssetSchemaAction_NewNode::PerformAction(class UEdGra
 	ParentGraph->Modify();
 	Graph->Modify();
 
-	UGenericGraphNode* NewNode = NewObject<UGenericGraphNode>(Graph, Graph->NodeType);
+	UGenericGraphNode* NewNode = NewObject<UGenericGraphNode>(Graph, NodeType);
 
 	Graph->AllNodes.Add(NewNode);
 
@@ -127,13 +127,62 @@ void UGenericGraphAssetGraphSchema::GetBreakLinkToSubMenuActions(class FMenuBuil
 
 void UGenericGraphAssetGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const
 {
+	UGenericGraph* Graph = CastChecked<UGenericGraph>(ContextMenuBuilder.CurrentGraph->GetOuter());
+
+	if (Graph->NodeType == nullptr)
+	{
+		return;
+	}
+
 	const bool bNoParent = (ContextMenuBuilder.FromPin == NULL);
 
 	const FText AddToolTip = LOCTEXT("NewGenericGraphNodeTooltip", "Add node here");
-	const FText Desc = LOCTEXT("NewGenericGraphNodeTooltip", "Add Node");
+
+	TSet<TSubclassOf<UGenericGraphNode> > Visited;
+
+	FText Desc = Graph->NodeType.GetDefaultObject()->ContextMenuName;
+
+	if (Desc.IsEmpty())
+	{
+		FString Title = Graph->NodeType->GetName();
+		Title.RemoveFromEnd("_C");
+		Desc = FText::FromString(Title);
+	}
+
 	TSharedPtr<FGenericGraphAssetSchemaAction_NewNode> NewNodeAction(new FGenericGraphAssetSchemaAction_NewNode(LOCTEXT("GenericGraphNodeAction", "Generic Graph Node"), Desc, AddToolTip, 0));
+	NewNodeAction->NodeType = Graph->NodeType;
 
 	ContextMenuBuilder.AddAction(NewNodeAction);
+
+	Visited.Add(Graph->NodeType);
+
+	for (TObjectIterator<UClass> It; It; ++It)
+	{
+		if (It->IsChildOf(Graph->NodeType) && !It->HasAnyClassFlags(CLASS_Abstract) && !Visited.Contains(*It))
+		{
+			TSubclassOf<UGenericGraphNode> NodeType = *It;
+
+			if (It->GetName().StartsWith("REINST") || It->GetName().StartsWith("SKEL"))
+			{
+				continue;
+			}
+
+			Desc = NodeType.GetDefaultObject()->ContextMenuName;
+
+			if (Desc.IsEmpty())
+			{
+				FString Title = Graph->NodeType->GetName();
+				Title.RemoveFromEnd("_C");
+				Desc = FText::FromString(Title);
+			}
+
+			TSharedPtr<FGenericGraphAssetSchemaAction_NewNode> Action(new FGenericGraphAssetSchemaAction_NewNode(LOCTEXT("GenericGraphNodeAction", "Generic Graph Node"), Desc, AddToolTip, 0));
+			Action->NodeType = NodeType;
+			ContextMenuBuilder.AddAction(Action);
+
+			Visited.Add(NodeType);
+		}
+	}
 }
 
 void UGenericGraphAssetGraphSchema::GetContextMenuActions(const UEdGraph* CurrentGraph, const UEdGraphNode* InGraphNode, const UEdGraphPin* InGraphPin, class FMenuBuilder* MenuBuilder, bool bIsDebugging) const
