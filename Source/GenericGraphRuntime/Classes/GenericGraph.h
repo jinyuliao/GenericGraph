@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GenericGraphNode.h"
+#include "GenericGraphEdge.h"
 #include "GenericGraph.generated.h"
 
 UCLASS(Blueprintable)
@@ -21,11 +22,17 @@ public:
 	UPROPERTY(EditAnywhere, Category = "GenericGraph")
 	TSubclassOf<UGenericGraphNode> NodeType;
 
+	UPROPERTY(EditAnywhere, Category = "GenericGraph")
+	TSubclassOf<UGenericGraphEdge> EdgeType;
+
 	UPROPERTY(BlueprintReadOnly, Category = "GenericGraph")
 	TArray<UGenericGraphNode*> RootNodes;
 
 	UPROPERTY(BlueprintReadOnly, Category = "GenericGraph")
 	TArray<UGenericGraphNode*> AllNodes;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GenericGraph")
+	bool bEdgeEnabled;
 
 #if WITH_EDITORONLY_DATA
 	UPROPERTY()

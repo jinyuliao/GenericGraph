@@ -2,14 +2,14 @@
 
 #include "CoreMinimal.h"
 
-class FGenericGraphAssetEditorToolbar;
+class FGGAssetEditorToolbar;
 class UGenericGraph;
 
-class FGenericGraphAssetEditor : public FAssetEditorToolkit, public FNotifyHook, public FGCObject
+class FAssetEditor_GenericGraph : public FAssetEditorToolkit, public FNotifyHook, public FGCObject
 {
 public:
-	FGenericGraphAssetEditor();
-	virtual ~FGenericGraphAssetEditor();
+	FAssetEditor_GenericGraph();
+	virtual ~FAssetEditor_GenericGraph();
 
 	void InitGenericGraphAssetEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UGenericGraph* Graph);
 
@@ -31,7 +31,7 @@ public:
 
 	//Toolbar
 	void UpdateToolbar();
-	TSharedPtr<class FGenericGraphAssetEditorToolbar> GetToolbarBuilder() { return ToolbarBuilder; }
+	TSharedPtr<class FAssetEditorToolbar_GenericGraph> GetToolbarBuilder() { return ToolbarBuilder; }
 	void RegisterToolbarTab(const TSharedRef<class FTabManager>& TabManager);
 
 
@@ -93,7 +93,7 @@ private:
 	UGenericGraph* EditingGraph;
 
 	//Toolbar
-	TSharedPtr<class FGenericGraphAssetEditorToolbar> ToolbarBuilder;
+	TSharedPtr<class FAssetEditorToolbar_GenericGraph> ToolbarBuilder;
 
 	/** Handle to the registered OnPackageSave delegate */
 	FDelegateHandle OnPackageSavedDelegateHandle;

@@ -4,6 +4,7 @@
 #include "GenericGraphNode.generated.h"
 
 class UGenericGraph;
+class UGenericGraphEdge;
 
 UCLASS(Blueprintable)
 class GENERICGRAPHRUNTIME_API UGenericGraphNode : public UObject
@@ -26,19 +27,23 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphNode")
 	TArray<UGenericGraphNode*> ChildrenNodes;
 
+	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphNode")
+	TMap<UGenericGraphNode*, UGenericGraphEdge*> Edges;
+
 #if WITH_EDITOR
 	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode")
 	FLinearColor BackgroundColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode")
 	FText ContextMenuName;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "GenericGraphNode")
+	FLinearColor GetBackgroundColor() const;
+	FLinearColor GetBackgroundColor_Implementation() const;
 #endif
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "GenericGraphNode")
-	void EnterNode(AActor* OwnerActor);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "GenericGraphNode")
-	void ExitNode(AActor* OwnerActor);
+	UFUNCTION(BlueprintCallable, Category = "GenericGraphNode")
+	virtual UGenericGraphEdge* GetEdge(UGenericGraphNode* ChildNode);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "GenericGraphNode")
 	FText GetNodeTitle();
@@ -48,5 +53,6 @@ public:
 	void SetCustomNodeTitle(const FText& NewTitle);
 	virtual void SetCustomNodeTitle_Implementation(const FText& NewTitle);
 
-	UGenericGraph* GetGraph();
+	UFUNCTION(BlueprintCallable, Category = "GenericGraphNode")
+	UGenericGraph* GetGraph() const;
 };

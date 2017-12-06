@@ -1,12 +1,13 @@
-#include "GenericGraphConnectionDrawingPolicy.h"
+#include "ConnectionDrawingPolicy_GenericGraph.h"
+#include "EdNode_GenericGraphNode.h"
 
-FGenericGraphConnectionDrawingPolicy::FGenericGraphConnectionDrawingPolicy(int32 InBackLayerID, int32 InFrontLayerID, float ZoomFactor, const FSlateRect& InClippingRect, FSlateWindowElementList& InDrawElements, UEdGraph* InGraphObj)
+FConnectionDrawingPolicy_GenericGraph::FConnectionDrawingPolicy_GenericGraph(int32 InBackLayerID, int32 InFrontLayerID, float ZoomFactor, const FSlateRect& InClippingRect, FSlateWindowElementList& InDrawElements, UEdGraph* InGraphObj)
 	: FConnectionDrawingPolicy(InBackLayerID, InFrontLayerID, ZoomFactor, InClippingRect, InDrawElements)
 	, GraphObj(InGraphObj)
 {
 }
 
-void FGenericGraphConnectionDrawingPolicy::DetermineWiringStyle(UEdGraphPin* OutputPin, UEdGraphPin* InputPin, /*inout*/ FConnectionParams& Params)
+void FConnectionDrawingPolicy_GenericGraph::DetermineWiringStyle(UEdGraphPin* OutputPin, UEdGraphPin* InputPin, /*inout*/ FConnectionParams& Params)
 {
 	Params.AssociatedPin1 = OutputPin;
 	Params.AssociatedPin2 = InputPin;
@@ -19,7 +20,7 @@ void FGenericGraphConnectionDrawingPolicy::DetermineWiringStyle(UEdGraphPin* Out
 	}
 }
 
-void FGenericGraphConnectionDrawingPolicy::Draw(TMap<TSharedRef<SWidget>, FArrangedWidget>& InPinGeometries, FArrangedChildren& ArrangedNodes)
+void FConnectionDrawingPolicy_GenericGraph::Draw(TMap<TSharedRef<SWidget>, FArrangedWidget>& InPinGeometries, FArrangedChildren& ArrangedNodes)
 {
 	// Build an acceleration structure to quickly find geometry for the nodes
 	NodeWidgetMap.Empty();
@@ -34,7 +35,7 @@ void FGenericGraphConnectionDrawingPolicy::Draw(TMap<TSharedRef<SWidget>, FArran
 	FConnectionDrawingPolicy::Draw(InPinGeometries, ArrangedNodes);
 }
 
-void FGenericGraphConnectionDrawingPolicy::DrawPreviewConnector(const FGeometry& PinGeometry, const FVector2D& StartPoint, const FVector2D& EndPoint, UEdGraphPin* Pin)
+void FConnectionDrawingPolicy_GenericGraph::DrawPreviewConnector(const FGeometry& PinGeometry, const FVector2D& StartPoint, const FVector2D& EndPoint, UEdGraphPin* Pin)
 {
 	FConnectionParams Params;
 	DetermineWiringStyle(Pin, nullptr, /*inout*/ Params);
@@ -49,7 +50,7 @@ void FGenericGraphConnectionDrawingPolicy::DrawPreviewConnector(const FGeometry&
 	}
 }
 
-void FGenericGraphConnectionDrawingPolicy::DrawSplineWithArrow(const FVector2D& StartAnchorPoint, const FVector2D& EndAnchorPoint, const FConnectionParams& Params)
+void FConnectionDrawingPolicy_GenericGraph::DrawSplineWithArrow(const FVector2D& StartAnchorPoint, const FVector2D& EndAnchorPoint, const FConnectionParams& Params)
 {
 	// bUserFlag1 indicates that we need to reverse the direction of connection (used by debugger)
 	const FVector2D& P0 = Params.bUserFlag1 ? EndAnchorPoint : StartAnchorPoint;
@@ -58,7 +59,7 @@ void FGenericGraphConnectionDrawingPolicy::DrawSplineWithArrow(const FVector2D& 
 	Internal_DrawLineWithArrow(P0, P1, Params);
 }
 
-void FGenericGraphConnectionDrawingPolicy::Internal_DrawLineWithArrow(const FVector2D& StartAnchorPoint, const FVector2D& EndAnchorPoint, const FConnectionParams& Params)
+void FConnectionDrawingPolicy_GenericGraph::Internal_DrawLineWithArrow(const FVector2D& StartAnchorPoint, const FVector2D& EndAnchorPoint, const FConnectionParams& Params)
 {
 	//@TODO: Should this be scaled by zoom factor?
 	const float LineSeparationAmount = 4.5f;
@@ -93,7 +94,7 @@ void FGenericGraphConnectionDrawingPolicy::Internal_DrawLineWithArrow(const FVec
 	);
 }
 
-void FGenericGraphConnectionDrawingPolicy::DrawSplineWithArrow(const FGeometry& StartGeom, const FGeometry& EndGeom, const FConnectionParams& Params)
+void FConnectionDrawingPolicy_GenericGraph::DrawSplineWithArrow(const FGeometry& StartGeom, const FGeometry& EndGeom, const FConnectionParams& Params)
 {
 	// Get a reasonable seed point (halfway between the boxes)
 	const FVector2D StartCenter = FGeometryHelper::CenterOf(StartGeom);
@@ -107,11 +108,41 @@ void FGenericGraphConnectionDrawingPolicy::DrawSplineWithArrow(const FGeometry& 
 	DrawSplineWithArrow(StartAnchorPoint, EndAnchorPoint, Params);
 }
 
-FVector2D FGenericGraphConnectionDrawingPolicy::ComputeSplineTangent(const FVector2D& Start, const FVector2D& End) const
+FVector2D FConnectionDrawingPolicy_GenericGraph::ComputeSplineTangent(const FVector2D& Start, const FVector2D& End) const
 {
 	const FVector2D Delta = End - Start;
 	const FVector2D NormDelta = Delta.GetSafeNormal();
 
 	return NormDelta;
+}
+
+void FConnectionDrawingPolicy_GenericGraph::DetermineLinkGeometry(FArrangedChildren& ArrangedNodes, TSharedRef<SWidget>& OutputPinWidget,
+	UEdGraphPin* OutputPin, UEdGraphPin* InputPin, FArrangedWidget*& StartWidgetGeometry, FArrangedWidget*& EndWidgetGeometry)
+{
+	if (UEdNode_GenericGraphEdge* EdgeNode = Cast<UEdNode_GenericGraphEdge>(InputPin->GetOwningNode()))
+	{
+		UEdNode_GenericGraphNode* Start = EdgeNode->GetStartNode();
+		UEdNode_GenericGraphNode* End = EdgeNode->GetEndNode();
+		if (Start != nullptr && End != nullptr)
+		{
+			int32* StartNodeIndex = NodeWidgetMap.Find(Start);
+			int32* EndNodeIndex = NodeWidgetMap.Find(End);
+			if (StartNodeIndex != nullptr && EndNodeIndex != nullptr)
+			{
+				StartWidgetGeometry = &(ArrangedNodes[*StartNodeIndex]);
+				EndWidgetGeometry = &(ArrangedNodes[*EndNodeIndex]);
+			}
+		}
+	}
+	else
+	{
+		StartWidgetGeometry = PinGeometries->Find(OutputPinWidget);
+
+		if (TSharedRef<SGraphPin>* pTargetWidget = PinToPinWidgetMap.Find(InputPin))
+		{
+			TSharedRef<SGraphPin> InputWidget = *pTargetWidget;
+			EndWidgetGeometry = PinGeometries->Find(InputWidget);
+		}
+	}
 }
 

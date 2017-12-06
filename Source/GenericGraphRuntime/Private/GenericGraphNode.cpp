@@ -16,6 +16,18 @@ UGenericGraphNode::~UGenericGraphNode()
 
 }
 
+#if WITH_EDITOR
+FLinearColor UGenericGraphNode::GetBackgroundColor_Implementation() const
+{
+	return BackgroundColor;
+}
+#endif
+
+UGenericGraphEdge* UGenericGraphNode::GetEdge(UGenericGraphNode* ChildNode)
+{
+	return Edges.Contains(ChildNode) ? Edges.FindChecked(ChildNode) : nullptr;
+}
+
 FText UGenericGraphNode::GetNodeTitle_Implementation()
 {
 	if (CustomNodeTitle.IsEmpty())
@@ -38,7 +50,7 @@ void UGenericGraphNode::SetCustomNodeTitle_Implementation(const FText& NewTitle)
 	CustomNodeTitle = NewTitle;
 }
 
-UGenericGraph* UGenericGraphNode::GetGraph()
+UGenericGraph* UGenericGraphNode::GetGraph() const
 {
 	return Cast<UGenericGraph>(GetOuter());
 }

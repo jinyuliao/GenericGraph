@@ -6,6 +6,9 @@
 UGenericGraph::UGenericGraph()
 {
 	NodeType = UGenericGraphNode::StaticClass();
+	EdgeType = UGenericGraphEdge::StaticClass();
+
+	bEdgeEnabled = true;
 
 #if WITH_EDITORONLY_DATA
 	EdGraph = nullptr;
@@ -116,12 +119,13 @@ void UGenericGraph::ClearGraph()
 	{
 		UGenericGraphNode* Node = AllNodes[i];
 
-		Node->ParentNodes.Reset();
-		Node->ChildrenNodes.Reset();
+		Node->ParentNodes.Empty();
+		Node->ChildrenNodes.Empty();
+		Node->Edges.Empty();
 	}
 
-	AllNodes.Reset();
-	RootNodes.Reset();
+	AllNodes.Empty();
+	RootNodes.Empty();
 }
 
 #undef LOCTEXT_NAMESPACE

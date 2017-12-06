@@ -1,9 +1,11 @@
-#include "SGenericGraphEdNode.h"
-#include "GenericGraphColors.h"
+#include "SEdNode_GenericGraphNode.h"
+#include "Colors_GenericGraph.h"
 #include "SLevelOfDetailBranchNode.h"
 #include "SInlineEditableTextBlock.h"
 #include "SCommentBubble.h"
 #include "SlateOptMacros.h"
+
+#define LOCTEXT_NAMESPACE "EdNode_GenericGraph"
 
 //////////////////////////////////////////////////////////////////////////
 class SGenericGraphPin : public SGraphPin
@@ -52,14 +54,14 @@ protected:
 
 
 //////////////////////////////////////////////////////////////////////////
-void SGenericGraphEdNode::Construct(const FArguments& InArgs, UGenericGraphEdNode* InNode)
+void SEdNode_GenericGraphNode::Construct(const FArguments& InArgs, UEdNode_GenericGraphNode* InNode)
 {
 	GraphNode = InNode;
 	UpdateGraphNode();
 }
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
-void SGenericGraphEdNode::UpdateGraphNode()
+void SEdNode_GenericGraphNode::UpdateGraphNode()
 {
 	const FMargin NodePadding = FMargin(2.0f);
 
@@ -97,7 +99,7 @@ void SGenericGraphEdNode::UpdateGraphNode()
 			SNew(SBorder)
 			.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.Body"))
 			.Padding(0.0f)
-			.BorderBackgroundColor(this, &SGenericGraphEdNode::GetBorderBackgroundColor)
+			.BorderBackgroundColor(this, &SEdNode_GenericGraphNode::GetBorderBackgroundColor)
 			//.OnMouseButtonDown(this, &SGenericGraphEdNode::OnMouseDown)
 			[
 				SNew(SOverlay)
@@ -130,7 +132,7 @@ void SGenericGraphEdNode::UpdateGraphNode()
 						[
 							SAssignNew(NodeBody, SBorder)
 							.BorderImage(FEditorStyle::GetBrush("BTEditor.Graph.BTNode.Body"))
-							.BorderBackgroundColor(this, &SGenericGraphEdNode::GetBackgroundColor)
+							.BorderBackgroundColor(this, &SEdNode_GenericGraphNode::GetBackgroundColor)
 							.HAlign(HAlign_Fill)
 							.VAlign(VAlign_Center)
 							.Visibility(EVisibility::SelfHitTestInvisible)
@@ -150,15 +152,15 @@ void SGenericGraphEdNode::UpdateGraphNode()
 										[
 											// POPUP ERROR MESSAGE
 											SAssignNew(ErrorText, SErrorText)
-											.BackgroundColor(this, &SGenericGraphEdNode::GetErrorColor)
-											.ToolTipText(this, &SGenericGraphEdNode::GetErrorMsgToolTip)
+											.BackgroundColor(this, &SEdNode_GenericGraphNode::GetErrorColor)
+											.ToolTipText(this, &SEdNode_GenericGraphNode::GetErrorMsgToolTip)
 										]
 
 										+ SHorizontalBox::Slot()
 										.AutoWidth()
 										[
 											SNew(SLevelOfDetailBranchNode)
-											.UseLowDetailSlot(this, &SGenericGraphEdNode::UseLowDetailNodeTitles)
+											.UseLowDetailSlot(this, &SEdNode_GenericGraphNode::UseLowDetailNodeTitles)
 											.LowDetail()
 											[
 												SNew(SBox)
@@ -178,10 +180,10 @@ void SGenericGraphEdNode::UpdateGraphNode()
 														SAssignNew(InlineEditableText, SInlineEditableTextBlock)
 														.Style(FEditorStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
 														.Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
-														.OnVerifyTextChanged(this, &SGenericGraphEdNode::OnVerifyNameTextChanged)
-														.OnTextCommitted(this, &SGenericGraphEdNode::OnNameTextCommited)
-														.IsReadOnly(this, &SGenericGraphEdNode::IsNameReadOnly)
-														.IsSelected(this, &SGenericGraphEdNode::IsSelectedExclusively)
+														.OnVerifyTextChanged(this, &SEdNode_GenericGraphNode::OnVerifyNameTextChanged)
+														.OnTextCommitted(this, &SEdNode_GenericGraphNode::OnNameTextCommited)
+														.IsReadOnly(this, &SEdNode_GenericGraphNode::IsNameReadOnly)
+														.IsSelected(this, &SEdNode_GenericGraphNode::IsSelectedExclusively)
 													]
 													+ SVerticalBox::Slot()
 													.AutoHeight()
@@ -248,9 +250,9 @@ void SGenericGraphEdNode::UpdateGraphNode()
 	CreatePinWidgets();
 }
 
-void SGenericGraphEdNode::CreatePinWidgets()
+void SEdNode_GenericGraphNode::CreatePinWidgets()
 {
-	UGenericGraphEdNode* StateNode = CastChecked<UGenericGraphEdNode>(GraphNode);
+	UEdNode_GenericGraphNode* StateNode = CastChecked<UEdNode_GenericGraphNode>(GraphNode);
 
 	for (int32 PinIdx = 0; PinIdx < StateNode->Pins.Num(); PinIdx++)
 	{
@@ -264,7 +266,7 @@ void SGenericGraphEdNode::CreatePinWidgets()
 	}
 }
 
-void SGenericGraphEdNode::AddPin(const TSharedRef<SGraphPin>& PinToAdd)
+void SEdNode_GenericGraphNode::AddPin(const TSharedRef<SGraphPin>& PinToAdd)
 {
 	PinToAdd->SetOwner(SharedThis(this));
 
@@ -301,53 +303,53 @@ void SGenericGraphEdNode::AddPin(const TSharedRef<SGraphPin>& PinToAdd)
 }
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
-bool SGenericGraphEdNode::IsNameReadOnly() const
-{
-	return false;
-}
-
-void SGenericGraphEdNode::OnNameTextCommited(const FText& InText, ETextCommit::Type CommitInfo)
+void SEdNode_GenericGraphNode::OnNameTextCommited(const FText& InText, ETextCommit::Type CommitInfo)
 {
 	SGraphNode::OnNameTextCommited(InText, CommitInfo);
 
-	UGenericGraphEdNode* MyNode = CastChecked<UGenericGraphEdNode>(GraphNode);
+	UEdNode_GenericGraphNode* MyNode = CastChecked<UEdNode_GenericGraphNode>(GraphNode);
 
-	if (MyNode != nullptr)
+	if (MyNode != nullptr && MyNode->GenericGraphNode != nullptr)
 	{
+		const FScopedTransaction Transaction(LOCTEXT("GenericGraphEditorRenameNode", "Generic Graph Editor: Rename Node"));
+		MyNode->Modify();
+		MyNode->GenericGraphNode->Modify();
 		MyNode->GenericGraphNode->SetCustomNodeTitle(InText);
 		UpdateGraphNode();
 	}
 }
 
-FSlateColor SGenericGraphEdNode::GetBorderBackgroundColor() const
+FSlateColor SEdNode_GenericGraphNode::GetBorderBackgroundColor() const
 {
-	UGenericGraphEdNode* MyNode = CastChecked<UGenericGraphEdNode>(GraphNode);
+	UEdNode_GenericGraphNode* MyNode = CastChecked<UEdNode_GenericGraphNode>(GraphNode);
 	return MyNode ? MyNode->GetBackgroundColor() : GenericGraphColors::NodeBorder::HighlightAbortRange0;
 }
 
-FSlateColor SGenericGraphEdNode::GetBackgroundColor() const
+FSlateColor SEdNode_GenericGraphNode::GetBackgroundColor() const
 {
 	return GenericGraphColors::NodeBody::Default;
 }
 
-EVisibility SGenericGraphEdNode::GetDragOverMarkerVisibility() const
+EVisibility SEdNode_GenericGraphNode::GetDragOverMarkerVisibility() const
 {
 	return EVisibility::Visible;
 }
 
-FText SGenericGraphEdNode::GetDescription() const
+FText SEdNode_GenericGraphNode::GetDescription() const
 {
-	UGenericGraphEdNode* MyNode = CastChecked<UGenericGraphEdNode>(GraphNode);
+	UEdNode_GenericGraphNode* MyNode = CastChecked<UEdNode_GenericGraphNode>(GraphNode);
 	return MyNode ? MyNode->GetDescription() : FText::GetEmpty();
 }
 
-EVisibility SGenericGraphEdNode::GetDescriptionVisibility() const
+EVisibility SEdNode_GenericGraphNode::GetDescriptionVisibility() const
 {
 	//return (GetCurrentLOD() > EGraphRenderingLOD::LowDetail) ? EVisibility::Visible : EVisibility::Collapsed;
 	return EVisibility::Hidden;
 }
 
-const FSlateBrush* SGenericGraphEdNode::GetNameIcon() const
+const FSlateBrush* SEdNode_GenericGraphNode::GetNameIcon() const
 {
 	return FEditorStyle::GetBrush(TEXT("BTEditor.Graph.BTNode.Icon"));
 }
+
+#undef LOCTEXT_NAMESPACE

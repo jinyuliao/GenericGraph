@@ -1,9 +1,9 @@
-#include "GenericGraphAssetEditor.h"
+#include "AssetEditor_GenericGraph.h"
 #include "GenericGraphEditorPrivatePCH.h"
-#include "GenericGraphAssetEditorToolbar.h"
-#include "GenericGraphAssetGraphSchema.h"
-#include "GenericGraphEditorCommands.h"
-#include "GenericGraphEdGraph.h"
+#include "AssetEditorToolbar_GenericGraph.h"
+#include "AssetGraphSchema_GenericGraph.h"
+#include "EditorCommands_GenericGraph.h"
+#include "EdGraph_GenericGraph.h"
 #include "AssetToolsModule.h"
 #include "GenericPlatform/GenericPlatformApplicationMisc.h"
 #include "GenericCommands.h"
@@ -13,7 +13,7 @@
 #include "Editor/UnrealEd/Public/Kismet2/BlueprintEditorUtils.h"
 #include "EdGraphUtilities.h"
 
-#define LOCTEXT_NAMESPACE "GenericGraphAssetEditor"
+#define LOCTEXT_NAMESPACE "AssetEditor_GenericGraph"
 
 const FName GenericGraphEditorAppName = FName(TEXT("GenericGraphEditorApp"));
 
@@ -31,31 +31,30 @@ const FName FGenericGraphAssetEditorTabs::ViewportID(TEXT("Viewport"));
 
 //////////////////////////////////////////////////////////////////////////
 
-FGenericGraphAssetEditor::FGenericGraphAssetEditor()
+FAssetEditor_GenericGraph::FAssetEditor_GenericGraph()
 {
 	EditingGraph = nullptr;
 
-	OnPackageSavedDelegateHandle = UPackage::PackageSavedEvent.AddRaw(this, &FGenericGraphAssetEditor::OnPackageSaved);
+	OnPackageSavedDelegateHandle = UPackage::PackageSavedEvent.AddRaw(this, &FAssetEditor_GenericGraph::OnPackageSaved);
 }
 
-FGenericGraphAssetEditor::~FGenericGraphAssetEditor()
+FAssetEditor_GenericGraph::~FAssetEditor_GenericGraph()
 {
 	UPackage::PackageSavedEvent.Remove(OnPackageSavedDelegateHandle);
 }
 
-void FGenericGraphAssetEditor::InitGenericGraphAssetEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UGenericGraph* Graph)
+void FAssetEditor_GenericGraph::InitGenericGraphAssetEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UGenericGraph* Graph)
 {
-
 	EditingGraph = Graph;
 	CreateEdGraph();
 
 	FGenericCommands::Register();
 	FGraphEditorCommands::Register();
-	FGenericGraphEditorCommands::Register();
+	FEditorCommands_GenericGraph::Register();
 
 	if (!ToolbarBuilder.IsValid())
 	{
-		ToolbarBuilder = MakeShareable(new FGenericGraphAssetEditorToolbar(SharedThis(this)));
+		ToolbarBuilder = MakeShareable(new FAssetEditorToolbar_GenericGraph(SharedThis(this)));
 	}
 
 	BindCommands();
@@ -102,25 +101,25 @@ void FGenericGraphAssetEditor::InitGenericGraphAssetEditor(const EToolkitMode::T
 	RegenerateMenusAndToolbars();
 }
 
-void FGenericGraphAssetEditor::RegisterTabSpawners(const TSharedRef<FTabManager>& InTabManager)
+void FAssetEditor_GenericGraph::RegisterTabSpawners(const TSharedRef<FTabManager>& InTabManager)
 {
 	WorkspaceMenuCategory = InTabManager->AddLocalWorkspaceMenuCategory(LOCTEXT("WorkspaceMenu_SoundCueEditor", "Sound Cue Editor"));
 	auto WorkspaceMenuCategoryRef = WorkspaceMenuCategory.ToSharedRef();
 
 	FAssetEditorToolkit::RegisterTabSpawners(InTabManager);
 
-	InTabManager->RegisterTabSpawner(FGenericGraphAssetEditorTabs::ViewportID, FOnSpawnTab::CreateSP(this, &FGenericGraphAssetEditor::SpawnTab_Viewport))
+	InTabManager->RegisterTabSpawner(FGenericGraphAssetEditorTabs::ViewportID, FOnSpawnTab::CreateSP(this, &FAssetEditor_GenericGraph::SpawnTab_Viewport))
 		.SetDisplayName(LOCTEXT("GraphCanvasTab", "Viewport"))
 		.SetGroup(WorkspaceMenuCategoryRef)
 		.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(), "GraphEditor.EventGraph_16x"));
 
-	InTabManager->RegisterTabSpawner(FGenericGraphAssetEditorTabs::DetailsID, FOnSpawnTab::CreateSP(this, &FGenericGraphAssetEditor::SpawnTab_Details))
+	InTabManager->RegisterTabSpawner(FGenericGraphAssetEditorTabs::DetailsID, FOnSpawnTab::CreateSP(this, &FAssetEditor_GenericGraph::SpawnTab_Details))
 		.SetDisplayName(LOCTEXT("DetailsTab", "Details"))
 		.SetGroup(WorkspaceMenuCategoryRef)
 		.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(), "LevelEditor.Tabs.Details"));
 }
 
-void FGenericGraphAssetEditor::UnregisterTabSpawners(const TSharedRef<FTabManager>& InTabManager)
+void FAssetEditor_GenericGraph::UnregisterTabSpawners(const TSharedRef<FTabManager>& InTabManager)
 {
 	FAssetEditorToolkit::UnregisterTabSpawners(InTabManager);
 
@@ -128,17 +127,17 @@ void FGenericGraphAssetEditor::UnregisterTabSpawners(const TSharedRef<FTabManage
 	InTabManager->UnregisterTabSpawner(FGenericGraphAssetEditorTabs::DetailsID);
 }
 
-FName FGenericGraphAssetEditor::GetToolkitFName() const
+FName FAssetEditor_GenericGraph::GetToolkitFName() const
 {
 	return FName("FGenericGraphEditor");
 }
 
-FText FGenericGraphAssetEditor::GetBaseToolkitName() const
+FText FAssetEditor_GenericGraph::GetBaseToolkitName() const
 {
 	return LOCTEXT("GenericGraphEditorAppLabel", "Generic Graph Editor");
 }
 
-FText FGenericGraphAssetEditor::GetToolkitName() const
+FText FAssetEditor_GenericGraph::GetToolkitName() const
 {
 	const bool bDirtyState = EditingGraph->GetOutermost()->IsDirty();
 
@@ -148,27 +147,27 @@ FText FGenericGraphAssetEditor::GetToolkitName() const
 	return FText::Format(LOCTEXT("GenericGraphEditorToolkitName", "{GenericGraphName}{DirtyState}"), Args);
 }
 
-FText FGenericGraphAssetEditor::GetToolkitToolTipText() const
+FText FAssetEditor_GenericGraph::GetToolkitToolTipText() const
 {
 	return FAssetEditorToolkit::GetToolTipTextForObject(EditingGraph);
 }
 
-FLinearColor FGenericGraphAssetEditor::GetWorldCentricTabColorScale() const
+FLinearColor FAssetEditor_GenericGraph::GetWorldCentricTabColorScale() const
 {
 	return FLinearColor::White;
 }
 
-FString FGenericGraphAssetEditor::GetWorldCentricTabPrefix() const
+FString FAssetEditor_GenericGraph::GetWorldCentricTabPrefix() const
 {
 	return TEXT("GenericGraphEditor");
 }
 
-FString FGenericGraphAssetEditor::GetDocumentationLink() const
+FString FAssetEditor_GenericGraph::GetDocumentationLink() const
 {
 	return TEXT("");
 }
 
-void FGenericGraphAssetEditor::SaveAsset_Execute()
+void FAssetEditor_GenericGraph::SaveAsset_Execute()
 {
 	if (EditingGraph != nullptr)
 	{
@@ -178,13 +177,13 @@ void FGenericGraphAssetEditor::SaveAsset_Execute()
 	FAssetEditorToolkit::SaveAsset_Execute();
 }
 
-void FGenericGraphAssetEditor::AddReferencedObjects(FReferenceCollector& Collector)
+void FAssetEditor_GenericGraph::AddReferencedObjects(FReferenceCollector& Collector)
 {
 	Collector.AddReferencedObject(EditingGraph);
 	Collector.AddReferencedObject(EditingGraph->EdGraph);
 }
 
-TSharedRef<SDockTab> FGenericGraphAssetEditor::SpawnTab_Viewport(const FSpawnTabArgs& Args)
+TSharedRef<SDockTab> FAssetEditor_GenericGraph::SpawnTab_Viewport(const FSpawnTabArgs& Args)
 {
 	check(Args.GetTabId() == FGenericGraphAssetEditorTabs::ViewportID);
 
@@ -199,7 +198,7 @@ TSharedRef<SDockTab> FGenericGraphAssetEditor::SpawnTab_Viewport(const FSpawnTab
 	return SpawnedTab;
 }
 
-TSharedRef<SDockTab> FGenericGraphAssetEditor::SpawnTab_Details(const FSpawnTabArgs& Args)
+TSharedRef<SDockTab> FAssetEditor_GenericGraph::SpawnTab_Details(const FSpawnTabArgs& Args)
 {
 	check(Args.GetTabId() == FGenericGraphAssetEditorTabs::DetailsID);
 
@@ -211,7 +210,7 @@ TSharedRef<SDockTab> FGenericGraphAssetEditor::SpawnTab_Details(const FSpawnTabA
 		];
 }
 
-void FGenericGraphAssetEditor::CreateInternalWidgets()
+void FAssetEditor_GenericGraph::CreateInternalWidgets()
 {
 	ViewportWidget = CreateViewportWidget();
 
@@ -224,10 +223,10 @@ void FGenericGraphAssetEditor::CreateInternalWidgets()
 	PropertyWidget->SetObject(EditingGraph);
 
 	//PropertyWidget->SetIsPropertyEditingEnabledDelegate(FIsPropertyEditingEnabled::CreateSP(this, &FGenericGraphAssetEditor::IsPropertyEditable));
-	PropertyWidget->OnFinishedChangingProperties().AddSP(this, &FGenericGraphAssetEditor::OnFinishedChangingProperties);
+	PropertyWidget->OnFinishedChangingProperties().AddSP(this, &FAssetEditor_GenericGraph::OnFinishedChangingProperties);
 }
 
-TSharedRef<SGraphEditor> FGenericGraphAssetEditor::CreateViewportWidget()
+TSharedRef<SGraphEditor> FAssetEditor_GenericGraph::CreateViewportWidget()
 {
 	FGraphAppearanceInfo AppearanceInfo;
 	AppearanceInfo.CornerText = LOCTEXT("AppearanceCornerText_GenericGraph", "Generic Graph");
@@ -235,8 +234,8 @@ TSharedRef<SGraphEditor> FGenericGraphAssetEditor::CreateViewportWidget()
 	CreateCommandList();
 
 	SGraphEditor::FGraphEditorEvents InEvents;
-	InEvents.OnSelectionChanged = SGraphEditor::FOnSelectionChanged::CreateSP(this, &FGenericGraphAssetEditor::OnSelectedNodesChanged);
-	InEvents.OnNodeDoubleClicked = FSingleNodeEvent::CreateSP(this, &FGenericGraphAssetEditor::OnNodeDoubleClicked);
+	InEvents.OnSelectionChanged = SGraphEditor::FOnSelectionChanged::CreateSP(this, &FAssetEditor_GenericGraph::OnSelectedNodesChanged);
+	InEvents.OnNodeDoubleClicked = FSingleNodeEvent::CreateSP(this, &FAssetEditor_GenericGraph::OnNodeDoubleClicked);
 
 	return SNew(SGraphEditor)
 		.AdditionalCommands(GraphEditorCommands)
@@ -249,19 +248,19 @@ TSharedRef<SGraphEditor> FGenericGraphAssetEditor::CreateViewportWidget()
 }
 
 
-void FGenericGraphAssetEditor::BindCommands()
+void FAssetEditor_GenericGraph::BindCommands()
 {
-	ToolkitCommands->MapAction(FGenericGraphEditorCommands::Get().GraphSettings,
-		FExecuteAction::CreateSP(this, &FGenericGraphAssetEditor::GraphSettings),
-		FCanExecuteAction::CreateSP(this, &FGenericGraphAssetEditor::CanGraphSettings)
+	ToolkitCommands->MapAction(FEditorCommands_GenericGraph::Get().GraphSettings,
+		FExecuteAction::CreateSP(this, &FAssetEditor_GenericGraph::GraphSettings),
+		FCanExecuteAction::CreateSP(this, &FAssetEditor_GenericGraph::CanGraphSettings)
 	);
 }
 
-void FGenericGraphAssetEditor::CreateEdGraph()
+void FAssetEditor_GenericGraph::CreateEdGraph()
 {
 	if (EditingGraph->EdGraph == nullptr)
 	{
-		EditingGraph->EdGraph = CastChecked<UGenericGraphEdGraph>(FBlueprintEditorUtils::CreateNewGraph(EditingGraph, NAME_None, UGenericGraphEdGraph::StaticClass(), UGenericGraphAssetGraphSchema::StaticClass()));
+		EditingGraph->EdGraph = CastChecked<UEdGraph_GenericGraph>(FBlueprintEditorUtils::CreateNewGraph(EditingGraph, NAME_None, UEdGraph_GenericGraph::StaticClass(), UAssetGraphSchema_GenericGraph::StaticClass()));
 		EditingGraph->EdGraph->bAllowDeletion = false;
 
 		// Give the schema a chance to fill out any required nodes (like the results node)
@@ -270,7 +269,7 @@ void FGenericGraphAssetEditor::CreateEdGraph()
 	}
 }
 
-void FGenericGraphAssetEditor::CreateCommandList()
+void FAssetEditor_GenericGraph::CreateCommandList()
 {
 	if (GraphEditorCommands.IsValid())
 	{
@@ -283,47 +282,47 @@ void FGenericGraphAssetEditor::CreateCommandList()
 	// however it should be safe, since commands are being used only within this editor
 	// if it ever crashes, this function will have to go away and be reimplemented in each derived class
 
-	GraphEditorCommands->MapAction(FGenericGraphEditorCommands::Get().GraphSettings,
-		FExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::GraphSettings),
-		FCanExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CanGraphSettings));
+	GraphEditorCommands->MapAction(FEditorCommands_GenericGraph::Get().GraphSettings,
+		FExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::GraphSettings),
+		FCanExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::CanGraphSettings));
 
 	GraphEditorCommands->MapAction(FGenericCommands::Get().SelectAll,
-		FExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::SelectAllNodes),
-		FCanExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CanSelectAllNodes)
+		FExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::SelectAllNodes),
+		FCanExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::CanSelectAllNodes)
 	);
 
 	GraphEditorCommands->MapAction(FGenericCommands::Get().Delete,
-		FExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::DeleteSelectedNodes),
-		FCanExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CanDeleteNodes)
+		FExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::DeleteSelectedNodes),
+		FCanExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::CanDeleteNodes)
 	);
 
 	GraphEditorCommands->MapAction(FGenericCommands::Get().Copy,
-		FExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CopySelectedNodes),
-		FCanExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CanCopyNodes)
+		FExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::CopySelectedNodes),
+		FCanExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::CanCopyNodes)
 	);
 
 	GraphEditorCommands->MapAction(FGenericCommands::Get().Cut,
-		FExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CutSelectedNodes),
-		FCanExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CanCutNodes)
+		FExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::CutSelectedNodes),
+		FCanExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::CanCutNodes)
 	);
 
 	GraphEditorCommands->MapAction(FGenericCommands::Get().Paste,
-		FExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::PasteNodes),
-		FCanExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CanPasteNodes)
+		FExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::PasteNodes),
+		FCanExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::CanPasteNodes)
 	);
 
 	GraphEditorCommands->MapAction(FGenericCommands::Get().Duplicate,
-		FExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::DuplicateNodes),
-		FCanExecuteAction::CreateRaw(this, &FGenericGraphAssetEditor::CanDuplicateNodes)
+		FExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::DuplicateNodes),
+		FCanExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::CanDuplicateNodes)
 	);
 }
 
-TSharedPtr<SGraphEditor> FGenericGraphAssetEditor::GetCurrGraphEditor()
+TSharedPtr<SGraphEditor> FAssetEditor_GenericGraph::GetCurrGraphEditor()
 {
 	return ViewportWidget;
 }
 
-FGraphPanelSelectionSet FGenericGraphAssetEditor::GetSelectedNodes()
+FGraphPanelSelectionSet FAssetEditor_GenericGraph::GetSelectedNodes()
 {
 	FGraphPanelSelectionSet CurrentSelection;
 	TSharedPtr<SGraphEditor> FocusedGraphEd = GetCurrGraphEditor();
@@ -335,7 +334,7 @@ FGraphPanelSelectionSet FGenericGraphAssetEditor::GetSelectedNodes()
 	return CurrentSelection;
 }
 
-void FGenericGraphAssetEditor::RebuildGenericGraph()
+void FAssetEditor_GenericGraph::RebuildGenericGraph()
 {
 	if (EditingGraph == nullptr)
 	{
@@ -343,13 +342,13 @@ void FGenericGraphAssetEditor::RebuildGenericGraph()
 		return;
 	}
 
-	UGenericGraphEdGraph* EdGraph = Cast<UGenericGraphEdGraph>(EditingGraph->EdGraph);
+	UEdGraph_GenericGraph* EdGraph = Cast<UEdGraph_GenericGraph>(EditingGraph->EdGraph);
 	check(EdGraph != nullptr);
 
 	EdGraph->RebuildGenericGraph();
 }
 
-void FGenericGraphAssetEditor::SelectAllNodes()
+void FAssetEditor_GenericGraph::SelectAllNodes()
 {
 	TSharedPtr<SGraphEditor> CurrentGraphEditor = GetCurrGraphEditor();
 	if (CurrentGraphEditor.IsValid())
@@ -358,12 +357,12 @@ void FGenericGraphAssetEditor::SelectAllNodes()
 	}
 }
 
-bool FGenericGraphAssetEditor::CanSelectAllNodes()
+bool FAssetEditor_GenericGraph::CanSelectAllNodes()
 {
 	return true;
 }
 
-void FGenericGraphAssetEditor::DeleteSelectedNodes()
+void FAssetEditor_GenericGraph::DeleteSelectedNodes()
 {
 	TSharedPtr<SGraphEditor> CurrentGraphEditor = GetCurrGraphEditor();
 	if (!CurrentGraphEditor.IsValid())
@@ -392,7 +391,7 @@ void FGenericGraphAssetEditor::DeleteSelectedNodes()
 	LOG_WARNING(TEXT("FGenericGraphAssetEditor::DeleteSelectedNodes Exec"));
 }
 
-bool FGenericGraphAssetEditor::CanDeleteNodes()
+bool FAssetEditor_GenericGraph::CanDeleteNodes()
 {
 	// If any of the nodes can be deleted then we should allow deleting
 	const FGraphPanelSelectionSet SelectedNodes = GetSelectedNodes();
@@ -410,7 +409,7 @@ bool FGenericGraphAssetEditor::CanDeleteNodes()
 	return false;
 }
 
-void FGenericGraphAssetEditor::DeleteSelectedDuplicatableNodes()
+void FAssetEditor_GenericGraph::DeleteSelectedDuplicatableNodes()
 {
 	TSharedPtr<SGraphEditor> CurrentGraphEditor = GetCurrGraphEditor();
 	if (!CurrentGraphEditor.IsValid())
@@ -444,18 +443,18 @@ void FGenericGraphAssetEditor::DeleteSelectedDuplicatableNodes()
 	}
 }
 
-void FGenericGraphAssetEditor::CutSelectedNodes()
+void FAssetEditor_GenericGraph::CutSelectedNodes()
 {
 	CopySelectedNodes();
 	DeleteSelectedDuplicatableNodes();
 }
 
-bool FGenericGraphAssetEditor::CanCutNodes()
+bool FAssetEditor_GenericGraph::CanCutNodes()
 {
 	return CanCopyNodes() && CanDeleteNodes();
 }
 
-void FGenericGraphAssetEditor::CopySelectedNodes()
+void FAssetEditor_GenericGraph::CopySelectedNodes()
 {
 	// Export the selected nodes and place the text on the clipboard
 	FGraphPanelSelectionSet SelectedNodes = GetSelectedNodes();
@@ -478,7 +477,7 @@ void FGenericGraphAssetEditor::CopySelectedNodes()
 	FGenericPlatformApplicationMisc::ClipboardCopy(*ExportedText);
 }
 
-bool FGenericGraphAssetEditor::CanCopyNodes()
+bool FAssetEditor_GenericGraph::CanCopyNodes()
 {
 	// If any of the nodes can be duplicated then we should allow copying
 	const FGraphPanelSelectionSet SelectedNodes = GetSelectedNodes();
@@ -494,7 +493,7 @@ bool FGenericGraphAssetEditor::CanCopyNodes()
 	return false;
 }
 
-void FGenericGraphAssetEditor::PasteNodes()
+void FAssetEditor_GenericGraph::PasteNodes()
 {
 	TSharedPtr<SGraphEditor> CurrentGraphEditor = GetCurrGraphEditor();
 	if (CurrentGraphEditor.IsValid())
@@ -503,40 +502,40 @@ void FGenericGraphAssetEditor::PasteNodes()
 	}
 }
 
-void FGenericGraphAssetEditor::PasteNodesHere(const FVector2D& Location)
+void FAssetEditor_GenericGraph::PasteNodesHere(const FVector2D& Location)
 {
 }
 
-bool FGenericGraphAssetEditor::CanPasteNodes()
+bool FAssetEditor_GenericGraph::CanPasteNodes()
 {
 	return false;
 }
 
-void FGenericGraphAssetEditor::DuplicateNodes()
+void FAssetEditor_GenericGraph::DuplicateNodes()
 {
 	CopySelectedNodes();
 	PasteNodes();
 }
 
-bool FGenericGraphAssetEditor::CanDuplicateNodes()
+bool FAssetEditor_GenericGraph::CanDuplicateNodes()
 {
 	//return CanCopyNodes();
 	return false;
 }
 
-void FGenericGraphAssetEditor::GraphSettings()
+void FAssetEditor_GenericGraph::GraphSettings()
 {
 	PropertyWidget->SetObject(EditingGraph);
 
 	LOG_WARNING(TEXT("FGenericGraphAssetEditor::GraphSettings"));
 }
 
-bool FGenericGraphAssetEditor::CanGraphSettings() const
+bool FAssetEditor_GenericGraph::CanGraphSettings() const
 {
 	return true;
 }
 
-void FGenericGraphAssetEditor::OnSelectedNodesChanged(const TSet<class UObject*>& NewSelection)
+void FAssetEditor_GenericGraph::OnSelectedNodesChanged(const TSet<class UObject*>& NewSelection)
 {
 	TArray<UObject*> Selection;
 
@@ -560,27 +559,25 @@ void FGenericGraphAssetEditor::OnSelectedNodesChanged(const TSet<class UObject*>
 	}
 }
 
-void FGenericGraphAssetEditor::OnNodeDoubleClicked(UEdGraphNode* Node)
+void FAssetEditor_GenericGraph::OnNodeDoubleClicked(UEdGraphNode* Node)
 {
 	
 }
 
-void FGenericGraphAssetEditor::OnFinishedChangingProperties(const FPropertyChangedEvent& PropertyChangedEvent)
+void FAssetEditor_GenericGraph::OnFinishedChangingProperties(const FPropertyChangedEvent& PropertyChangedEvent)
 {
 	if (EditingGraph == nullptr)
 		return;
 
-	RebuildGenericGraph();
-
 	EditingGraph->EdGraph->GetSchema()->ForceVisualizationCacheClear();
 }
 
-void FGenericGraphAssetEditor::OnPackageSaved(const FString& PackageFileName, UObject* Outer)
+void FAssetEditor_GenericGraph::OnPackageSaved(const FString& PackageFileName, UObject* Outer)
 {
 	RebuildGenericGraph();
 }
 
-void FGenericGraphAssetEditor::RegisterToolbarTab(const TSharedRef<class FTabManager>& InTabManager) 
+void FAssetEditor_GenericGraph::RegisterToolbarTab(const TSharedRef<class FTabManager>& InTabManager) 
 {
 	FAssetEditorToolkit::RegisterTabSpawners(InTabManager);
 }

@@ -1,20 +1,24 @@
-// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
-
-#include "GenericGraphAssetTypeActions.h"
-#include "GenericGraphAssetEditor/GenericGraphEdNode.h"
-#include "GenericGraphAssetEditor/SGenericGraphEdNode.h"
+#include "AssetTypeActions_GenericGraph.h"
+#include "GenericGraphAssetEditor/EdNode_GenericGraphNode.h"
+#include "GenericGraphAssetEditor/EdNode_GenericGraphEdge.h"
+#include "GenericGraphAssetEditor/SEdNode_GenericGraphNode.h"
+#include "GenericGraphAssetEditor/SEdNode_GenericGraphEdge.h"
 
 DEFINE_LOG_CATEGORY(GenericGraphEditor)
 
-#define LOCTEXT_NAMESPACE "GenericGraphEditor"
+#define LOCTEXT_NAMESPACE "Editor_GenericGraph"
 
 class FGraphPanelNodeFactory_GenericGraph : public FGraphPanelNodeFactory
 {
 	virtual TSharedPtr<class SGraphNode> CreateNode(UEdGraphNode* Node) const override
 	{
-		if (UGenericGraphEdNode* GraphEdNode = Cast<UGenericGraphEdNode>(Node))
+		if (UEdNode_GenericGraphNode* GraphEdNode = Cast<UEdNode_GenericGraphNode>(Node))
 		{
-			return SNew(SGenericGraphEdNode, GraphEdNode);
+			return SNew(SEdNode_GenericGraphNode, GraphEdNode);
+		}
+		else if (UEdNode_GenericGraphEdge* TransitionEdNode = Cast<UEdNode_GenericGraphEdge>(Node))
+		{
+			return SNew(SEdNode_GenericGraphEdge, TransitionEdNode);
 		}
 		return nullptr;
 	}
@@ -48,7 +52,7 @@ void FGenericGraphEditor::StartupModule()
 
 	GenericGraphAssetCategoryBit = AssetTools.RegisterAdvancedAssetCategory(FName(TEXT("GenericGraph")), LOCTEXT("GenericGraphAssetCategory", "GenericGraph"));
 
-	RegisterAssetTypeAction(AssetTools, MakeShareable(new FGenericGraphAssetTypeActions(GenericGraphAssetCategoryBit)));
+	RegisterAssetTypeAction(AssetTools, MakeShareable(new FAssetTypeActions_GenericGraph(GenericGraphAssetCategoryBit)));
 }
 
 

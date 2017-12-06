@@ -3,14 +3,14 @@
 
 #include "CoreMinimal.h"
 
-class FGenericGraphAssetEditor;
+class FAssetEditor_GenericGraph;
 class FExtender;
 class FToolBarBuilder;
 
-class FGenericGraphAssetEditorToolbar : public TSharedFromThis<FGenericGraphAssetEditorToolbar>
+class FAssetEditorToolbar_GenericGraph : public TSharedFromThis<FAssetEditorToolbar_GenericGraph>
 {
 public:
-	FGenericGraphAssetEditorToolbar(TSharedPtr<FGenericGraphAssetEditor> InGenericGraphEditor)
+	FAssetEditorToolbar_GenericGraph(TSharedPtr<FAssetEditor_GenericGraph> InGenericGraphEditor)
 		: GenericGraphEditor(InGenericGraphEditor) {}
 
 	void AddGenericGraphToolbar(TSharedPtr<FExtender> Extender);
@@ -20,5 +20,5 @@ private:
 
 protected:
 	/** Pointer back to the blueprint editor tool that owns us */
-	TWeakPtr<FGenericGraphAssetEditor> GenericGraphEditor;
+	TWeakPtr<FAssetEditor_GenericGraph> GenericGraphEditor;
 };

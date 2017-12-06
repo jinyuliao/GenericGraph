@@ -1,16 +1,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GenericGraphEdGraph.generated.h"
+#include "EdGraph_GenericGraph.generated.h"
 
 UCLASS()
-class UGenericGraphEdGraph : public UEdGraph
+class UEdGraph_GenericGraph : public UEdGraph
 {
 	GENERATED_BODY()
 
 public:
-	UGenericGraphEdGraph();
-	virtual ~UGenericGraphEdGraph();
+	UEdGraph_GenericGraph();
+	virtual ~UEdGraph_GenericGraph();
 
 	virtual void RebuildGenericGraph();
 

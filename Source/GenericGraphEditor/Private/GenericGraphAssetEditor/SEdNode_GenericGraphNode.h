@@ -2,20 +2,18 @@
 
 #include "CoreMinimal.h"
 
-class SGenericGraphEdNode : public SGraphNode
+class SEdNode_GenericGraphNode : public SGraphNode
 {
 public:
-	SLATE_BEGIN_ARGS(SGenericGraphEdNode) {}
+	SLATE_BEGIN_ARGS(SEdNode_GenericGraphNode) {}
 	SLATE_END_ARGS()
 
-	void Construct(const FArguments& InArgs, UGenericGraphEdNode* InNode);
+	void Construct(const FArguments& InArgs, UEdNode_GenericGraphNode* InNode);
 
 	//~ Begin SGraphNode Interface
 	virtual void UpdateGraphNode() override;
 	virtual void CreatePinWidgets() override;
 	virtual void AddPin(const TSharedRef<SGraphPin>& PinToAdd) override;
-
-	virtual bool IsNameReadOnly() const override;
 
 	void OnNameTextCommited(const FText& InText, ETextCommit::Type CommitInfo);
 

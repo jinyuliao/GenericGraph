@@ -1,6 +1,6 @@
 #include "GenericGraphFactory.h"
 
-#define LOCTEXT_NAMESPACE "GenericGraph"
+#define LOCTEXT_NAMESPACE "GenericGraphFactory"
 
 UGenericGraphFactory::UGenericGraphFactory()
 {
