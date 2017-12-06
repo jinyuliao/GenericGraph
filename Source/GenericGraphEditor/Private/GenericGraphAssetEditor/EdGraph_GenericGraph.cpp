@@ -40,16 +40,30 @@ void UEdGraph_GenericGraph::RebuildGenericGraph()
 
 				for (int LinkToIdx = 0; LinkToIdx < Pin->LinkedTo.Num(); ++LinkToIdx)
 				{
-					UEdNode_GenericGraphNode* ChildEdNode = Cast<UEdNode_GenericGraphNode>(Pin->LinkedTo[LinkToIdx]->GetOwningNode());
+					UGenericGraphNode* ChildNode = nullptr;
+					if (UEdNode_GenericGraphNode* EdNode_Child = Cast<UEdNode_GenericGraphNode>(Pin->LinkedTo[LinkToIdx]->GetOwningNode()))
+					{
+						ChildNode = EdNode_Child->GenericGraphNode;
+					}
+					else if (UEdNode_GenericGraphEdge* EdNode_Edge = Cast<UEdNode_GenericGraphEdge>(Pin->LinkedTo[LinkToIdx]->GetOwningNode()))
+					{
+						UEdNode_GenericGraphNode* EdNode_Child = EdNode_Edge->GetEndNode();;
+						if (EdNode_Child != nullptr)
+						{
+							ChildNode = EdNode_Child->GenericGraphNode;
+						}
+					}
 
-					if (ChildEdNode == nullptr)
-						continue;
+					if (ChildNode != nullptr)
+					{
+						GNode->ChildrenNodes.Add(ChildNode);
 
-					UGenericGraphNode* ChildNode = ChildEdNode->GenericGraphNode;
-
-					GNode->ChildrenNodes.Add(ChildNode);
-
-					ChildNode->ParentNodes.Add(GNode);
+						ChildNode->ParentNodes.Add(GNode);
+					}
+					else
+					{
+						LOG_ERROR(TEXT("UEdGraph_GenericGraph::RebuildGenericGraph can't find child node"));
+					}
 				}
 			}
 		}
