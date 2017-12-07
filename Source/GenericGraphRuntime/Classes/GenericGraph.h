@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GenericGraphNode.h"
 #include "GenericGraphEdge.h"
+#include "GameplayTagContainer.h"
 #include "GenericGraph.generated.h"
 
 UCLASS(Blueprintable)
@@ -16,14 +17,17 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// uproperties
-	UPROPERTY(EditAnywhere, Category = "GenericGraph")
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraph")
 	FString Name;
 
-	UPROPERTY(EditAnywhere, Category = "GenericGraph")
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraph")
 	TSubclassOf<UGenericGraphNode> NodeType;
 
-	UPROPERTY(EditAnywhere, Category = "GenericGraph")
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraph")
 	TSubclassOf<UGenericGraphEdge> EdgeType;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GenericGraph")
+	FGameplayTagContainer GraphTags;
 
 	UPROPERTY(BlueprintReadOnly, Category = "GenericGraph")
 	TArray<UGenericGraphNode*> RootNodes;

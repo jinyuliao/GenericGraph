@@ -36,7 +36,8 @@ namespace UnrealBuildTool.Rules
 				{
 					// ... add private dependencies that you statically link with here ...
                     "Slate",
-                    "SlateCore"
+                    "SlateCore",
+                    "GameplayTags"
                 }
 				);
 
