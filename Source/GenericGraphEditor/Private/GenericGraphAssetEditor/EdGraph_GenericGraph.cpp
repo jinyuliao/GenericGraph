@@ -14,11 +14,11 @@ UEdGraph_GenericGraph::~UEdGraph_GenericGraph()
 
 void UEdGraph_GenericGraph::RebuildGenericGraph()
 {
-	LOG_WARNING(TEXT("UGenericGraphEdGraph::RebuildGenericGraph has been called"));
+	LOG_INFO(TEXT("UGenericGraphEdGraph::RebuildGenericGraph has been called"));
 
-	UGenericGraph* G = CastChecked<UGenericGraph>(GetOuter());
+	UGenericGraph* Graph = CastChecked<UGenericGraph>(GetOuter());
 
-	G->ClearGraph();
+	Graph->ClearGraph();
 
 	for (int i = 0; i < Nodes.Num(); ++i)
 	{
@@ -27,9 +27,9 @@ void UEdGraph_GenericGraph::RebuildGenericGraph()
 			if (EdNode->GenericGraphNode == nullptr)
 				continue;
 
-			UGenericGraphNode* GNode = EdNode->GenericGraphNode;
+			UGenericGraphNode* GenericGraphNode = EdNode->GenericGraphNode;
 
-			G->AllNodes.Add(GNode);
+			Graph->AllNodes.Add(GenericGraphNode);
 
 			for (int PinIdx = 0; PinIdx < EdNode->Pins.Num(); ++PinIdx)
 			{
@@ -56,9 +56,9 @@ void UEdGraph_GenericGraph::RebuildGenericGraph()
 
 					if (ChildNode != nullptr)
 					{
-						GNode->ChildrenNodes.Add(ChildNode);
+						GenericGraphNode->ChildrenNodes.Add(ChildNode);
 
-						ChildNode->ParentNodes.Add(GNode);
+						ChildNode->ParentNodes.Add(GenericGraphNode);
 					}
 					else
 					{
@@ -67,14 +67,17 @@ void UEdGraph_GenericGraph::RebuildGenericGraph()
 				}
 			}
 		}
-		else if (UEdNode_GenericGraphEdge* TransitionNode = Cast<UEdNode_GenericGraphEdge>(Nodes[i]))
+		else if (UEdNode_GenericGraphEdge* EdgeNode = Cast<UEdNode_GenericGraphEdge>(Nodes[i]))
 		{
-			UEdNode_GenericGraphNode* StartNode = TransitionNode->GetStartNode();
-			UEdNode_GenericGraphNode* EndNode = TransitionNode->GetEndNode();
-			UGenericGraphEdge* Edge = TransitionNode->GenericGraphEdge;
+			UEdNode_GenericGraphNode* StartNode = EdgeNode->GetStartNode();
+			UEdNode_GenericGraphNode* EndNode = EdgeNode->GetEndNode();
+			UGenericGraphEdge* Edge = EdgeNode->GenericGraphEdge;
 
 			if (StartNode == nullptr || EndNode == nullptr || Edge == nullptr)
+			{
+				LOG_ERROR(TEXT("UEdGraph_GenericGraph::RebuildGenericGraph add edge failed."));
 				continue;
+			}
 
 			Edge->StartNode = StartNode->GenericGraphNode;
 			Edge->EndNode = EndNode->GenericGraphNode;
@@ -82,12 +85,12 @@ void UEdGraph_GenericGraph::RebuildGenericGraph()
 		}
 	}
 
-	for (int i = 0; i < G->AllNodes.Num(); ++i)
+	for (int i = 0; i < Graph->AllNodes.Num(); ++i)
 	{
-		UGenericGraphNode* Node = G->AllNodes[i];
+		UGenericGraphNode* Node = Graph->AllNodes[i];
 		if (Node->ParentNodes.Num() == 0)
 		{
-			G->RootNodes.Add(Node);
+			Graph->RootNodes.Add(Node);
 		}
 	}
 }

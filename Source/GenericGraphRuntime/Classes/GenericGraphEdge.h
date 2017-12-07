@@ -15,10 +15,10 @@ public:
 	UGenericGraphEdge();
 	virtual ~UGenericGraphEdge();
 
-	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphTransition")
+	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphEdge")
 	UGenericGraphNode* StartNode;
 
-	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphTransition")
+	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphEdge")
 	UGenericGraphNode* EndNode;
 
 	UFUNCTION(BlueprintPure, Category = "GenericGraphEdge")

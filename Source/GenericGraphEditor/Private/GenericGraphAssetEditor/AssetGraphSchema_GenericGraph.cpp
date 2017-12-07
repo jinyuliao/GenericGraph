@@ -91,13 +91,13 @@ void FAssetSchemaAction_GenericGraph_NewNode::AddReferencedObjects(FReferenceCol
 	Collector.AddReferencedObject(NodeTemplate);
 }
 
-UEdGraphNode* FAssetSchemaAction_GenericGraph_NewTransition::PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode /*= true*/)
+UEdGraphNode* FAssetSchemaAction_GenericGraph_NewEdge::PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode /*= true*/)
 {
 	UEdGraphNode* ResultNode = nullptr;
 
 	if (NodeTemplate != nullptr)
 	{
-		const FScopedTransaction Transaction(LOCTEXT("GenericGraphEditorNewTransition", "Generic Graph Editor: New Edge"));
+		const FScopedTransaction Transaction(LOCTEXT("GenericGraphEditorNewEdge", "Generic Graph Editor: New Edge"));
 		ParentGraph->Modify();
 		if (FromPin != nullptr)
 			FromPin->Modify();
@@ -122,7 +122,7 @@ UEdGraphNode* FAssetSchemaAction_GenericGraph_NewTransition::PerformAction(class
 	return ResultNode;
 }
 
-void FAssetSchemaAction_GenericGraph_NewTransition::AddReferencedObjects(FReferenceCollector& Collector)
+void FAssetSchemaAction_GenericGraph_NewEdge::AddReferencedObjects(FReferenceCollector& Collector)
 {
 	FEdGraphSchemaAction::AddReferencedObjects(Collector);
 	Collector.AddReferencedObject(NodeTemplate);
@@ -338,18 +338,18 @@ bool UAssetGraphSchema_GenericGraph::CreateAutomaticConversionNodeAndConnections
 	UGenericGraph* Graph = NodeA->GenericGraphNode->GetGraph();
 	UGenericGraphEdge* Edge = NewObject<UGenericGraphEdge>(Graph, Graph->EdgeType);
 
-	FAssetSchemaAction_GenericGraph_NewTransition Action;
+	FAssetSchemaAction_GenericGraph_NewEdge Action;
 	Action.NodeTemplate = NewObject<UEdNode_GenericGraphEdge>();
 	Action.NodeTemplate->SetEdge(Edge);
-	UEdNode_GenericGraphEdge* TransitionNode = Cast<UEdNode_GenericGraphEdge>(Action.PerformAction(NodeA->GetGraph(), nullptr, FVector2D(0.0f, 0.0f), false));
+	UEdNode_GenericGraphEdge* EdgeNode = Cast<UEdNode_GenericGraphEdge>(Action.PerformAction(NodeA->GetGraph(), nullptr, FVector2D(0.0f, 0.0f), false));
 
 	if (A->Direction == EGPD_Output)
 	{
-		TransitionNode->CreateConnections(NodeA, NodeB);
+		EdgeNode->CreateConnections(NodeA, NodeB);
 	}
 	else
 	{
-		TransitionNode->CreateConnections(NodeB, NodeA);
+		EdgeNode->CreateConnections(NodeB, NodeA);
 	}
 
 	return true;

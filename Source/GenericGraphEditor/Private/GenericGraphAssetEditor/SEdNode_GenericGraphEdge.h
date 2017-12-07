@@ -29,7 +29,7 @@ public:
 	void PositionBetweenTwoNodesWithOffset(const FGeometry& StartGeom, const FGeometry& EndGeom, int32 NodeIndex, int32 MaxNodes) const;
 
 protected:
-	FSlateColor GetTransitionColor() const;
+	FSlateColor GetEdgeColor() const;
 
 private:
 	TSharedPtr<STextEntryPopup> TextEntryWidget;

@@ -77,7 +77,7 @@ void SEdNode_GenericGraphEdge::UpdateGraphNode()
 			[
 				SNew(SImage)
 				.Image( FEditorStyle::GetBrush("Graph.TransitionNode.ColorSpill") )
-				.ColorAndOpacity( this, &SEdNode_GenericGraphEdge::GetTransitionColor )
+				.ColorAndOpacity( this, &SEdNode_GenericGraphEdge::GetEdgeColor )
 			]
 			+SOverlay::Slot()
 			[
@@ -138,7 +138,7 @@ void SEdNode_GenericGraphEdge::PositionBetweenTwoNodesWithOffset(const FGeometry
 	GraphNode->NodePosY = NewCorner.Y;
 }
 
-FSlateColor SEdNode_GenericGraphEdge::GetTransitionColor() const
+FSlateColor SEdNode_GenericGraphEdge::GetEdgeColor() const
 {
 	return FLinearColor(0.9f, 0.9f, 0.9f, 1.0f);
 }

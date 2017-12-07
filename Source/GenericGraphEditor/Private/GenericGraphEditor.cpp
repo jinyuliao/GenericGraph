@@ -12,13 +12,13 @@ class FGraphPanelNodeFactory_GenericGraph : public FGraphPanelNodeFactory
 {
 	virtual TSharedPtr<class SGraphNode> CreateNode(UEdGraphNode* Node) const override
 	{
-		if (UEdNode_GenericGraphNode* GraphEdNode = Cast<UEdNode_GenericGraphNode>(Node))
+		if (UEdNode_GenericGraphNode* EdNode_GraphNode = Cast<UEdNode_GenericGraphNode>(Node))
 		{
-			return SNew(SEdNode_GenericGraphNode, GraphEdNode);
+			return SNew(SEdNode_GenericGraphNode, EdNode_GraphNode);
 		}
-		else if (UEdNode_GenericGraphEdge* TransitionEdNode = Cast<UEdNode_GenericGraphEdge>(Node))
+		else if (UEdNode_GenericGraphEdge* EdNode_Edge = Cast<UEdNode_GenericGraphEdge>(Node))
 		{
-			return SNew(SEdNode_GenericGraphEdge, TransitionEdNode);
+			return SNew(SEdNode_GenericGraphEdge, EdNode_Edge);
 		}
 		return nullptr;
 	}

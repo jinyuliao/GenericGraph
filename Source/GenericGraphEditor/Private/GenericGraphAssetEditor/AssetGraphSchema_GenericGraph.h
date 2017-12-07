@@ -27,14 +27,14 @@ public:
 };
 
 USTRUCT()
-struct FAssetSchemaAction_GenericGraph_NewTransition : public FEdGraphSchemaAction
+struct FAssetSchemaAction_GenericGraph_NewEdge : public FEdGraphSchemaAction
 {
 	GENERATED_USTRUCT_BODY();
 
 public:
-	FAssetSchemaAction_GenericGraph_NewTransition(): NodeTemplate(nullptr){}
+	FAssetSchemaAction_GenericGraph_NewEdge(): NodeTemplate(nullptr){}
 
-	FAssetSchemaAction_GenericGraph_NewTransition(const FText& InNodeCategory, const FText& InMenuDesc, const FText& InToolTip, const int32 InGrouping)
+	FAssetSchemaAction_GenericGraph_NewEdge(const FText& InNodeCategory, const FText& InMenuDesc, const FText& InToolTip, const int32 InGrouping)
 		: FEdGraphSchemaAction(InNodeCategory, InMenuDesc, InToolTip, InGrouping), NodeTemplate(nullptr) {}
 
 	virtual UEdGraphNode* PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode = true) override;
@@ -43,7 +43,7 @@ public:
 	template <typename NodeType>
 	static NodeType* SpawnNodeFromTemplate(class UEdGraph* ParentGraph, NodeType* InTemplateNode, const FVector2D Location = FVector2D(0.0f, 0.0f), bool bSelectNewNode = true)
 	{
-		FAssetSchemaAction_GenericGraph_NewTransition Action;
+		FAssetSchemaAction_GenericGraph_NewEdge Action;
 		Action.NodeTemplate = InTemplateNode;
 
 		return Cast<NodeType>(Action.PerformAction(ParentGraph, NULL, Location, bSelectNewNode));

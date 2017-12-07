@@ -1,7 +1,7 @@
 GenericGraphPlugin
 ==================
 
-Generic graph data struct plugin for ue4
+Generic graph data structure plugin for ue4
 
 .. image:: docs/images/GenericGraph.png
 
