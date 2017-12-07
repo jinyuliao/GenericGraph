@@ -16,15 +16,28 @@ Feature
 Usage
 -----
 
-* SKill tree system
-* Civilization-like technologies system
+* Ability system
 * Dialogue system
 * Quest system
-* etc
+* Etc
 
 Install
 -------
 
-#. clone this project to ${YourProject}/Plugins/
-#. generate project file
-#. compile
+#. Clone this project to ${YourProject}/Plugins/
+#. Generate project file
+#. Compile
+
+Example
+-------
+
+Dialogue System: SRPGTemplate_
+
+.. image:: docs/images/dialogue/dialogue01.png
+
+.. image:: docs/images/dialogue/dialogue02.png
+
+.. image:: docs/images/dialogue/dialogue03.png
+
+
+.. _SRPGTemplate: https://github.com/jinyuliao/SRPGTemplate

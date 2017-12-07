@@ -57,7 +57,7 @@ void UGenericGraph::Print(bool ToConsole /*= true*/, bool ToScreen /*= true*/)
 	}
 }
 
-int UGenericGraph::GetLevelNum()
+int UGenericGraph::GetLevelNum() const
 {
 	int Level = 0;
 	TArray<UGenericGraphNode*> CurrLevelNodes = RootNodes;

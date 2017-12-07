@@ -49,7 +49,7 @@ public:
 	void Print(bool ToConsole = true, bool ToScreen = true);
 
 	UFUNCTION(BlueprintCallable, Category = "GenericGraph")
-	int GetLevelNum();
+	int GetLevelNum() const;
 
 	UFUNCTION(BlueprintCallable, Category = "GenericGraph")
 	void GetNodesByLevel(int Level, TArray<UGenericGraphNode*>& Nodes);
