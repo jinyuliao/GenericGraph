@@ -4,6 +4,8 @@
 
 UGenericGraphNode::UGenericGraphNode()
 {
+	CompatibleGraphType = UGenericGraph::StaticClass();
+
 #if WITH_EDITOR
 	BackgroundColor = FLinearColor::Black;
 #endif
@@ -31,24 +33,24 @@ UGenericGraphEdge* UGenericGraphNode::GetEdge(UGenericGraphNode* ChildNode)
 
 FText UGenericGraphNode::GetNodeTitle_Implementation()
 {
-	if (CustomNodeTitle.IsEmpty())
+	if (NodeTitle.IsEmpty())
 	{
 		return LOCTEXT("DefaultNodeTitle", "Generic Graph Node");
 	}
 	else
 	{
-		return CustomNodeTitle;
+		return NodeTitle;
 	}
 }
 
-void UGenericGraphNode::SetCustomNodeTitle_Implementation(const FText& NewTitle)
+void UGenericGraphNode::SetNodeTitle_Implementation(const FText& NewTitle)
 {
-	CustomNodeTitle = NewTitle;
+	NodeTitle = NewTitle;
 }
 
 UGenericGraph* UGenericGraphNode::GetGraph() const
 {
-	return Cast<UGenericGraph>(GetOuter());
+	return Graph;
 }
 
 #undef LOCTEXT_NAMESPACE

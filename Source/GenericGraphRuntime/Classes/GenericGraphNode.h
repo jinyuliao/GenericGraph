@@ -15,8 +15,14 @@ public:
 	UGenericGraphNode();
 	virtual ~UGenericGraphNode();
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GenericGraphNode")
-	FText CustomNodeTitle;
+	UPROPERTY(VisibleDefaultsOnly, Category = "GenericGraphNode")
+	UGenericGraph* Graph;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "GenericGraphNode")
+	TSubclassOf<UGenericGraph> CompatibleGraphType;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode")
+	FText NodeTitle;
 
 	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphNode")
 	TArray<UGenericGraphNode*> ParentNodes;
@@ -47,8 +53,8 @@ public:
 	virtual FText GetNodeTitle_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "GenericGraphNode")
-	void SetCustomNodeTitle(const FText& NewTitle);
-	virtual void SetCustomNodeTitle_Implementation(const FText& NewTitle);
+	void SetNodeTitle(const FText& NewTitle);
+	virtual void SetNodeTitle_Implementation(const FText& NewTitle);
 
 	UFUNCTION(BlueprintCallable, Category = "GenericGraphNode")
 	UGenericGraph* GetGraph() const;

@@ -37,12 +37,12 @@ void UGenericGraph::Print(bool ToConsole /*= true*/, bool ToScreen /*= true*/)
 
 			if (ToConsole)
 			{
-				LOG_WARNING(TEXT("%s"), *Message);
+				LOG_INFO(TEXT("%s"), *Message);
 			}
 
 			if (ToScreen && GEngine != nullptr)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, Message);
+				GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, Message);
 			}
 
 			for (int j = 0; j < Node->ChildrenNodes.Num(); ++j)

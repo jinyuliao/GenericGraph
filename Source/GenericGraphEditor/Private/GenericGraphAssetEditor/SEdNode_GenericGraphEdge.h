@@ -17,11 +17,8 @@ public:
 
 	void Construct(const FArguments& InArgs, UEdNode_GenericGraphEdge* InNode);
 
-	// SNodePanel::SNode interface
-	virtual void MoveTo(const FVector2D& NewPosition, FNodeSet& NodeFilter) override;
 	virtual bool RequiresSecondPassLayout() const override;
 	virtual void PerformSecondPassLayout(const TMap< UObject*, TSharedRef<SNode> >& NodeToWidgetLookup) const override;
-	// End of SNodePanel::SNode interface
 
 	virtual void UpdateGraphNode() override;
 

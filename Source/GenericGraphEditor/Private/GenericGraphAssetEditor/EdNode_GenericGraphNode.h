@@ -16,19 +16,18 @@ public:
 	UEdNode_GenericGraphNode();
 	virtual ~UEdNode_GenericGraphNode();
 
-	UPROPERTY(VisibleAnywhere, instanced, Category = "GenericGraph")
+	UPROPERTY(VisibleAnywhere, Instanced, Category = "GenericGraph")
 	UGenericGraphNode* GenericGraphNode;
 
-	virtual void AllocateDefaultPins() override;
-
+	void SetGenericGraphNode(UGenericGraphNode* InNode);
 	UEdGraph_GenericGraph* GetGenericGraphEdGraph();
 
+	virtual void AllocateDefaultPins() override;
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
-
-	void SetGenericGraphNode(UGenericGraphNode* InNode);
+	virtual void PrepareForCopying() override;
+	virtual void AutowireNewNode(UEdGraphPin* FromPin) override;
 
 	virtual FLinearColor GetBackgroundColor() const;
-
 	virtual UEdGraphPin* GetInputPin() const;
 	virtual UEdGraphPin* GetOutputPin() const;
 

@@ -74,22 +74,7 @@ void SEdNode_GenericGraphNode::UpdateGraphNode()
 	OutputPinBox.Reset();
 
 	TSharedPtr<SErrorText> ErrorText;
-	TSharedPtr<STextBlock> DescriptionText;
 	TSharedPtr<SNodeTitle> NodeTitle = SNew(SNodeTitle, GraphNode);
-
-	TWeakPtr<SNodeTitle> WeakNodeTitle = NodeTitle;
-	auto GetNodeTitlePlaceholderWidth = [WeakNodeTitle]() -> FOptionalSize
-	{
-		TSharedPtr<SNodeTitle> NodeTitlePin = WeakNodeTitle.Pin();
-		const float DesiredWidth = (NodeTitlePin.IsValid()) ? NodeTitlePin->GetTitleSize().X : 0.0f;
-		return FMath::Max(75.0f, DesiredWidth);
-	};
-	auto GetNodeTitlePlaceholderHeight = [WeakNodeTitle]() -> FOptionalSize
-	{
-		TSharedPtr<SNodeTitle> NodeTitlePin = WeakNodeTitle.Pin();
-		const float DesiredHeight = (NodeTitlePin.IsValid()) ? NodeTitlePin->GetTitleSize().Y : 0.0f;
-		return FMath::Max(22.0f, DesiredHeight);
-	};
 
 	this->ContentScale.Bind(this, &SGraphNode::GetContentScale);
 	this->GetOrAddSlot(ENodeZone::Center)
@@ -100,7 +85,6 @@ void SEdNode_GenericGraphNode::UpdateGraphNode()
 			.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.Body"))
 			.Padding(0.0f)
 			.BorderBackgroundColor(this, &SEdNode_GenericGraphNode::GetBorderBackgroundColor)
-			//.OnMouseButtonDown(this, &SGenericGraphEdNode::OnMouseDown)
 			[
 				SNew(SOverlay)
 
@@ -159,37 +143,26 @@ void SEdNode_GenericGraphNode::UpdateGraphNode()
 										+ SHorizontalBox::Slot()
 										.AutoWidth()
 										[
-											SNew(SLevelOfDetailBranchNode)
-											.UseLowDetailSlot(this, &SEdNode_GenericGraphNode::UseLowDetailNodeTitles)
-											.LowDetail()
+											SNew(SHorizontalBox)
+											+ SHorizontalBox::Slot()
+											.Padding(FMargin(4.0f, 0.0f, 4.0f, 0.0f))
 											[
-												SNew(SBox)
-												.WidthOverride_Lambda(GetNodeTitlePlaceholderWidth)
-												.HeightOverride_Lambda(GetNodeTitlePlaceholderHeight)
-											]
-											.HighDetail()
-											[
-												SNew(SHorizontalBox)
-												+ SHorizontalBox::Slot()
-												.Padding(FMargin(4.0f, 0.0f, 4.0f, 0.0f))
+												SNew(SVerticalBox)
+												+ SVerticalBox::Slot()
+												.AutoHeight()
 												[
-													SNew(SVerticalBox)
-													+ SVerticalBox::Slot()
-													.AutoHeight()
-													[
-														SAssignNew(InlineEditableText, SInlineEditableTextBlock)
-														.Style(FEditorStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
-														.Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
-														.OnVerifyTextChanged(this, &SEdNode_GenericGraphNode::OnVerifyNameTextChanged)
-														.OnTextCommitted(this, &SEdNode_GenericGraphNode::OnNameTextCommited)
-														.IsReadOnly(this, &SEdNode_GenericGraphNode::IsNameReadOnly)
-														.IsSelected(this, &SEdNode_GenericGraphNode::IsSelectedExclusively)
-													]
-													+ SVerticalBox::Slot()
-													.AutoHeight()
-													[
-														NodeTitle.ToSharedRef()
-													]
+													SAssignNew(InlineEditableText, SInlineEditableTextBlock)
+													.Style(FEditorStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
+													.Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
+													.OnVerifyTextChanged(this, &SEdNode_GenericGraphNode::OnVerifyNameTextChanged)
+													.OnTextCommitted(this, &SEdNode_GenericGraphNode::OnNameTextCommited)
+													.IsReadOnly(this, &SEdNode_GenericGraphNode::IsNameReadOnly)
+													.IsSelected(this, &SEdNode_GenericGraphNode::IsSelectedExclusively)
+												]
+												+ SVerticalBox::Slot()
+												.AutoHeight()
+												[
+													NodeTitle.ToSharedRef()
 												]
 											]
 										]
@@ -314,7 +287,7 @@ void SEdNode_GenericGraphNode::OnNameTextCommited(const FText& InText, ETextComm
 		const FScopedTransaction Transaction(LOCTEXT("GenericGraphEditorRenameNode", "Generic Graph Editor: Rename Node"));
 		MyNode->Modify();
 		MyNode->GenericGraphNode->Modify();
-		MyNode->GenericGraphNode->SetCustomNodeTitle(InText);
+		MyNode->GenericGraphNode->SetNodeTitle(InText);
 		UpdateGraphNode();
 	}
 }

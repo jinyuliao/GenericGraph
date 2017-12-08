@@ -5,13 +5,17 @@
 #include "EditorCommands_GenericGraph.h"
 #include "EdGraph_GenericGraph.h"
 #include "AssetToolsModule.h"
-#include "GenericPlatform/GenericPlatformApplicationMisc.h"
+#include "HAL/PlatformApplicationMisc.h"
 #include "GenericCommands.h"
 #include "GraphEditorActions.h"
 #include "IDetailsView.h"
 #include "PropertyEditorModule.h"
 #include "Editor/UnrealEd/Public/Kismet2/BlueprintEditorUtils.h"
+#include "Kismet2/KismetEditorUtilities.h"
 #include "EdGraphUtilities.h"
+#include "EdGraph_GenericGraph.h"
+#include "EdNode_GenericGraphNode.h"
+#include "EdNode_GenericGraphEdge.h"
 
 #define LOCTEXT_NAMESPACE "AssetEditor_GenericGraph"
 
@@ -315,14 +319,19 @@ void FAssetEditor_GenericGraph::CreateCommandList()
 		FExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::DuplicateNodes),
 		FCanExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::CanDuplicateNodes)
 	);
+
+	GraphEditorCommands->MapAction(FGenericCommands::Get().Rename,
+		FExecuteAction::CreateSP(this, &FAssetEditor_GenericGraph::OnRenameNode),
+		FCanExecuteAction::CreateSP(this, &FAssetEditor_GenericGraph::CanRenameNodes)
+	);
 }
 
-TSharedPtr<SGraphEditor> FAssetEditor_GenericGraph::GetCurrGraphEditor()
+TSharedPtr<SGraphEditor> FAssetEditor_GenericGraph::GetCurrGraphEditor() const
 {
 	return ViewportWidget;
 }
 
-FGraphPanelSelectionSet FAssetEditor_GenericGraph::GetSelectedNodes()
+FGraphPanelSelectionSet FAssetEditor_GenericGraph::GetSelectedNodes() const
 {
 	FGraphPanelSelectionSet CurrentSelection;
 	TSharedPtr<SGraphEditor> FocusedGraphEd = GetCurrGraphEditor();
@@ -371,6 +380,7 @@ void FAssetEditor_GenericGraph::DeleteSelectedNodes()
 	}
 
 	const FScopedTransaction Transaction(FGenericCommands::Get().Delete->GetDescription());
+
 	CurrentGraphEditor->GetCurrentGraph()->Modify();
 
 	const FGraphPanelSelectionSet SelectedNodes = CurrentGraphEditor->GetSelectedNodes();
@@ -378,17 +388,28 @@ void FAssetEditor_GenericGraph::DeleteSelectedNodes()
 
 	for (FGraphPanelSelectionSet::TConstIterator NodeIt(SelectedNodes); NodeIt; ++NodeIt)
 	{
-		if (UEdGraphNode* Node = Cast<UEdGraphNode>(*NodeIt))
+		UEdGraphNode* EdNode = Cast<UEdGraphNode>(*NodeIt);
+		if (EdNode == nullptr || !EdNode->CanUserDeleteNode())
+			continue;;
+
+		if (UEdNode_GenericGraphNode* EdNode_Node = Cast<UEdNode_GenericGraphNode>(EdNode))
 		{
-			if (Node->CanUserDeleteNode())
+			EdNode_Node->Modify();
+
+			const UEdGraphSchema* Schema = EdNode_Node->GetSchema();
+			if (Schema != nullptr)
 			{
-				Node->Modify();
-				Node->DestroyNode();
+				Schema->BreakNodeLinks(*EdNode_Node);
 			}
+
+			EdNode_Node->DestroyNode();
+		}
+		else
+		{
+			EdNode->Modify();
+			EdNode->DestroyNode();
 		}
 	}
-
-	LOG_WARNING(TEXT("FGenericGraphAssetEditor::DeleteSelectedNodes Exec"));
 }
 
 bool FAssetEditor_GenericGraph::CanDeleteNodes()
@@ -403,8 +424,6 @@ bool FAssetEditor_GenericGraph::CanDeleteNodes()
 			return true;
 		}
 	}
-
-	LOG_WARNING(TEXT("FGenericGraphAssetEditor::CanDeleteNodes Can't delete"));
 
 	return false;
 }
@@ -470,11 +489,23 @@ void FAssetEditor_GenericGraph::CopySelectedNodes()
 			continue;
 		}
 
+		if (UEdNode_GenericGraphEdge* EdNode_Edge = Cast<UEdNode_GenericGraphEdge>(*SelectedIter))
+		{
+			UEdNode_GenericGraphNode* StartNode = EdNode_Edge->GetStartNode();
+			UEdNode_GenericGraphNode* EndNode = EdNode_Edge->GetEndNode();
+
+			if (!SelectedNodes.Contains(StartNode) || !SelectedNodes.Contains(EndNode))
+			{
+				SelectedIter.RemoveCurrent();
+				continue;
+			}
+		}
+
 		Node->PrepareForCopying();
 	}
 
 	FEdGraphUtilities::ExportNodesToText(SelectedNodes, ExportedText);
-	FGenericPlatformApplicationMisc::ClipboardCopy(*ExportedText);
+	FPlatformApplicationMisc::ClipboardCopy(*ExportedText);
 }
 
 bool FAssetEditor_GenericGraph::CanCopyNodes()
@@ -504,11 +535,82 @@ void FAssetEditor_GenericGraph::PasteNodes()
 
 void FAssetEditor_GenericGraph::PasteNodesHere(const FVector2D& Location)
 {
+	// Find the graph editor with focus
+	TSharedPtr<SGraphEditor> CurrentGraphEditor = GetCurrGraphEditor();
+	if (!CurrentGraphEditor.IsValid())
+	{
+		return;
+	}
+	// Select the newly pasted stuff
+	UEdGraph* EdGraph = CurrentGraphEditor->GetCurrentGraph();
+
+	{
+		const FScopedTransaction Transaction(FGenericCommands::Get().Paste->GetDescription());
+		EdGraph->Modify();
+
+		// Clear the selection set (newly pasted stuff will be selected)
+		CurrentGraphEditor->ClearSelectionSet();
+
+		// Grab the text to paste from the clipboard.
+		FString TextToImport;
+		FPlatformApplicationMisc::ClipboardPaste(TextToImport);
+
+		// Import the nodes
+		TSet<UEdGraphNode*> PastedNodes;
+		FEdGraphUtilities::ImportNodesFromText(EdGraph, TextToImport, PastedNodes);
+
+		//Average position of nodes so we can move them while still maintaining relative distances to each other
+		FVector2D AvgNodePosition(0.0f, 0.0f);
+
+		for (TSet<UEdGraphNode*>::TIterator It(PastedNodes); It; ++It)
+		{
+			UEdGraphNode* Node = *It;
+			AvgNodePosition.X += Node->NodePosX;
+			AvgNodePosition.Y += Node->NodePosY;
+		}
+
+		float InvNumNodes = 1.0f / float(PastedNodes.Num());
+		AvgNodePosition.X *= InvNumNodes;
+		AvgNodePosition.Y *= InvNumNodes;
+
+		for (TSet<UEdGraphNode*>::TIterator It(PastedNodes); It; ++It)
+		{
+			UEdGraphNode* Node = *It;
+			CurrentGraphEditor->SetNodeSelection(Node, true);
+
+			Node->NodePosX = (Node->NodePosX - AvgNodePosition.X) + Location.X;
+			Node->NodePosY = (Node->NodePosY - AvgNodePosition.Y) + Location.Y;
+
+			Node->SnapToGrid(16);
+
+			// Give new node a different Guid from the old one
+			Node->CreateNewGuid();
+		}
+	}
+
+	// Update UI
+	CurrentGraphEditor->NotifyGraphChanged();
+
+	UObject* GraphOwner = EdGraph->GetOuter();
+	if (GraphOwner)
+	{
+		GraphOwner->PostEditChange();
+		GraphOwner->MarkPackageDirty();
+	}
 }
 
 bool FAssetEditor_GenericGraph::CanPasteNodes()
 {
-	return false;
+	TSharedPtr<SGraphEditor> CurrentGraphEditor = GetCurrGraphEditor();
+	if (!CurrentGraphEditor.IsValid())
+	{
+		return false;
+	}
+
+	FString ClipboardContent;
+	FPlatformApplicationMisc::ClipboardPaste(ClipboardContent);
+
+	return FEdGraphUtilities::CanImportNodesFromText(CurrentGraphEditor->GetCurrentGraph(), ClipboardContent);
 }
 
 void FAssetEditor_GenericGraph::DuplicateNodes()
@@ -519,20 +621,40 @@ void FAssetEditor_GenericGraph::DuplicateNodes()
 
 bool FAssetEditor_GenericGraph::CanDuplicateNodes()
 {
-	//return CanCopyNodes();
-	return false;
+	return CanCopyNodes();
 }
 
 void FAssetEditor_GenericGraph::GraphSettings()
 {
 	PropertyWidget->SetObject(EditingGraph);
-
-	LOG_WARNING(TEXT("FGenericGraphAssetEditor::GraphSettings"));
 }
 
 bool FAssetEditor_GenericGraph::CanGraphSettings() const
 {
 	return true;
+}
+
+void FAssetEditor_GenericGraph::OnRenameNode()
+{
+	TSharedPtr<SGraphEditor> CurrentGraphEditor = GetCurrGraphEditor();
+	if (CurrentGraphEditor.IsValid())
+	{
+		const FGraphPanelSelectionSet SelectedNodes = GetSelectedNodes();
+		for (FGraphPanelSelectionSet::TConstIterator NodeIt(SelectedNodes); NodeIt; ++NodeIt)
+		{
+			UEdGraphNode* SelectedNode = Cast<UEdGraphNode>(*NodeIt);
+			if (SelectedNode != NULL && SelectedNode->bCanRenameNode)
+			{
+				CurrentGraphEditor->IsNodeTitleVisible(SelectedNode, true);
+				break;
+			}
+		}
+	}
+}
+
+bool FAssetEditor_GenericGraph::CanRenameNodes() const
+{
+	return GetSelectedNodes().Num() == 1;
 }
 
 void FAssetEditor_GenericGraph::OnSelectedNodesChanged(const TSet<class UObject*>& NewSelection)

@@ -1,4 +1,6 @@
 #include "EdNode_GenericGraphNode.h"
+#include "Kismet2/Kismet2NameValidators.h"
+#include "Kismet2/BlueprintEditorUtils.h"
 
 #define LOCTEXT_NAMESPACE "EdNode_GenericGraph"
 
@@ -32,6 +34,24 @@ FText UEdNode_GenericGraphNode::GetNodeTitle(ENodeTitleType::Type TitleType) con
 	else
 	{
 		return GenericGraphNode->GetNodeTitle();
+	}
+}
+
+void UEdNode_GenericGraphNode::PrepareForCopying()
+{
+	GenericGraphNode->Rename(nullptr, this, REN_DontCreateRedirectors | REN_DoNotDirty);
+}
+
+void UEdNode_GenericGraphNode::AutowireNewNode(UEdGraphPin* FromPin)
+{
+	Super::AutowireNewNode(FromPin);
+
+	if (FromPin != nullptr)
+	{
+		if (GetSchema()->TryCreateConnection(FromPin, GetInputPin()))
+		{
+			FromPin->GetOwningNode()->NodeConnectionListChanged();
+		}
 	}
 }
 

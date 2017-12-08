@@ -203,7 +203,8 @@ void UAssetGraphSchema_GenericGraph::GetGraphContextActions(FGraphContextMenuBui
 
 	TSharedPtr<FAssetSchemaAction_GenericGraph_NewNode> NewNodeAction(new FAssetSchemaAction_GenericGraph_NewNode(LOCTEXT("GenericGraphNodeAction", "Generic Graph Node"), Desc, AddToolTip, 0));
 	NewNodeAction->NodeTemplate = NewObject<UEdNode_GenericGraphNode>(ContextMenuBuilder.OwnerOfTemporaries);
-	NewNodeAction->NodeTemplate->GenericGraphNode = NewObject<UGenericGraphNode>(Graph, Graph->NodeType);
+	NewNodeAction->NodeTemplate->GenericGraphNode = NewObject<UGenericGraphNode>(NewNodeAction->NodeTemplate, Graph->NodeType);
+	NewNodeAction->NodeTemplate->GenericGraphNode->Graph = Graph;
 	ContextMenuBuilder.AddAction(NewNodeAction);
 
 	Visited.Add(Graph->NodeType);
@@ -215,9 +216,10 @@ void UAssetGraphSchema_GenericGraph::GetGraphContextActions(FGraphContextMenuBui
 			TSubclassOf<UGenericGraphNode> NodeType = *It;
 
 			if (It->GetName().StartsWith("REINST") || It->GetName().StartsWith("SKEL"))
-			{
 				continue;
-			}
+
+			if (!Graph->GetClass()->IsChildOf(NodeType.GetDefaultObject()->CompatibleGraphType))
+				continue;
 
 			Desc = NodeType.GetDefaultObject()->ContextMenuName;
 
@@ -230,7 +232,8 @@ void UAssetGraphSchema_GenericGraph::GetGraphContextActions(FGraphContextMenuBui
 
 			TSharedPtr<FAssetSchemaAction_GenericGraph_NewNode> Action(new FAssetSchemaAction_GenericGraph_NewNode(LOCTEXT("GenericGraphNodeAction", "Generic Graph Node"), Desc, AddToolTip, 0));
 			Action->NodeTemplate = NewObject<UEdNode_GenericGraphNode>(ContextMenuBuilder.OwnerOfTemporaries);
-			Action->NodeTemplate->GenericGraphNode = NewObject<UGenericGraphNode>(Graph, NodeType);
+			Action->NodeTemplate->GenericGraphNode = NewObject<UGenericGraphNode>(Action->NodeTemplate, NodeType);
+			Action->NodeTemplate->GenericGraphNode->Graph = Graph;
 			ContextMenuBuilder.AddAction(Action);
 
 			Visited.Add(NodeType);
@@ -336,12 +339,13 @@ bool UAssetGraphSchema_GenericGraph::CreateAutomaticConversionNodeAndConnections
 		return false;
 
 	UGenericGraph* Graph = NodeA->GenericGraphNode->GetGraph();
-	UGenericGraphEdge* Edge = NewObject<UGenericGraphEdge>(Graph, Graph->EdgeType);
+
+	FVector2D InitPos((NodeA->NodePosX + NodeB->NodePosX) / 2, (NodeA->NodePosY + NodeB->NodePosY) / 2);
 
 	FAssetSchemaAction_GenericGraph_NewEdge Action;
-	Action.NodeTemplate = NewObject<UEdNode_GenericGraphEdge>();
-	Action.NodeTemplate->SetEdge(Edge);
-	UEdNode_GenericGraphEdge* EdgeNode = Cast<UEdNode_GenericGraphEdge>(Action.PerformAction(NodeA->GetGraph(), nullptr, FVector2D(0.0f, 0.0f), false));
+	Action.NodeTemplate = NewObject<UEdNode_GenericGraphEdge>(NodeA->GetGraph());
+	Action.NodeTemplate->SetEdge(NewObject<UGenericGraphEdge>(Action.NodeTemplate, Graph->EdgeType));
+	UEdNode_GenericGraphEdge* EdgeNode = Cast<UEdNode_GenericGraphEdge>(Action.PerformAction(NodeA->GetGraph(), nullptr, InitPos, false));
 
 	if (A->Direction == EGPD_Output)
 	{

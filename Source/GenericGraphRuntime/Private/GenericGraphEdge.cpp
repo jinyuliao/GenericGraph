@@ -12,5 +12,5 @@ UGenericGraphEdge::~UGenericGraphEdge()
 
 UGenericGraph* UGenericGraphEdge::GetGraph() const
 {
-	return Cast<UGenericGraph>(GetOuter());
+	return Graph;
 }

@@ -37,6 +37,11 @@ void UEdNode_GenericGraphEdge::PinConnectionListChanged(UEdGraphPin* Pin)
 	}
 }
 
+void UEdNode_GenericGraphEdge::PrepareForCopying()
+{
+	GenericGraphEdge->Rename(nullptr, this, REN_DontCreateRedirectors | REN_DoNotDirty);
+}
+
 void UEdNode_GenericGraphEdge::CreateConnections(UEdNode_GenericGraphNode* Start, UEdNode_GenericGraphNode* End)
 {
 	Pins[0]->Modify();

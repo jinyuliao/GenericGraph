@@ -53,9 +53,9 @@ private:
 
 	void CreateCommandList();
 
-	TSharedPtr<SGraphEditor> GetCurrGraphEditor();
+	TSharedPtr<SGraphEditor> GetCurrGraphEditor() const;
 
-	FGraphPanelSelectionSet GetSelectedNodes();
+	FGraphPanelSelectionSet GetSelectedNodes() const;
 
 	void RebuildGenericGraph();
 
@@ -77,6 +77,9 @@ private:
 
 	void GraphSettings();
 	bool CanGraphSettings() const;
+
+	void OnRenameNode();
+	bool CanRenameNodes() const;
 
 	//////////////////////////////////////////////////////////////////////////
 	// graph editor event

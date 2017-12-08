@@ -15,11 +15,6 @@ void SEdNode_GenericGraphEdge::Construct(const FArguments& InArgs, UEdNode_Gener
 	this->UpdateGraphNode();
 }
 
-void SEdNode_GenericGraphEdge::MoveTo(const FVector2D& NewPosition, FNodeSet& NodeFilter)
-{
-
-}
-
 bool SEdNode_GenericGraphEdge::RequiresSecondPassLayout() const
 {
 	return true;
