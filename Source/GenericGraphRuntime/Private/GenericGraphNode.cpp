@@ -4,8 +4,6 @@
 
 UGenericGraphNode::UGenericGraphNode()
 {
-	NodeType = AActor::StaticClass();
-
 #if WITH_EDITOR
 	BackgroundColor = FLinearColor::Black;
 #endif
@@ -35,12 +33,7 @@ FText UGenericGraphNode::GetNodeTitle_Implementation()
 {
 	if (CustomNodeTitle.IsEmpty())
 	{
-		UClass* C = *NodeType;
-
-		FString Title = C->GetName();
-		Title.RemoveFromEnd("_C");
-
-		return FText::FromString(Title);
+		return LOCTEXT("DefaultNodeTitle", "Generic Graph Node");
 	}
 	else
 	{

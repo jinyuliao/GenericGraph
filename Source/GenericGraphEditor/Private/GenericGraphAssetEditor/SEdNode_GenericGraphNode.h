@@ -22,9 +22,6 @@ public:
 
 	virtual EVisibility GetDragOverMarkerVisibility() const;
 
-	virtual FText GetDescription() const;
-	virtual EVisibility GetDescriptionVisibility() const;
-
 	virtual const FSlateBrush* GetNameIcon() const;
 
 protected:

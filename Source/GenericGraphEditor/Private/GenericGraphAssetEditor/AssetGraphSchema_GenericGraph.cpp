@@ -230,7 +230,7 @@ void UAssetGraphSchema_GenericGraph::GetGraphContextActions(FGraphContextMenuBui
 
 			TSharedPtr<FAssetSchemaAction_GenericGraph_NewNode> Action(new FAssetSchemaAction_GenericGraph_NewNode(LOCTEXT("GenericGraphNodeAction", "Generic Graph Node"), Desc, AddToolTip, 0));
 			Action->NodeTemplate = NewObject<UEdNode_GenericGraphNode>(ContextMenuBuilder.OwnerOfTemporaries);
-			Action->NodeTemplate->GenericGraphNode = NewObject<UGenericGraphNode>(Graph, Graph->NodeType);
+			Action->NodeTemplate->GenericGraphNode = NewObject<UGenericGraphNode>(Graph, NodeType);
 			ContextMenuBuilder.AddAction(Action);
 
 			Visited.Add(NodeType);

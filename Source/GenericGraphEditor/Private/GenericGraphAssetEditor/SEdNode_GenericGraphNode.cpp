@@ -335,18 +335,6 @@ EVisibility SEdNode_GenericGraphNode::GetDragOverMarkerVisibility() const
 	return EVisibility::Visible;
 }
 
-FText SEdNode_GenericGraphNode::GetDescription() const
-{
-	UEdNode_GenericGraphNode* MyNode = CastChecked<UEdNode_GenericGraphNode>(GraphNode);
-	return MyNode ? MyNode->GetDescription() : FText::GetEmpty();
-}
-
-EVisibility SEdNode_GenericGraphNode::GetDescriptionVisibility() const
-{
-	//return (GetCurrentLOD() > EGraphRenderingLOD::LowDetail) ? EVisibility::Visible : EVisibility::Collapsed;
-	return EVisibility::Hidden;
-}
-
 const FSlateBrush* SEdNode_GenericGraphNode::GetNameIcon() const
 {
 	return FEditorStyle::GetBrush(TEXT("BTEditor.Graph.BTNode.Icon"));

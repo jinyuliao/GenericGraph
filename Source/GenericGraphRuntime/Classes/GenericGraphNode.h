@@ -16,9 +16,6 @@ public:
 	virtual ~UGenericGraphNode();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GenericGraphNode")
-	TSubclassOf<UObject> NodeType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GenericGraphNode")
 	FText CustomNodeTitle;
 
 	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphNode")
@@ -40,14 +37,14 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "GenericGraphNode")
 	FLinearColor GetBackgroundColor() const;
-	FLinearColor GetBackgroundColor_Implementation() const;
+	virtual FLinearColor GetBackgroundColor_Implementation() const;
 
 	UFUNCTION(BlueprintCallable, Category = "GenericGraphNode")
 	virtual UGenericGraphEdge* GetEdge(UGenericGraphNode* ChildNode);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "GenericGraphNode")
 	FText GetNodeTitle();
-	FText GetNodeTitle_Implementation();
+	virtual FText GetNodeTitle_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "GenericGraphNode")
 	void SetCustomNodeTitle(const FText& NewTitle);

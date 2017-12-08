@@ -40,15 +40,6 @@ void UEdNode_GenericGraphNode::SetGenericGraphNode(UGenericGraphNode* InNode)
 	GenericGraphNode = InNode;
 }
 
-FText UEdNode_GenericGraphNode::GetDescription() const
-{
-	UGenericGraph* Graph = GenericGraphNode->GetGraph();
-
-	UClass* C = *GenericGraphNode->NodeType;
-
-	return FText::FromString(C->GetDescription());
-}
-
 FLinearColor UEdNode_GenericGraphNode::GetBackgroundColor() const
 {
 	return GenericGraphNode == nullptr ? FLinearColor::Black : GenericGraphNode->GetBackgroundColor();
