@@ -16,12 +16,15 @@ UGenericGraphNode::~UGenericGraphNode()
 
 }
 
-#if WITH_EDITOR
+
 FLinearColor UGenericGraphNode::GetBackgroundColor_Implementation() const
 {
+#if WITH_EDITOR
 	return BackgroundColor;
-}
+#else
+	return FLinearColor::Black;
 #endif
+}
 
 UGenericGraphEdge* UGenericGraphNode::GetEdge(UGenericGraphNode* ChildNode)
 {

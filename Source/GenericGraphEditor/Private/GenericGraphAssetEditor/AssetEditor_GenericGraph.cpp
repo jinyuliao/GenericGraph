@@ -549,13 +549,9 @@ void FAssetEditor_GenericGraph::OnSelectedNodesChanged(const TSet<class UObject*
 		PropertyWidget->SetObject(EditingGraph);
 
 	}
-	else if (Selection.Num() == 1)
-	{
-		PropertyWidget->SetObject(Selection[0]);
-	}
 	else
 	{
-		PropertyWidget->SetObject(nullptr);
+		PropertyWidget->SetObjects(Selection);
 	}
 }
 

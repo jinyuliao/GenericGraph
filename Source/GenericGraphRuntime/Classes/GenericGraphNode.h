@@ -36,11 +36,11 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode")
 	FText ContextMenuName;
+#endif
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "GenericGraphNode")
 	FLinearColor GetBackgroundColor() const;
 	FLinearColor GetBackgroundColor_Implementation() const;
-#endif
 
 	UFUNCTION(BlueprintCallable, Category = "GenericGraphNode")
 	virtual UGenericGraphEdge* GetEdge(UGenericGraphNode* ChildNode);
