@@ -15,8 +15,6 @@ public:
 	UGenericGraph();
 	virtual ~UGenericGraph();
 
-	//////////////////////////////////////////////////////////////////////////
-	// uproperties
 	UPROPERTY(EditDefaultsOnly, Category = "GenericGraph")
 	FString Name;
 
@@ -43,8 +41,6 @@ public:
 	class UEdGraph* EdGraph;
 #endif
 
-	//////////////////////////////////////////////////////////////////////////
-	// ufunctions
 	UFUNCTION(BlueprintCallable, Category = "GenericGraph")
 	void Print(bool ToConsole = true, bool ToScreen = true);
 

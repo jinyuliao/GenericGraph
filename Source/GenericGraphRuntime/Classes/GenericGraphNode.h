@@ -1,6 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SubclassOf.h"
+#include "TextProperty.h"
 #include "GenericGraphNode.generated.h"
 
 class UGenericGraph;
@@ -18,9 +20,6 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = "GenericGraphNode")
 	UGenericGraph* Graph;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "GenericGraphNode")
-	TSubclassOf<UGenericGraph> CompatibleGraphType;
-
 	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode")
 	FText NodeTitle;
 
@@ -34,6 +33,9 @@ public:
 	TMap<UGenericGraphNode*, UGenericGraphEdge*> Edges;
 
 #if WITH_EDITOR
+	UPROPERTY(VisibleDefaultsOnly, Category = "GenericGraphNode")
+	TSubclassOf<UGenericGraph> CompatibleGraphType;
+
 	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode")
 	FLinearColor BackgroundColor;
 

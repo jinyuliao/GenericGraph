@@ -1,7 +1,10 @@
 #include "AssetGraphSchema_GenericGraph.h"
+#include "GenericGraphEditorPCH.h"
 #include "EdNode_GenericGraphNode.h"
 #include "EdNode_GenericGraphEdge.h"
 #include "ConnectionDrawingPolicy_GenericGraph.h"
+#include "GraphEditorActions.h"
+#include "Framework/Commands/GenericCommands.h"
 
 #define LOCTEXT_NAMESPACE "AssetSchema_GenericGraph"
 

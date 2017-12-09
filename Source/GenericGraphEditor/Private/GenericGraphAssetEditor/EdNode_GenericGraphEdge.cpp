@@ -1,4 +1,6 @@
 #include "EdNode_GenericGraphEdge.h"
+#include "GenericGraphEdge.h"
+#include "EdNode_GenericGraphNode.h"
 
 #define LOCTEXT_NAMESPACE "EdNode_GenericGraphEdge"
 

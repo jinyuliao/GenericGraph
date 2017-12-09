@@ -1,5 +1,6 @@
 #include "ConnectionDrawingPolicy_GenericGraph.h"
 #include "EdNode_GenericGraphNode.h"
+#include "EdNode_GenericGraphEdge.h"
 
 FConnectionDrawingPolicy_GenericGraph::FConnectionDrawingPolicy_GenericGraph(int32 InBackLayerID, int32 InFrontLayerID, float ZoomFactor, const FSlateRect& InClippingRect, FSlateWindowElementList& InDrawElements, UEdGraph* InGraphObj)
 	: FConnectionDrawingPolicy(InBackLayerID, InFrontLayerID, ZoomFactor, InClippingRect, InDrawElements)

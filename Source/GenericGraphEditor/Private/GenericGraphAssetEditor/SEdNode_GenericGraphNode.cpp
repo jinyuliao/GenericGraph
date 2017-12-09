@@ -4,6 +4,9 @@
 #include "SInlineEditableTextBlock.h"
 #include "SCommentBubble.h"
 #include "SlateOptMacros.h"
+#include "SGraphPin.h"
+#include "GraphEditorSettings.h"
+#include "EdNode_GenericGraphNode.h"
 
 #define LOCTEXT_NAMESPACE "EdNode_GenericGraph"
 

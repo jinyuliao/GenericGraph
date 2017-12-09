@@ -1,5 +1,5 @@
 #include "AssetEditor_GenericGraph.h"
-#include "GenericGraphEditorPrivatePCH.h"
+#include "GenericGraphEditorPCH.h"
 #include "AssetEditorToolbar_GenericGraph.h"
 #include "AssetGraphSchema_GenericGraph.h"
 #include "EditorCommands_GenericGraph.h"

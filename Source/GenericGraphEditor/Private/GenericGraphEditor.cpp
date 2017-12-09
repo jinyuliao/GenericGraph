@@ -1,4 +1,6 @@
 #include "AssetTypeActions_GenericGraph.h"
+#include "GenericGraphEditorPCH.h"
+#include "EdGraphUtilities.h"
 #include "GenericGraphAssetEditor/EdNode_GenericGraphNode.h"
 #include "GenericGraphAssetEditor/EdNode_GenericGraphEdge.h"
 #include "GenericGraphAssetEditor/SEdNode_GenericGraphNode.h"

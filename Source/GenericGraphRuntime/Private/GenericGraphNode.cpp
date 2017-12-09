@@ -1,12 +1,13 @@
 #include "GenericGraphNode.h"
+#include "GenericGraph.h"
 
 #define LOCTEXT_NAMESPACE "GenericGraphNode"
 
 UGenericGraphNode::UGenericGraphNode()
 {
+#if WITH_EDITOR
 	CompatibleGraphType = UGenericGraph::StaticClass();
 
-#if WITH_EDITOR
 	BackgroundColor = FLinearColor::Black;
 #endif
 }

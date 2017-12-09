@@ -1,4 +1,5 @@
 #include "GenericGraphFactory.h"
+#include "GenericGraph.h"
 
 #define LOCTEXT_NAMESPACE "GenericGraphFactory"
 

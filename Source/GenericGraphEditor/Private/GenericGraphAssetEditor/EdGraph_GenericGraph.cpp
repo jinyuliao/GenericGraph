@@ -1,4 +1,6 @@
 #include "EdGraph_GenericGraph.h"
+#include "GenericGraphEditorPCH.h"
+#include "GenericGraph.h"
 #include "EdNode_GenericGraphNode.h"
 #include "EdNode_GenericGraphEdge.h"
 

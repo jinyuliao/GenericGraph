@@ -4,6 +4,7 @@
 #include "Widgets/SToolTip.h"
 #include "SGraphPanel.h"
 #include "EdGraphSchema_K2.h"
+#include "EdNode_GenericGraphNode.h"
 #include "EdNode_GenericGraphEdge.h"
 #include "ConnectionDrawingPolicy_GenericGraph.h"
 

@@ -1,4 +1,5 @@
 #include "EdNode_GenericGraphNode.h"
+#include "EdGraph_GenericGraph.h"
 #include "Kismet2/Kismet2NameValidators.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 

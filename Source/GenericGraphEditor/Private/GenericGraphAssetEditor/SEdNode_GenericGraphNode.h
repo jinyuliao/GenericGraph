@@ -1,6 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SGraphNode.h"
+
+class UEdNode_GenericGraphNode;
 
 class SEdNode_GenericGraphNode : public SGraphNode
 {

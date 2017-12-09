@@ -8,6 +8,7 @@
 #include "SGraphNode.h"
 
 class SToolTip;
+class UEdNode_GenericGraphEdge;
 
 class SEdNode_GenericGraphEdge : public SGraphNode
 {

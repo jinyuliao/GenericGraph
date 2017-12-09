@@ -2,10 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "EdGraph/EdGraphNode.h"
+#include "GenericGraphNode.h"
 #include "EdNode_GenericGraphNode.generated.h"
 
-class UGenericGraphNode;
 class UEdNode_GenericGraphEdge;
+class UEdGraph_GenericGraph;
 
 UCLASS(MinimalAPI)
 class UEdNode_GenericGraphNode : public UEdGraphNode
