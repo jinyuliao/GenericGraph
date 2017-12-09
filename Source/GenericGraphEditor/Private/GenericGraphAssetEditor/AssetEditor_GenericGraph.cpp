@@ -654,7 +654,13 @@ void FAssetEditor_GenericGraph::OnRenameNode()
 
 bool FAssetEditor_GenericGraph::CanRenameNodes() const
 {
-	return GetSelectedNodes().Num() == 1;
+	UEdGraph_GenericGraph* EdGraph = Cast<UEdGraph_GenericGraph>(EditingGraph->EdGraph);
+	check(EdGraph != nullptr);
+
+	UGenericGraph* Graph = EdGraph->GetGenericGraph();
+	check(Graph != nullptr)
+
+	return Graph->bCanRenameNode && GetSelectedNodes().Num() == 1;
 }
 
 void FAssetEditor_GenericGraph::OnSelectedNodesChanged(const TSet<class UObject*>& NewSelection)

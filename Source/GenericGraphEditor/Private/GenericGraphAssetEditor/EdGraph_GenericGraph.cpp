@@ -18,7 +18,7 @@ void UEdGraph_GenericGraph::RebuildGenericGraph()
 {
 	LOG_INFO(TEXT("UGenericGraphEdGraph::RebuildGenericGraph has been called"));
 
-	UGenericGraph* Graph = CastChecked<UGenericGraph>(GetOuter());
+	UGenericGraph* Graph = GetGenericGraph();
 
 	Graph->ClearGraph();
 
@@ -100,6 +100,11 @@ void UEdGraph_GenericGraph::RebuildGenericGraph()
 		Node->Graph = Graph;
 		Node->Rename(nullptr, Graph, REN_DontCreateRedirectors | REN_DoNotDirty);
 	}
+}
+
+UGenericGraph* UEdGraph_GenericGraph::GetGenericGraph() const
+{
+	return CastChecked<UGenericGraph>(GetOuter());
 }
 
 #if WITH_EDITOR

@@ -12,6 +12,8 @@ UGenericGraph::UGenericGraph()
 
 #if WITH_EDITORONLY_DATA
 	EdGraph = nullptr;
+
+	bCanRenameNode = true;
 #endif
 }
 

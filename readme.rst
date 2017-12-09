@@ -31,13 +31,15 @@ Install
 Example
 -------
 
-Dialogue System: SRPGTemplate_
+Dialogue System and ability system: SRPGTemplate_
 
 .. image:: docs/images/dialogue/dialogue01.png
 
 .. image:: docs/images/dialogue/dialogue02.png
 
 .. image:: docs/images/dialogue/dialogue03.png
+
+.. image:: docs/images/ability-graph.png
 
 
 .. _SRPGTemplate: https://github.com/jinyuliao/SRPGTemplate

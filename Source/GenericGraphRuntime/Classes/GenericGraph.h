@@ -39,6 +39,9 @@ public:
 #if WITH_EDITORONLY_DATA
 	UPROPERTY()
 	class UEdGraph* EdGraph;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraph")
+	bool bCanRenameNode;
 #endif
 
 	UFUNCTION(BlueprintCallable, Category = "GenericGraph")

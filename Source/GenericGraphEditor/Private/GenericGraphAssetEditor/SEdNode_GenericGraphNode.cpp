@@ -1,4 +1,5 @@
 #include "SEdNode_GenericGraphNode.h"
+#include "GenericGraphEditorPCH.h"
 #include "Colors_GenericGraph.h"
 #include "SLevelOfDetailBranchNode.h"
 #include "SInlineEditableTextBlock.h"
@@ -277,6 +278,18 @@ void SEdNode_GenericGraphNode::AddPin(const TSharedRef<SGraphPin>& PinToAdd)
 		OutputPins.Add(PinToAdd);
 	}
 }
+
+bool SEdNode_GenericGraphNode::IsNameReadOnly() const
+{
+	UEdNode_GenericGraphNode* EdNode_Node = Cast<UEdNode_GenericGraphNode>(GraphNode);
+	check(EdNode_Node != nullptr);
+
+	UGenericGraph* GenericGraph = EdNode_Node->GenericGraphNode->Graph;
+	check(GenericGraph != nullptr);
+
+	return !GenericGraph->bCanRenameNode || SGraphNode::IsNameReadOnly();
+}
+
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
 void SEdNode_GenericGraphNode::OnNameTextCommited(const FText& InText, ETextCommit::Type CommitInfo)
