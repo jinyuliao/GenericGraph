@@ -21,6 +21,8 @@ void UEdGraph_GenericGraph::RebuildGenericGraph()
 	UGenericGraph* Graph = GetGenericGraph();
 
 	Graph->ClearGraph();
+	NodeMap.Reset();
+	EdgeMap.Reset();
 
 	for (int i = 0; i < Nodes.Num(); ++i)
 	{
@@ -30,6 +32,8 @@ void UEdGraph_GenericGraph::RebuildGenericGraph()
 				continue;
 
 			UGenericGraphNode* GenericGraphNode = EdNode->GenericGraphNode;
+
+			NodeMap.Add(GenericGraphNode, EdNode);
 
 			Graph->AllNodes.Add(GenericGraphNode);
 
@@ -80,6 +84,8 @@ void UEdGraph_GenericGraph::RebuildGenericGraph()
 				LOG_ERROR(TEXT("UEdGraph_GenericGraph::RebuildGenericGraph add edge failed."));
 				continue;
 			}
+
+			EdgeMap.Add(Edge, EdgeNode);
 
 			Edge->Graph = Graph;
 			Edge->Rename(nullptr, Graph, REN_DontCreateRedirectors | REN_DoNotDirty);

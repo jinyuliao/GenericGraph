@@ -7,6 +7,7 @@
 
 class UEdNode_GenericGraphNode;
 class UEdNode_GenericGraphEdge;
+class UAutoLayoutStrategy;
 
 /** Action to add a node to the graph */
 USTRUCT()
@@ -43,10 +44,30 @@ public:
 	UEdNode_GenericGraphEdge* NodeTemplate;
 };
 
+USTRUCT()
+struct FAssetSchemaAction_AutoArrange : public FEdGraphSchemaAction
+{
+	GENERATED_USTRUCT_BODY();
+
+public:
+	FAssetSchemaAction_AutoArrange() : LayoutStrategy(nullptr) {}
+
+	FAssetSchemaAction_AutoArrange(const FText& InNodeCategory, const FText& InMenuDesc, const FText& InToolTip, const int32 InGrouping)
+		: FEdGraphSchemaAction(InNodeCategory, InMenuDesc, InToolTip, InGrouping), LayoutStrategy(nullptr) {}
+
+	virtual UEdGraphNode* PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode = true) override;
+	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
+
+	UAutoLayoutStrategy* LayoutStrategy;
+};
+
 UCLASS(MinimalAPI)
 class UAssetGraphSchema_GenericGraph : public UEdGraphSchema
 {
 	GENERATED_BODY()
+
+public:
+	UAssetGraphSchema_GenericGraph();
 
 	void GetBreakLinkToSubMenuActions(class FMenuBuilder& MenuBuilder, class UEdGraphPin* InGraphPin);
 
@@ -78,5 +99,8 @@ class UAssetGraphSchema_GenericGraph : public UEdGraphSchema
 
 private:
 	static int32 CurrentCacheRefreshID;
+
+	UPROPERTY()
+	UAutoLayoutStrategy* LayoutStrategy;
 };
 

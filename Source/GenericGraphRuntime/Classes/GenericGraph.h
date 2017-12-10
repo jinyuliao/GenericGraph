@@ -42,6 +42,21 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "GenericGraph")
 	bool bCanRenameNode;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AutoArrange")
+	bool bRandomInit;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AutoArrange")
+	float OptimalDistance;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AutoArrange")
+	int32 MaxIteration;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AutoArrange")
+	float InitTemperature;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AutoArrange")
+	float CoolDownRate;
 #endif
 
 	UFUNCTION(BlueprintCallable, Category = "GenericGraph")

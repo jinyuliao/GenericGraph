@@ -5,6 +5,7 @@
 #include "ConnectionDrawingPolicy_GenericGraph.h"
 #include "GraphEditorActions.h"
 #include "Framework/Commands/GenericCommands.h"
+#include "AutoLayout/ForceDirectedLayoutStrategy.h"
 
 #define LOCTEXT_NAMESPACE "AssetSchema_GenericGraph"
 
@@ -131,6 +132,35 @@ void FAssetSchemaAction_GenericGraph_NewEdge::AddReferencedObjects(FReferenceCol
 	Collector.AddReferencedObject(NodeTemplate);
 }
 
+UEdGraphNode* FAssetSchemaAction_AutoArrange::PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode /*= true*/)
+{
+	const FScopedTransaction Transaction(LOCTEXT("GenericGraphEditorAutoArrange", "Generic Graph Editor: Auto Arrange"));
+
+	ParentGraph->Modify();
+	if (FromPin != nullptr)
+		FromPin->Modify();
+
+	for (int i = 0; i < ParentGraph->Nodes.Num(); ++i)
+	{
+		ParentGraph->Nodes[i]->Modify();
+	}
+
+	LayoutStrategy->Layout(ParentGraph);
+
+	return nullptr;
+}
+
+void FAssetSchemaAction_AutoArrange::AddReferencedObjects(FReferenceCollector& Collector)
+{
+	FEdGraphSchemaAction::AddReferencedObjects(Collector);
+	Collector.AddReferencedObject(LayoutStrategy);
+}
+
+UAssetGraphSchema_GenericGraph::UAssetGraphSchema_GenericGraph()
+{
+	LayoutStrategy = CreateDefaultSubobject<UForceDirectedLayoutStrategy>(TEXT("LayoutStrategy"), true);
+}
+
 void UAssetGraphSchema_GenericGraph::GetBreakLinkToSubMenuActions(class FMenuBuilder& MenuBuilder, class UEdGraphPin* InGraphPin)
 {
 	// Make sure we have a unique name for every entry in the list
@@ -242,6 +272,10 @@ void UAssetGraphSchema_GenericGraph::GetGraphContextActions(FGraphContextMenuBui
 			Visited.Add(NodeType);
 		}
 	}
+
+	TSharedPtr<FAssetSchemaAction_AutoArrange> AutoArrangeAction(new FAssetSchemaAction_AutoArrange(LOCTEXT("", ""), LOCTEXT("AutoArrange", "AutoArrange"), LOCTEXT("AutoArrange", "AutoArrange"), 0));
+	AutoArrangeAction->LayoutStrategy = LayoutStrategy;
+	ContextMenuBuilder.AddAction(AutoArrangeAction);
 }
 
 void UAssetGraphSchema_GenericGraph::GetContextMenuActions(const UEdGraph* CurrentGraph, const UEdGraphNode* InGraphNode, const UEdGraphPin* InGraphPin, class FMenuBuilder* MenuBuilder, bool bIsDebugging) const

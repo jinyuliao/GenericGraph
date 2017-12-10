@@ -5,6 +5,10 @@
 #include "EdGraph_GenericGraph.generated.h"
 
 class UGenericGraph;
+class UGenericGraphNode;
+class UGenericGraphEdge;
+class UEdNode_GenericGraphNode;
+class UEdNode_GenericGraphEdge;
 
 UCLASS()
 class UEdGraph_GenericGraph : public UEdGraph
@@ -22,4 +26,10 @@ public:
 #if WITH_EDITOR
 	virtual void PostEditUndo() override;
 #endif
+
+	UPROPERTY(Transient)
+	TMap<UGenericGraphNode*, UEdNode_GenericGraphNode*> NodeMap;
+
+	UPROPERTY(Transient)
+	TMap<UGenericGraphEdge*, UEdNode_GenericGraphEdge*> EdgeMap;
 };
