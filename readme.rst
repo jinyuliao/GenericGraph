@@ -41,5 +41,10 @@ Dialogue System and ability system: SRPGTemplate_
 
 .. image:: docs/images/ability-graph.png
 
+Donate
+------
+
+.. image:: docs/images/donate.png
+    :target: https://jinyuliao.github.io/blog/html/pages/donate.html
 
 .. _SRPGTemplate: https://github.com/jinyuliao/SRPGTemplate
