@@ -1,9 +1,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Settings_GenericGraphEditor.h"
+#include "GenericGraph.h"
 
 class FGGAssetEditorToolbar;
-class UGenericGraph;
 
 class FAssetEditor_GenericGraph : public FAssetEditorToolkit, public FNotifyHook, public FGCObject
 {
@@ -39,9 +40,12 @@ public:
 	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
 	// End of FSerializableObject interface
 
+	UGenericGraphEditorSettings* GetSettings() const;
+
 private:
 	TSharedRef<SDockTab> SpawnTab_Viewport(const FSpawnTabArgs& Args);
 	TSharedRef<SDockTab> SpawnTab_Details(const FSpawnTabArgs& Args);
+	TSharedRef<SDockTab> SpawnTab_EditorSettings(const FSpawnTabArgs& Args);
 
 	void CreateInternalWidgets();
 	TSharedRef<SGraphEditor> CreateViewportWidget();
@@ -78,6 +82,9 @@ private:
 	void GraphSettings();
 	bool CanGraphSettings() const;
 
+	void AutoArrange();
+	bool CanAutoArrange() const;
+
 	void OnRenameNode();
 	bool CanRenameNodes() const;
 
@@ -91,8 +98,9 @@ private:
 
 	void OnPackageSaved(const FString& PackageFileName, UObject* Outer);
 
-
 private:
+	UGenericGraphEditorSettings* GenricGraphEditorSettings;
+
 	UGenericGraph* EditingGraph;
 
 	//Toolbar
@@ -103,6 +111,7 @@ private:
 
 	TSharedPtr<SGraphEditor> ViewportWidget;
 	TSharedPtr<class IDetailsView> PropertyWidget;
+	TSharedPtr<class IDetailsView> EditorSettingsWidget;
 
 	/** The command list for this editor */
 	TSharedPtr<FUICommandList> GraphEditorCommands;

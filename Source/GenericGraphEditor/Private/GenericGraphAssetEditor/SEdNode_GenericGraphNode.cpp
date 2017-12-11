@@ -62,6 +62,7 @@ void SEdNode_GenericGraphNode::Construct(const FArguments& InArgs, UEdNode_Gener
 {
 	GraphNode = InNode;
 	UpdateGraphNode();
+	InNode->SEdNode = this;
 }
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION

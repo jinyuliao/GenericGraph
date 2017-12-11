@@ -12,6 +12,7 @@ Feature
 * UE4 BehaviorTree-like asset editor
 * Extendable graph node type
 * Extendable graph edge type
+* Extendable graph type(new asset type with generic graph editor, C++ only)
 
 Usage
 -----
@@ -44,7 +45,8 @@ Dialogue System and ability system: SRPGTemplate_
 Donate
 ------
 
-.. image:: docs/images/donate.png
+.. image:: https://jinyuliao.github.io/blog/html/_images/donate.png
     :target: https://jinyuliao.github.io/blog/html/pages/donate.html
+    :alt: Donate
 
 .. _SRPGTemplate: https://github.com/jinyuliao/SRPGTemplate

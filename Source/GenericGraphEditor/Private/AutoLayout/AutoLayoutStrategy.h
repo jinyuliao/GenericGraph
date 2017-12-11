@@ -6,6 +6,7 @@
 #include "GenericGraphAssetEditor/EdGraph_GenericGraph.h"
 #include "GenericGraphAssetEditor/EdNode_GenericGraphNode.h"
 #include "GenericGraphAssetEditor/EdNode_GenericGraphEdge.h"
+#include "GenericGraphAssetEditor/Settings_GenericGraphEditor.h"
 #include "AutoLayoutStrategy.generated.h"
 
 UCLASS(abstract)
@@ -18,15 +19,22 @@ public:
 
 	virtual void Layout(UEdGraph* EdGraph) {};
 
-protected:
-	virtual FBox2D GetNodeBound(UEdGraphNode* EdNode);
+	class UGenericGraphEditorSettings* Settings;
 
-	virtual FBox2D GetActualBounds(UGenericGraphNode* RootNode);
+protected:
+	int32 GetNodeWidth(UEdNode_GenericGraphNode* EdNode);
+
+	int32 GetNodeHeight(UEdNode_GenericGraphNode* EdNode);
+
+	FBox2D GetNodeBound(UEdGraphNode* EdNode);
+
+	FBox2D GetActualBounds(UGenericGraphNode* RootNode);
 
 	virtual void RandomLayoutOneTree(UGenericGraphNode* RootNode, const FBox2D& Bound);
 
 protected:
-	UGenericGraph * Graph;
+	UGenericGraph* Graph;
 	UEdGraph_GenericGraph* EdGraph;
-	float OptimalDistance;
+	int32 MaxIteration;
+	int32 OptimalDistance;
 };

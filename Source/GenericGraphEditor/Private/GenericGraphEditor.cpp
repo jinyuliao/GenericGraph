@@ -5,6 +5,7 @@
 #include "GenericGraphAssetEditor/EdNode_GenericGraphEdge.h"
 #include "GenericGraphAssetEditor/SEdNode_GenericGraphNode.h"
 #include "GenericGraphAssetEditor/SEdNode_GenericGraphEdge.h"
+#include "GenericGraphAssetEditor/GenericGraphEditorStyle.h"
 
 DEFINE_LOG_CATEGORY(GenericGraphEditor)
 
@@ -47,6 +48,8 @@ IMPLEMENT_MODULE( FGenericGraphEditor, UGenericGraphEditor )
 
 void FGenericGraphEditor::StartupModule()
 {
+	FGenericGraphEditorStyle::Initialize();
+
 	GraphPanelNodeFactory_GenericGraph = MakeShareable(new FGraphPanelNodeFactory_GenericGraph());
 	FEdGraphUtilities::RegisterVisualNodeFactory(GraphPanelNodeFactory_GenericGraph);
 
@@ -75,6 +78,8 @@ void FGenericGraphEditor::ShutdownModule()
 		FEdGraphUtilities::UnregisterVisualNodeFactory(GraphPanelNodeFactory_GenericGraph);
 		GraphPanelNodeFactory_GenericGraph.Reset();
 	}
+
+	FGenericGraphEditorStyle::Shutdown();
 }
 
 void FGenericGraphEditor::RegisterAssetTypeAction(IAssetTools& AssetTools, TSharedRef<IAssetTypeActions> Action)

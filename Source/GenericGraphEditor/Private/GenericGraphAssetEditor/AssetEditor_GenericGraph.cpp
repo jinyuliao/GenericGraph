@@ -16,6 +16,8 @@
 #include "EdGraph_GenericGraph.h"
 #include "EdNode_GenericGraphNode.h"
 #include "EdNode_GenericGraphEdge.h"
+#include "AutoLayout/TreeLayoutStrategy.h"
+#include "AutoLayout/ForceDirectedLayoutStrategy.h"
 
 #define LOCTEXT_NAMESPACE "AssetEditor_GenericGraph"
 
@@ -24,20 +26,24 @@ const FName GenericGraphEditorAppName = FName(TEXT("GenericGraphEditorApp"));
 struct FGenericGraphAssetEditorTabs
 {
 	// Tab identifiers
-	static const FName DetailsID;
+	static const FName GenericGraphPropertyID;
 	static const FName ViewportID;
+	static const FName GenericGraphEditorSettingsID;
 };
 
 //////////////////////////////////////////////////////////////////////////
 
-const FName FGenericGraphAssetEditorTabs::DetailsID(TEXT("Details"));
+const FName FGenericGraphAssetEditorTabs::GenericGraphPropertyID(TEXT("GenericGraphProperty"));
 const FName FGenericGraphAssetEditorTabs::ViewportID(TEXT("Viewport"));
+const FName FGenericGraphAssetEditorTabs::GenericGraphEditorSettingsID(TEXT("GenericGraphEditorSettings"));
 
 //////////////////////////////////////////////////////////////////////////
 
 FAssetEditor_GenericGraph::FAssetEditor_GenericGraph()
 {
 	EditingGraph = nullptr;
+
+	GenricGraphEditorSettings = NewObject<UGenericGraphEditorSettings>(UGenericGraphEditorSettings::StaticClass());
 
 	OnPackageSavedDelegateHandle = UPackage::PackageSavedEvent.AddRaw(this, &FAssetEditor_GenericGraph::OnPackageSaved);
 }
@@ -86,14 +92,24 @@ void FAssetEditor_GenericGraph::InitGenericGraphAssetEditor(const EToolkitMode::
 				->Split
 				(
 					FTabManager::NewStack()
-					->SetSizeCoefficient(0.225f)
-					->AddTab(FGenericGraphAssetEditorTabs::ViewportID, ETabState::OpenedTab)
+					->SetSizeCoefficient(0.65f)
+					->AddTab(FGenericGraphAssetEditorTabs::ViewportID, ETabState::OpenedTab)->SetHideTabWell(true)
 				)
 				->Split
 				(
-					FTabManager::NewStack()
-					->SetSizeCoefficient(0.65f)
-					->AddTab(FGenericGraphAssetEditorTabs::DetailsID, ETabState::OpenedTab)->SetHideTabWell(true)
+					FTabManager::NewPrimaryArea()->SetOrientation(Orient_Vertical)
+					->Split
+					(
+						FTabManager::NewStack()
+						->SetSizeCoefficient(0.7f)
+						->AddTab(FGenericGraphAssetEditorTabs::GenericGraphPropertyID, ETabState::OpenedTab)->SetHideTabWell(true)
+					)
+					->Split
+					(
+						FTabManager::NewStack()
+						->SetSizeCoefficient(0.3f)
+						->AddTab(FGenericGraphAssetEditorTabs::GenericGraphEditorSettingsID, ETabState::OpenedTab)
+					)
 				)
 			)
 		);
@@ -107,7 +123,7 @@ void FAssetEditor_GenericGraph::InitGenericGraphAssetEditor(const EToolkitMode::
 
 void FAssetEditor_GenericGraph::RegisterTabSpawners(const TSharedRef<FTabManager>& InTabManager)
 {
-	WorkspaceMenuCategory = InTabManager->AddLocalWorkspaceMenuCategory(LOCTEXT("WorkspaceMenu_SoundCueEditor", "Sound Cue Editor"));
+	WorkspaceMenuCategory = InTabManager->AddLocalWorkspaceMenuCategory(LOCTEXT("WorkspaceMenu_GenericGraphEditor", "Generic Graph Editor"));
 	auto WorkspaceMenuCategoryRef = WorkspaceMenuCategory.ToSharedRef();
 
 	FAssetEditorToolkit::RegisterTabSpawners(InTabManager);
@@ -117,8 +133,13 @@ void FAssetEditor_GenericGraph::RegisterTabSpawners(const TSharedRef<FTabManager
 		.SetGroup(WorkspaceMenuCategoryRef)
 		.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(), "GraphEditor.EventGraph_16x"));
 
-	InTabManager->RegisterTabSpawner(FGenericGraphAssetEditorTabs::DetailsID, FOnSpawnTab::CreateSP(this, &FAssetEditor_GenericGraph::SpawnTab_Details))
-		.SetDisplayName(LOCTEXT("DetailsTab", "Details"))
+	InTabManager->RegisterTabSpawner(FGenericGraphAssetEditorTabs::GenericGraphPropertyID, FOnSpawnTab::CreateSP(this, &FAssetEditor_GenericGraph::SpawnTab_Details))
+		.SetDisplayName(LOCTEXT("DetailsTab", "Property"))
+		.SetGroup(WorkspaceMenuCategoryRef)
+		.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(), "LevelEditor.Tabs.Details"));
+
+	InTabManager->RegisterTabSpawner(FGenericGraphAssetEditorTabs::GenericGraphEditorSettingsID, FOnSpawnTab::CreateSP(this, &FAssetEditor_GenericGraph::SpawnTab_EditorSettings))
+		.SetDisplayName(LOCTEXT("EditorSettingsTab", "Generic Graph Editor Setttings"))
 		.SetGroup(WorkspaceMenuCategoryRef)
 		.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(), "LevelEditor.Tabs.Details"));
 }
@@ -128,7 +149,8 @@ void FAssetEditor_GenericGraph::UnregisterTabSpawners(const TSharedRef<FTabManag
 	FAssetEditorToolkit::UnregisterTabSpawners(InTabManager);
 
 	InTabManager->UnregisterTabSpawner(FGenericGraphAssetEditorTabs::ViewportID);
-	InTabManager->UnregisterTabSpawner(FGenericGraphAssetEditorTabs::DetailsID);
+	InTabManager->UnregisterTabSpawner(FGenericGraphAssetEditorTabs::GenericGraphPropertyID);
+	InTabManager->UnregisterTabSpawner(FGenericGraphAssetEditorTabs::GenericGraphEditorSettingsID);
 }
 
 FName FAssetEditor_GenericGraph::GetToolkitFName() const
@@ -187,6 +209,11 @@ void FAssetEditor_GenericGraph::AddReferencedObjects(FReferenceCollector& Collec
 	Collector.AddReferencedObject(EditingGraph->EdGraph);
 }
 
+UGenericGraphEditorSettings* FAssetEditor_GenericGraph::GetSettings() const
+{
+	return GenricGraphEditorSettings;
+}
+
 TSharedRef<SDockTab> FAssetEditor_GenericGraph::SpawnTab_Viewport(const FSpawnTabArgs& Args)
 {
 	check(Args.GetTabId() == FGenericGraphAssetEditorTabs::ViewportID);
@@ -204,13 +231,25 @@ TSharedRef<SDockTab> FAssetEditor_GenericGraph::SpawnTab_Viewport(const FSpawnTa
 
 TSharedRef<SDockTab> FAssetEditor_GenericGraph::SpawnTab_Details(const FSpawnTabArgs& Args)
 {
-	check(Args.GetTabId() == FGenericGraphAssetEditorTabs::DetailsID);
+	check(Args.GetTabId() == FGenericGraphAssetEditorTabs::GenericGraphPropertyID);
 
 	return SNew(SDockTab)
 		.Icon(FEditorStyle::GetBrush("LevelEditor.Tabs.Details"))
-		.Label(LOCTEXT("Details_Title", "Details"))
+		.Label(LOCTEXT("Details_Title", "Property"))
 		[
 			PropertyWidget.ToSharedRef()
+		];
+}
+
+TSharedRef<SDockTab> FAssetEditor_GenericGraph::SpawnTab_EditorSettings(const FSpawnTabArgs& Args)
+{
+	check(Args.GetTabId() == FGenericGraphAssetEditorTabs::GenericGraphEditorSettingsID);
+
+	return SNew(SDockTab)
+		.Icon(FEditorStyle::GetBrush("LevelEditor.Tabs.Details"))
+		.Label(LOCTEXT("EditorSettings_Title", "Generic Graph Editor Setttings"))
+		[
+			EditorSettingsWidget.ToSharedRef()
 		];
 }
 
@@ -225,9 +264,10 @@ void FAssetEditor_GenericGraph::CreateInternalWidgets()
 	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 	PropertyWidget = PropertyModule.CreateDetailView(Args);
 	PropertyWidget->SetObject(EditingGraph);
-
-	//PropertyWidget->SetIsPropertyEditingEnabledDelegate(FIsPropertyEditingEnabled::CreateSP(this, &FGenericGraphAssetEditor::IsPropertyEditable));
 	PropertyWidget->OnFinishedChangingProperties().AddSP(this, &FAssetEditor_GenericGraph::OnFinishedChangingProperties);
+
+	EditorSettingsWidget = PropertyModule.CreateDetailView(Args);
+	EditorSettingsWidget->SetObject(GenricGraphEditorSettings);
 }
 
 TSharedRef<SGraphEditor> FAssetEditor_GenericGraph::CreateViewportWidget()
@@ -251,12 +291,16 @@ TSharedRef<SGraphEditor> FAssetEditor_GenericGraph::CreateViewportWidget()
 		.ShowGraphStateOverlay(false);
 }
 
-
 void FAssetEditor_GenericGraph::BindCommands()
 {
 	ToolkitCommands->MapAction(FEditorCommands_GenericGraph::Get().GraphSettings,
 		FExecuteAction::CreateSP(this, &FAssetEditor_GenericGraph::GraphSettings),
 		FCanExecuteAction::CreateSP(this, &FAssetEditor_GenericGraph::CanGraphSettings)
+	);
+
+	ToolkitCommands->MapAction(FEditorCommands_GenericGraph::Get().AutoArrange,
+		FExecuteAction::CreateSP(this, &FAssetEditor_GenericGraph::AutoArrange),
+		FCanExecuteAction::CreateSP(this, &FAssetEditor_GenericGraph::CanAutoArrange)
 	);
 }
 
@@ -289,6 +333,10 @@ void FAssetEditor_GenericGraph::CreateCommandList()
 	GraphEditorCommands->MapAction(FEditorCommands_GenericGraph::Get().GraphSettings,
 		FExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::GraphSettings),
 		FCanExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::CanGraphSettings));
+
+	GraphEditorCommands->MapAction(FEditorCommands_GenericGraph::Get().AutoArrange,
+		FExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::AutoArrange),
+		FCanExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::CanAutoArrange));
 
 	GraphEditorCommands->MapAction(FGenericCommands::Get().SelectAll,
 		FExecuteAction::CreateRaw(this, &FAssetEditor_GenericGraph::SelectAllNodes),
@@ -632,6 +680,45 @@ void FAssetEditor_GenericGraph::GraphSettings()
 bool FAssetEditor_GenericGraph::CanGraphSettings() const
 {
 	return true;
+}
+
+void FAssetEditor_GenericGraph::AutoArrange()
+{
+	UEdGraph_GenericGraph* EdGraph = Cast<UEdGraph_GenericGraph>(EditingGraph->EdGraph);
+	check(EdGraph != nullptr);
+
+	const FScopedTransaction Transaction(LOCTEXT("GenericGraphEditorAutoArrange", "Generic Graph Editor: Auto Arrange"));
+
+	EdGraph->Modify();
+
+	UAutoLayoutStrategy* LayoutStrategy = nullptr;
+	switch (GenricGraphEditorSettings->AutoLayoutStrategy)
+	{
+	case EAutoLayoutStrategy::Tree:
+		LayoutStrategy = NewObject<UAutoLayoutStrategy>(EdGraph, UTreeLayoutStrategy::StaticClass());
+		break;
+	case EAutoLayoutStrategy::ForceDirected:
+		LayoutStrategy = NewObject<UAutoLayoutStrategy>(EdGraph, UForceDirectedLayoutStrategy::StaticClass());
+		break;
+	default:
+		break;
+	}
+
+	if (LayoutStrategy != nullptr)
+	{
+		LayoutStrategy->Settings = GenricGraphEditorSettings;
+		LayoutStrategy->Layout(EdGraph);
+		LayoutStrategy->ConditionalBeginDestroy();
+	}
+	else
+	{
+		LOG_ERROR(TEXT("FAssetEditor_GenericGraph::AutoArrange LayoutStrategy is null."));
+	}
+}
+
+bool FAssetEditor_GenericGraph::CanAutoArrange() const
+{
+	return EditingGraph != nullptr && Cast<UEdGraph_GenericGraph>(EditingGraph->EdGraph) != nullptr;
 }
 
 void FAssetEditor_GenericGraph::OnRenameNode()

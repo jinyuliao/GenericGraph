@@ -23,13 +23,17 @@ public:
 
 	UGenericGraph* GetGenericGraph() const;
 
-#if WITH_EDITOR
+	virtual bool Modify(bool bAlwaysMarkDirty = true) override;
 	virtual void PostEditUndo() override;
-#endif
 
 	UPROPERTY(Transient)
 	TMap<UGenericGraphNode*, UEdNode_GenericGraphNode*> NodeMap;
 
 	UPROPERTY(Transient)
 	TMap<UGenericGraphEdge*, UEdNode_GenericGraphEdge*> EdgeMap;
+
+protected:
+	void Clear();
+
+	void SortNodes(UGenericGraphNode* RootNode);
 };

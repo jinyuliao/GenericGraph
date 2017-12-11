@@ -20,9 +20,7 @@ void UEdGraph_GenericGraph::RebuildGenericGraph()
 
 	UGenericGraph* Graph = GetGenericGraph();
 
-	Graph->ClearGraph();
-	NodeMap.Reset();
-	EdgeMap.Reset();
+	Clear();
 
 	for (int i = 0; i < Nodes.Num(); ++i)
 	{
@@ -101,11 +99,20 @@ void UEdGraph_GenericGraph::RebuildGenericGraph()
 		if (Node->ParentNodes.Num() == 0)
 		{
 			Graph->RootNodes.Add(Node);
+
+			SortNodes(Node);
 		}
 
 		Node->Graph = Graph;
 		Node->Rename(nullptr, Graph, REN_DontCreateRedirectors | REN_DoNotDirty);
 	}
+
+	Graph->RootNodes.Sort([&](const UGenericGraphNode& L, const UGenericGraphNode& R)
+	{
+		UEdNode_GenericGraphNode* EdNode_LNode = NodeMap[&L];
+		UEdNode_GenericGraphNode* EdNode_RNode = NodeMap[&R];
+		return EdNode_LNode->NodePosX < EdNode_RNode->NodePosX;
+	});
 }
 
 UGenericGraph* UEdGraph_GenericGraph::GetGenericGraph() const
@@ -113,12 +120,79 @@ UGenericGraph* UEdGraph_GenericGraph::GetGenericGraph() const
 	return CastChecked<UGenericGraph>(GetOuter());
 }
 
-#if WITH_EDITOR
+bool UEdGraph_GenericGraph::Modify(bool bAlwaysMarkDirty /*= true*/)
+{
+	bool Rtn = Super::Modify(bAlwaysMarkDirty);
+
+	GetGenericGraph()->Modify();
+
+	for (int32 i = 0; i < Nodes.Num(); ++i)
+	{
+		Nodes[i]->Modify();
+	}
+
+	return Rtn;
+}
+
+void UEdGraph_GenericGraph::Clear()
+{
+	UGenericGraph* Graph = GetGenericGraph();
+
+	Graph->ClearGraph();
+	NodeMap.Reset();
+	EdgeMap.Reset();
+
+	for (int i = 0; i < Nodes.Num(); ++i)
+	{
+		if (UEdNode_GenericGraphNode* EdNode = Cast<UEdNode_GenericGraphNode>(Nodes[i]))
+		{
+			UGenericGraphNode* GenericGraphNode = EdNode->GenericGraphNode;
+			GenericGraphNode->ParentNodes.Reset();
+			GenericGraphNode->ChildrenNodes.Reset();
+			GenericGraphNode->Edges.Reset();
+		}
+	}
+}
+
+void UEdGraph_GenericGraph::SortNodes(UGenericGraphNode* RootNode)
+{
+	int Level = 0;
+	TArray<UGenericGraphNode*> CurrLevelNodes = { RootNode };
+	TArray<UGenericGraphNode*> NextLevelNodes;
+
+	while (CurrLevelNodes.Num() != 0)
+	{
+		int32 LevelWidth = 0;
+		for (int i = 0; i < CurrLevelNodes.Num(); ++i)
+		{
+			UGenericGraphNode* Node = CurrLevelNodes[i];
+
+			auto Comp = [&](const UGenericGraphNode& L, const UGenericGraphNode& R)
+			{
+				UEdNode_GenericGraphNode* EdNode_LNode = NodeMap[&L];
+				UEdNode_GenericGraphNode* EdNode_RNode = NodeMap[&R];
+				return EdNode_LNode->NodePosX < EdNode_RNode->NodePosX;
+			};
+
+			Node->ChildrenNodes.Sort(Comp);
+			Node->ParentNodes.Sort(Comp);
+
+			for (int j = 0; j < Node->ChildrenNodes.Num(); ++j)
+			{
+				NextLevelNodes.Add(Node->ChildrenNodes[j]);
+			}
+		}
+
+		CurrLevelNodes = NextLevelNodes;
+		NextLevelNodes.Reset();
+		++Level;
+	}
+}
+
 void UEdGraph_GenericGraph::PostEditUndo()
 {
 	Super::PostEditUndo();
 
 	NotifyGraphChanged();
 }
-#endif
 

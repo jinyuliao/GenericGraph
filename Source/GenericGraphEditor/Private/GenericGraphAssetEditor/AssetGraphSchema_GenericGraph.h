@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenericGraph.h"
 #include "GenericGraphNode.h"
 #include "GenericGraphEdge.h"
 #include "AssetGraphSchema_GenericGraph.generated.h"
@@ -44,31 +45,12 @@ public:
 	UEdNode_GenericGraphEdge* NodeTemplate;
 };
 
-USTRUCT()
-struct FAssetSchemaAction_AutoArrange : public FEdGraphSchemaAction
-{
-	GENERATED_USTRUCT_BODY();
-
-public:
-	FAssetSchemaAction_AutoArrange() : LayoutStrategy(nullptr) {}
-
-	FAssetSchemaAction_AutoArrange(const FText& InNodeCategory, const FText& InMenuDesc, const FText& InToolTip, const int32 InGrouping)
-		: FEdGraphSchemaAction(InNodeCategory, InMenuDesc, InToolTip, InGrouping), LayoutStrategy(nullptr) {}
-
-	virtual UEdGraphNode* PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode = true) override;
-	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
-
-	UAutoLayoutStrategy* LayoutStrategy;
-};
-
 UCLASS(MinimalAPI)
 class UAssetGraphSchema_GenericGraph : public UEdGraphSchema
 {
 	GENERATED_BODY()
 
 public:
-	UAssetGraphSchema_GenericGraph();
-
 	void GetBreakLinkToSubMenuActions(class FMenuBuilder& MenuBuilder, class UEdGraphPin* InGraphPin);
 
 	virtual EGraphType GetGraphType(const UEdGraph* TestEdGraph) const override;
@@ -99,8 +81,5 @@ public:
 
 private:
 	static int32 CurrentCacheRefreshID;
-
-	UPROPERTY()
-	UAutoLayoutStrategy* LayoutStrategy;
 };
 

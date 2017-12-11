@@ -32,7 +32,7 @@ UGenericGraphEdge* UGenericGraphNode::GetEdge(UGenericGraphNode* ChildNode)
 	return Edges.Contains(ChildNode) ? Edges.FindChecked(ChildNode) : nullptr;
 }
 
-FText UGenericGraphNode::GetNodeTitle_Implementation()
+FText UGenericGraphNode::GetNodeTitle_Implementation() const
 {
 	if (NodeTitle.IsEmpty())
 	{
@@ -47,6 +47,11 @@ FText UGenericGraphNode::GetNodeTitle_Implementation()
 void UGenericGraphNode::SetNodeTitle_Implementation(const FText& NewTitle)
 {
 	NodeTitle = NewTitle;
+}
+
+bool UGenericGraphNode::IsLeafNode() const
+{
+	return ChildrenNodes.Num() == 0;
 }
 
 UGenericGraph* UGenericGraphNode::GetGraph() const

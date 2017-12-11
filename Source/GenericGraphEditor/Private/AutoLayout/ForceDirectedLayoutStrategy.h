@@ -16,10 +16,9 @@ public:
 
 protected:
 	virtual FBox2D LayoutOneTree(UGenericGraphNode* RootNode, const FBox2D& PreTreeBound);
-	virtual FBox2D PredictTreeBoundLocal(UGenericGraphNode* RootNode);
 
 protected:
-	int32 MaxIteration;
+	bool bRandomInit;
 	float InitTemperature;
 	float CoolDownRate;
 };

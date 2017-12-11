@@ -23,16 +23,13 @@ bool SEdNode_GenericGraphEdge::RequiresSecondPassLayout() const
 
 void SEdNode_GenericGraphEdge::PerformSecondPassLayout(const TMap< UObject*, TSharedRef<SNode> >& NodeToWidgetLookup) const
 {
-	UEdNode_GenericGraphEdge* TransNode = CastChecked<UEdNode_GenericGraphEdge>(GraphNode);
+	UEdNode_GenericGraphEdge* EdgeNode = CastChecked<UEdNode_GenericGraphEdge>(GraphNode);
 
 	FGeometry StartGeom;
 	FGeometry EndGeom;
 
-	int32 TransIndex = 0;
-	int32 NumOfTrans = 1;
-
-	UEdNode_GenericGraphNode* Start = TransNode->GetStartNode();
-	UEdNode_GenericGraphNode* End = TransNode->GetEndNode();
+	UEdNode_GenericGraphNode* Start = EdgeNode->GetStartNode();
+	UEdNode_GenericGraphNode* End = EdgeNode->GetEndNode();
 	if (Start != nullptr && End != nullptr)
 	{
 		const TSharedRef<SNode>* pFromWidget = NodeToWidgetLookup.Find(Start);
@@ -47,7 +44,7 @@ void SEdNode_GenericGraphEdge::PerformSecondPassLayout(const TMap< UObject*, TSh
 		}
 	}
 
-	PositionBetweenTwoNodesWithOffset(StartGeom, EndGeom, TransIndex, NumOfTrans);
+	PositionBetweenTwoNodesWithOffset(StartGeom, EndGeom, 0, 1);
 }
 
 void SEdNode_GenericGraphEdge::UpdateGraphNode()

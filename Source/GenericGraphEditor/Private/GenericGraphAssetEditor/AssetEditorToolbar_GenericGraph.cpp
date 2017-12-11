@@ -1,6 +1,7 @@
 #include "AssetEditorToolbar_GenericGraph.h"
 #include "AssetEditor_GenericGraph.h"
 #include "EditorCommands_GenericGraph.h"
+#include "GenericGraphEditorStyle.h"
 
 #define LOCTEXT_NAMESPACE "AssetEditorToolbar_GenericGraph"
 
@@ -21,15 +22,21 @@ void FAssetEditorToolbar_GenericGraph::FillGenericGraphToolbar(FToolBarBuilder& 
 
 	ToolbarBuilder.BeginSection("Generic Graph");
 	{
-
-		const FText GraphSettingsLabel = LOCTEXT("GraphSettings_Label", "Graph Settings");
-		const FText GraphSettingsTip = LOCTEXT("GraphSettings_ToolTip", "Show the Graph Settings");
-		const FSlateIcon GraphSettingsIcon = FSlateIcon(FEditorStyle::GetStyleSetName(), "LevelEditor.GameSettings");
 		ToolbarBuilder.AddToolBarButton(FEditorCommands_GenericGraph::Get().GraphSettings,
 			NAME_None,
-			GraphSettingsLabel,
-			GraphSettingsTip,
-			GraphSettingsIcon);
+			LOCTEXT("GraphSettings_Label", "Graph Settings"),
+			LOCTEXT("GraphSettings_ToolTip", "Show the Graph Settings"),
+			FSlateIcon(FEditorStyle::GetStyleSetName(), "LevelEditor.GameSettings"));
+	}
+	ToolbarBuilder.EndSection();
+
+	ToolbarBuilder.BeginSection("Util");
+	{
+		ToolbarBuilder.AddToolBarButton(FEditorCommands_GenericGraph::Get().AutoArrange,
+			NAME_None,
+			LOCTEXT("AutoArrange_Label", "Auto Arrange"),
+			LOCTEXT("AutoArrange_ToolTip", "Auto arrange nodes, not perfect, but still handy"),
+			FSlateIcon(FGenericGraphEditorStyle::GetStyleSetName(), "GenericGraphEditor.AutoArrange"));
 	}
 	ToolbarBuilder.EndSection();
 

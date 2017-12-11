@@ -50,9 +50,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GenericGraphNode")
 	virtual UGenericGraphEdge* GetEdge(UGenericGraphNode* ChildNode);
 
+	UFUNCTION(BlueprintCallable, Category = "GenericGraphNode")
+	bool IsLeafNode() const;
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "GenericGraphNode")
-	FText GetNodeTitle();
-	virtual FText GetNodeTitle_Implementation();
+	FText GetNodeTitle() const;
+	virtual FText GetNodeTitle_Implementation() const;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "GenericGraphNode")
 	void SetNodeTitle(const FText& NewTitle);

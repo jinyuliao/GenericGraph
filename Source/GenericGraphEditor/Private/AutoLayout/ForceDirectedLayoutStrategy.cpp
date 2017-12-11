@@ -18,7 +18,7 @@ static inline float GetRepulseForce(float X, float k)
 
 UForceDirectedLayoutStrategy::UForceDirectedLayoutStrategy()
 {
-	MaxIteration = 50;
+	bRandomInit = false;
 	CoolDownRate = 10;
 	InitTemperature = 10.f;
 }
@@ -37,8 +37,12 @@ void UForceDirectedLayoutStrategy::Layout(UEdGraph* _EdGraph)
 	Graph = EdGraph->GetGenericGraph();
 	check(Graph != nullptr);
 
-	OptimalDistance = Graph->OptimalDistance;
-	MaxIteration = Graph->MaxIteration;
+	if (Settings != nullptr)
+	{
+		OptimalDistance = Settings->OptimalDistance;
+		MaxIteration = Settings->MaxIteration;
+		bRandomInit = Settings->bRandomInit;
+	}
 
 	FBox2D PreTreeBound(ForceInitToZero);
 	for (int32 i = 0; i < Graph->RootNodes.Num(); ++i)
@@ -50,11 +54,11 @@ void UForceDirectedLayoutStrategy::Layout(UEdGraph* _EdGraph)
 FBox2D UForceDirectedLayoutStrategy::LayoutOneTree(UGenericGraphNode* RootNode, const FBox2D& PreTreeBound)
 {
 	float Temp = InitTemperature;
-	FBox2D TreeBound = PredictTreeBoundLocal(RootNode);
+	FBox2D TreeBound = GetActualBounds(RootNode);
 	TreeBound.Min.X += PreTreeBound.Max.X + OptimalDistance;
 	TreeBound.Max.X += PreTreeBound.Max.X + OptimalDistance;
 
-	if (Graph->bRandomInit)
+	if (bRandomInit)
 	{
 		RandomLayoutOneTree(RootNode, TreeBound);
 	}
@@ -156,50 +160,3 @@ FBox2D UForceDirectedLayoutStrategy::LayoutOneTree(UGenericGraphNode* RootNode, 
 
 	return TreeBound;
 }
-
-FBox2D UForceDirectedLayoutStrategy::PredictTreeBoundLocal(UGenericGraphNode* RootNode)
-{
-	int Level = 0;
-	TArray<UGenericGraphNode*> CurrLevelNodes = { RootNode };
-	TArray<UGenericGraphNode*> NextLevelNodes;
-
-	int32 GraphWidth = EdGraph->NodeMap[RootNode]->NodeWidth;
-	int32 GraphHeight = EdGraph->NodeMap[RootNode]->NodeHeight;
-
-	while (CurrLevelNodes.Num() != 0)
-	{
-		int32 LevelWidth = 0;
-		int32 MaxHeightInLevel = 0;
-		for (int i = 0; i < CurrLevelNodes.Num(); ++i)
-		{
-			UGenericGraphNode* Node = CurrLevelNodes[i];
-			check(Node != nullptr);
-
-			UEdNode_GenericGraphNode* EdNode_Node = EdGraph->NodeMap[Node];
-
-			LevelWidth += EdNode_Node->NodeWidth;
-			if (i > 0)
-				LevelWidth += OptimalDistance;
-
-			if (MaxHeightInLevel < EdNode_Node->NodeHeight)
-				MaxHeightInLevel = EdNode_Node->NodeHeight;
-
-			for (int j = 0; j < Node->ChildrenNodes.Num(); ++j)
-			{
-				NextLevelNodes.Add(Node->ChildrenNodes[j]);
-			}
-		}
-
-		if (LevelWidth > GraphWidth)
-			GraphWidth = LevelWidth;
-
-		GraphHeight += MaxHeightInLevel + OptimalDistance;
-
-		CurrLevelNodes = NextLevelNodes;
-		NextLevelNodes.Reset();
-		++Level;
-	}
-
-	return FBox2D(FVector2D(0, 0), FVector2D(GraphWidth, GraphHeight));
-}
-

@@ -1,9 +1,13 @@
 #include "AutoLayout/AutoLayoutStrategy.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "GenericGraphAssetEditor/EdNode_GenericGraphNode.h"
+#include "GenericGraphAssetEditor/SEdNode_GenericGraphNode.h"
 
 UAutoLayoutStrategy::UAutoLayoutStrategy()
 {
-	OptimalDistance = 200.f;
+	Settings = nullptr;
+	MaxIteration = 50;
+	OptimalDistance = 150;
 }
 
 UAutoLayoutStrategy::~UAutoLayoutStrategy()
@@ -13,8 +17,10 @@ UAutoLayoutStrategy::~UAutoLayoutStrategy()
 
 FBox2D UAutoLayoutStrategy::GetNodeBound(UEdGraphNode* EdNode)
 {
-	FVector2D Min(EdNode->NodePosX - EdNode->NodeWidth / 2, EdNode->NodePosY - EdNode->NodeHeight / 2);
-	FVector2D Max(EdNode->NodePosX + EdNode->NodeWidth / 2, EdNode->NodePosY + EdNode->NodeHeight / 2);
+	int32 NodeWidth = GetNodeWidth(Cast<UEdNode_GenericGraphNode>(EdNode));
+	int32 NodeHeight = GetNodeHeight(Cast<UEdNode_GenericGraphNode>(EdNode));
+	FVector2D Min(EdNode->NodePosX, EdNode->NodePosY);
+	FVector2D Max(EdNode->NodePosX + NodeWidth, EdNode->NodePosY + NodeHeight);
 	return FBox2D(Min, Max);
 }
 
@@ -77,3 +83,14 @@ void UAutoLayoutStrategy::RandomLayoutOneTree(UGenericGraphNode* RootNode, const
 		++Level;
 	}
 }
+
+int32 UAutoLayoutStrategy::GetNodeWidth(UEdNode_GenericGraphNode* EdNode)
+{
+	return EdNode->SEdNode->GetCachedGeometry().GetLocalSize().X;
+}
+
+int32 UAutoLayoutStrategy::GetNodeHeight(UEdNode_GenericGraphNode* EdNode)
+{
+	return EdNode->SEdNode->GetCachedGeometry().GetLocalSize().Y;
+}
+
