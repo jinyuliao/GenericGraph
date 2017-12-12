@@ -29,19 +29,12 @@ void UTreeLayoutStrategy::Layout(UEdGraph* _EdGraph)
 		bFirstPassOnly = Settings->bFirstPassOnly;
 	}
 
-	VisitedNodes.Reset();
-
-	FBox2D PreTreeBound(ForceInitToZero);
 	FVector2D Anchor(0.f, 0.f);
 	for (int32 i = 0; i < Graph->RootNodes.Num(); ++i)
 	{
 		UGenericGraphNode* RootNode = Graph->RootNodes[i];
 		InitPass(RootNode, Anchor);
-	}
 
-	for (int32 i = 0; i < Graph->RootNodes.Num(); ++i)
-	{
-		UGenericGraphNode* RootNode = Graph->RootNodes[i];
 		if (!bFirstPassOnly)
 		{
 			for (int32 j = 0; j < MaxIteration; ++j)

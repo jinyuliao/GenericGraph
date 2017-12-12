@@ -13,7 +13,6 @@ public:
 
 	void Construct(const FArguments& InArgs, UEdNode_GenericGraphNode* InNode);
 
-	//~ Begin SGraphNode Interface
 	virtual void UpdateGraphNode() override;
 	virtual void CreatePinWidgets() override;
 	virtual void AddPin(const TSharedRef<SGraphPin>& PinToAdd) override;

@@ -26,6 +26,4 @@ protected:
 	void ShiftSubTree(UGenericGraphNode* RootNode, const FVector2D& Offset);
 
 	void UpdateParentNodePosition(UGenericGraphNode* RootNode);
-
-	TSet<UEdNode_GenericGraphNode*> VisitedNodes;
 };

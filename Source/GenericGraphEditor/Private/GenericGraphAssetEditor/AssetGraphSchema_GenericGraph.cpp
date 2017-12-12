@@ -395,6 +395,25 @@ void UAssetGraphSchema_GenericGraph::BreakSinglePinLink(UEdGraphPin* SourcePin, 
 	Super::BreakSinglePinLink(SourcePin, TargetPin);
 }
 
+UEdGraphPin* UAssetGraphSchema_GenericGraph::DropPinOnNode(UEdGraphNode* InTargetNode, const FString& InSourcePinName, const FEdGraphPinType& InSourcePinType, EEdGraphPinDirection InSourcePinDirection) const
+{
+	UEdNode_GenericGraphNode* EdNode = Cast<UEdNode_GenericGraphNode>(InTargetNode);
+	switch (InSourcePinDirection)
+	{
+	case EGPD_Input:
+		return EdNode->GetOutputPin();
+	case EGPD_Output:
+		return EdNode->GetInputPin();
+	default:
+		return nullptr;
+	}
+}
+
+bool UAssetGraphSchema_GenericGraph::SupportsDropPinOnNode(UEdGraphNode* InTargetNode, const FEdGraphPinType& InSourcePinType, EEdGraphPinDirection InSourcePinDirection, FText& OutErrorMessage) const
+{
+	return Cast<UEdNode_GenericGraphNode>(InTargetNode) != nullptr;
+}
+
 bool UAssetGraphSchema_GenericGraph::IsCacheVisualizationOutOfDate(int32 InVisualizationCacheID) const
 {
 	return CurrentCacheRefreshID != InVisualizationCacheID;
