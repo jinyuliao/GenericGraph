@@ -5,7 +5,7 @@
 
 UGenericGraphNode::UGenericGraphNode()
 {
-#if WITH_EDITOR
+#if WITH_EDITORONLY_DATA
 	CompatibleGraphType = UGenericGraph::StaticClass();
 
 	BackgroundColor = FLinearColor::Black;
@@ -20,7 +20,7 @@ UGenericGraphNode::~UGenericGraphNode()
 
 FLinearColor UGenericGraphNode::GetBackgroundColor_Implementation() const
 {
-#if WITH_EDITOR
+#if WITH_EDITORONLY_DATA
 	return BackgroundColor;
 #else
 	return FLinearColor::Black;
