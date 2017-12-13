@@ -9,7 +9,7 @@ class FGenericGraphRuntime : public IGenericGraphRuntime
 	virtual void ShutdownModule() override;
 };
 
-IMPLEMENT_MODULE( FGenericGraphRuntime, UGenericGraphRuntime )
+IMPLEMENT_MODULE( FGenericGraphRuntime, GenericGraphRuntime )
 
 
 

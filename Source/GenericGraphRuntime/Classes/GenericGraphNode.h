@@ -32,7 +32,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphNode")
 	TMap<UGenericGraphNode*, UGenericGraphEdge*> Edges;
 
-#if WITH_EDITOR
+#if WITH_EDITORONLY_DATA
 	UPROPERTY(VisibleDefaultsOnly, Category = "GenericGraphNode")
 	TSubclassOf<UGenericGraph> CompatibleGraphType;
 

@@ -44,7 +44,7 @@ private:
 	EAssetTypeCategories::Type GenericGraphAssetCategoryBit;
 };
 
-IMPLEMENT_MODULE( FGenericGraphEditor, UGenericGraphEditor )
+IMPLEMENT_MODULE( FGenericGraphEditor, GenericGraphEditor )
 
 void FGenericGraphEditor::StartupModule()
 {
