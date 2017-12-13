@@ -43,7 +43,6 @@ public class GenericGraphEditor : ModuleRules
                 "EditorStyle",
                 "Kismet",
                 "KismetWidgets",
-                "ApplicationCore",
 				// ... add private dependencies that you statically link with here ...
 			}
 			);

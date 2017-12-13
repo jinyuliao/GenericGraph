@@ -5,7 +5,6 @@
 #include "EditorCommands_GenericGraph.h"
 #include "EdGraph_GenericGraph.h"
 #include "AssetToolsModule.h"
-#include "HAL/PlatformApplicationMisc.h"
 #include "GenericCommands.h"
 #include "GraphEditorActions.h"
 #include "IDetailsView.h"
@@ -553,7 +552,7 @@ void FAssetEditor_GenericGraph::CopySelectedNodes()
 	}
 
 	FEdGraphUtilities::ExportNodesToText(SelectedNodes, ExportedText);
-	FPlatformApplicationMisc::ClipboardCopy(*ExportedText);
+	FPlatformMisc::ClipboardCopy(*ExportedText);
 }
 
 bool FAssetEditor_GenericGraph::CanCopyNodes()
@@ -601,7 +600,7 @@ void FAssetEditor_GenericGraph::PasteNodesHere(const FVector2D& Location)
 
 		// Grab the text to paste from the clipboard.
 		FString TextToImport;
-		FPlatformApplicationMisc::ClipboardPaste(TextToImport);
+		FPlatformMisc::ClipboardPaste(TextToImport);
 
 		// Import the nodes
 		TSet<UEdGraphNode*> PastedNodes;
@@ -656,7 +655,7 @@ bool FAssetEditor_GenericGraph::CanPasteNodes()
 	}
 
 	FString ClipboardContent;
-	FPlatformApplicationMisc::ClipboardPaste(ClipboardContent);
+	FPlatformMisc::ClipboardPaste(ClipboardContent);
 
 	return FEdGraphUtilities::CanImportNodesFromText(CurrentGraphEditor->GetCurrentGraph(), ClipboardContent);
 }

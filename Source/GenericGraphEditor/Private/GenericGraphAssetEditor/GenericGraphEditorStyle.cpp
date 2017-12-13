@@ -23,7 +23,7 @@ void FGenericGraphEditorStyle::Initialize()
 
 	StyleSet = MakeShareable(new FSlateStyleSet("GenericGraphEditorStyle"));
 
-	StyleSet->SetContentRoot(FPaths::ProjectPluginsDir() / TEXT("GenericGraph/Resources"));
+	StyleSet->SetContentRoot(FPaths::GamePluginsDir() / TEXT("GenericGraph/Resources"));
 
 	StyleSet->Set("GenericGraphEditor.AutoArrange", new IMAGE_BRUSH("AutoArrangeIcon", Icon40x40));
 
