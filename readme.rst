@@ -29,6 +29,11 @@ Install
 #. Generate project file
 #. Compile
 
+Tutorial
+--------
+
+`Dialogue System`_ (WIP)
+
 Example
 -------
 
@@ -49,4 +54,5 @@ Donate
     :target: https://jinyuliao.github.io/blog/html/pages/donate.html
     :alt: Donate
 
+.. _Dialogue System: https://jinyuliao.github.io/blog/html/2017/12/15/ue4_dialogue_system_part1.html
 .. _SRPGTemplate: https://github.com/jinyuliao/SRPGTemplate
