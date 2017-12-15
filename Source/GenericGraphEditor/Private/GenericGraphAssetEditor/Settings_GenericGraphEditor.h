@@ -20,12 +20,12 @@ public:
 	virtual ~UGenericGraphEditorSettings();
 
 	UPROPERTY(EditDefaultsOnly, Category = "AutoArrange")
-	EAutoLayoutStrategy AutoLayoutStrategy;
-
-	UPROPERTY(EditDefaultsOnly, Category = "AutoArrange")
 	float OptimalDistance;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AutoArrange")
+	UPROPERTY(EditDefaultsOnly, AdvancedDisplay, Category = "AutoArrange")
+	EAutoLayoutStrategy AutoLayoutStrategy;
+
+	UPROPERTY(EditDefaultsOnly, AdvancedDisplay, Category = "AutoArrange")
 	int32 MaxIteration;
 
 	UPROPERTY(EditDefaultsOnly, AdvancedDisplay, Category = "AutoArrange")
