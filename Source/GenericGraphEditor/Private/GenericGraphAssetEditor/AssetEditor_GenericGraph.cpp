@@ -97,7 +97,7 @@ void FAssetEditor_GenericGraph::InitGenericGraphAssetEditor(const EToolkitMode::
 				)
 				->Split
 				(
-					FTabManager::NewPrimaryArea()->SetOrientation(Orient_Vertical)
+					FTabManager::NewSplitter()->SetOrientation(Orient_Vertical)
 					->Split
 					(
 						FTabManager::NewStack()
