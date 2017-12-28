@@ -20,9 +20,6 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = "GenericGraphNode")
 	UGenericGraph* Graph;
 
-	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode")
-	FText NodeTitle;
-
 	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphNode")
 	TArray<UGenericGraphNode*> ParentNodes;
 
@@ -32,35 +29,41 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphNode")
 	TMap<UGenericGraphNode*, UGenericGraphEdge*> Edges;
 
-#if WITH_EDITORONLY_DATA
-	UPROPERTY(VisibleDefaultsOnly, Category = "GenericGraphNode")
-	TSubclassOf<UGenericGraph> CompatibleGraphType;
-
-	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode")
-	FLinearColor BackgroundColor;
-
-	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode")
-	FText ContextMenuName;
-#endif
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "GenericGraphNode")
-	FLinearColor GetBackgroundColor() const;
-	virtual FLinearColor GetBackgroundColor_Implementation() const;
-
 	UFUNCTION(BlueprintCallable, Category = "GenericGraphNode")
 	virtual UGenericGraphEdge* GetEdge(UGenericGraphNode* ChildNode);
 
 	UFUNCTION(BlueprintCallable, Category = "GenericGraphNode")
 	bool IsLeafNode() const;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "GenericGraphNode")
-	FText GetNodeTitle() const;
-	virtual FText GetNodeTitle_Implementation() const;
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "GenericGraphNode")
-	void SetNodeTitle(const FText& NewTitle);
-	virtual void SetNodeTitle_Implementation(const FText& NewTitle);
-
 	UFUNCTION(BlueprintCallable, Category = "GenericGraphNode")
 	UGenericGraph* GetGraph() const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "MissionNode")
+	FText GetDescription() const;
+	virtual FText GetDescription_Implementation() const;
+
+	//////////////////////////////////////////////////////////////////////////
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode_Editor")
+	FText NodeTitle;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "GenericGraphNode_Editor")
+	TSubclassOf<UGenericGraph> CompatibleGraphType;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode_Editor")
+	FLinearColor BackgroundColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode_Editor")
+	FText ContextMenuName;
+#endif
+
+#if WITH_EDITOR
+	virtual FLinearColor GetBackgroundColor() const;
+
+	virtual FText GetNodeTitle() const;
+
+	virtual void SetNodeTitle(const FText& NewTitle);
+
+	virtual bool CanCreateConnection(UGenericGraphNode* Other, FText& ErrorMessage);
+#endif
 };

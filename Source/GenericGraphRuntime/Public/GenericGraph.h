@@ -36,14 +36,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GenericGraph")
 	bool bEdgeEnabled;
 
-#if WITH_EDITORONLY_DATA
-	UPROPERTY()
-	class UEdGraph* EdGraph;
-
-	UPROPERTY(EditDefaultsOnly, Category = "GenericGraph")
-	bool bCanRenameNode;
-#endif
-
 	UFUNCTION(BlueprintCallable, Category = "GenericGraph")
 	void Print(bool ToConsole = true, bool ToScreen = true);
 
@@ -54,4 +46,12 @@ public:
 	void GetNodesByLevel(int Level, TArray<UGenericGraphNode*>& Nodes);
 
 	void ClearGraph();
+
+#if WITH_EDITORONLY_DATA
+	UPROPERTY()
+	class UEdGraph* EdGraph;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraph_Editor")
+	bool bCanRenameNode;
+#endif
 };

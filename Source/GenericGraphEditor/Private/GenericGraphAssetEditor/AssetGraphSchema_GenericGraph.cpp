@@ -206,13 +206,16 @@ void UAssetGraphSchema_GenericGraph::GetGraphContextActions(FGraphContextMenuBui
 		Desc = FText::FromString(Title);
 	}
 
-	TSharedPtr<FAssetSchemaAction_GenericGraph_NewNode> NewNodeAction(new FAssetSchemaAction_GenericGraph_NewNode(LOCTEXT("GenericGraphNodeAction", "Generic Graph Node"), Desc, AddToolTip, 0));
-	NewNodeAction->NodeTemplate = NewObject<UEdNode_GenericGraphNode>(ContextMenuBuilder.OwnerOfTemporaries);
-	NewNodeAction->NodeTemplate->GenericGraphNode = NewObject<UGenericGraphNode>(NewNodeAction->NodeTemplate, Graph->NodeType);
-	NewNodeAction->NodeTemplate->GenericGraphNode->Graph = Graph;
-	ContextMenuBuilder.AddAction(NewNodeAction);
+	if (!Graph->NodeType->HasAnyClassFlags(CLASS_Abstract))
+	{
+		TSharedPtr<FAssetSchemaAction_GenericGraph_NewNode> NewNodeAction(new FAssetSchemaAction_GenericGraph_NewNode(LOCTEXT("GenericGraphNodeAction", "Generic Graph Node"), Desc, AddToolTip, 0));
+		NewNodeAction->NodeTemplate = NewObject<UEdNode_GenericGraphNode>(ContextMenuBuilder.OwnerOfTemporaries);
+		NewNodeAction->NodeTemplate->GenericGraphNode = NewObject<UGenericGraphNode>(NewNodeAction->NodeTemplate, Graph->NodeType);
+		NewNodeAction->NodeTemplate->GenericGraphNode->Graph = Graph;
+		ContextMenuBuilder.AddAction(NewNodeAction);
 
-	Visited.Add(Graph->NodeType);
+		Visited.Add(Graph->NodeType);
+	}
 
 	for (TObjectIterator<UClass> It; It; ++It)
 	{
@@ -230,7 +233,7 @@ void UAssetGraphSchema_GenericGraph::GetGraphContextActions(FGraphContextMenuBui
 
 			if (Desc.IsEmpty())
 			{
-				FString Title = Graph->NodeType->GetName();
+				FString Title = NodeType->GetName();
 				Title.RemoveFromEnd("_C");
 				Desc = FText::FromString(Title);
 			}
@@ -315,14 +318,31 @@ const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorCycle", "Can't create a graph cycle"));
 	}
 
-	UEdNode_GenericGraphNode* EdNode = Cast<UEdNode_GenericGraphNode>(A->GetOwningNode());
+	UEdNode_GenericGraphNode* EdNode_A = Cast<UEdNode_GenericGraphNode>(A->GetOwningNode());
+	UEdNode_GenericGraphNode* EdNode_B = Cast<UEdNode_GenericGraphNode>(B->GetOwningNode());
 
-	if (EdNode == nullptr)
+	if (EdNode_A == nullptr || EdNode_B == nullptr)
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinError", "Not a valid UGenericGraphEdNode"));
 	}
 
-	if (EdNode->GenericGraphNode->GetGraph()->bEdgeEnabled)
+	FText ErrorMessage;
+	if (A->Direction == EGPD_Input)
+	{
+		if (!EdNode_A->GenericGraphNode->CanCreateConnection(EdNode_B->GenericGraphNode, ErrorMessage))
+		{
+			return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, ErrorMessage);
+		}
+	}
+	else
+	{
+		if (!EdNode_B->GenericGraphNode->CanCreateConnection(EdNode_A->GenericGraphNode, ErrorMessage))
+		{
+			return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, ErrorMessage);
+		}
+	}
+
+	if (EdNode_A->GenericGraphNode->GetGraph()->bEdgeEnabled)
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_MAKE_WITH_CONVERSION_NODE, LOCTEXT("PinConnect", "Connect nodes with edge"));
 	}
