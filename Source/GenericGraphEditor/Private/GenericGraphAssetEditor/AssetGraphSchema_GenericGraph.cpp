@@ -146,7 +146,7 @@ void UAssetGraphSchema_GenericGraph::GetBreakLinkToSubMenuActions(class FMenuBui
 		FText Title = FText::FromString(TitleString);
 		if (Pin->PinName != TEXT(""))
 		{
-			TitleString = FString::Printf(TEXT("%s (%s)"), *TitleString, *Pin->PinName);
+			TitleString = FString::Printf(TEXT("%s (%s)"), *TitleString, *Pin->PinName.ToString());
 
 			// Add name of connection if possible
 			FFormatNamedArguments Args;
@@ -408,14 +408,14 @@ void UAssetGraphSchema_GenericGraph::BreakPinLinks(UEdGraphPin& TargetPin, bool 
 	Super::BreakPinLinks(TargetPin, bSendsNodeNotifcation);
 }
 
-void UAssetGraphSchema_GenericGraph::BreakSinglePinLink(UEdGraphPin* SourcePin, UEdGraphPin* TargetPin)
+void UAssetGraphSchema_GenericGraph::BreakSinglePinLink(UEdGraphPin* SourcePin, UEdGraphPin* TargetPin) const
 {
 	const FScopedTransaction Transaction(NSLOCTEXT("UnrealEd", "GraphEd_BreakSinglePinLink", "Break Pin Link"));
 
 	Super::BreakSinglePinLink(SourcePin, TargetPin);
 }
 
-UEdGraphPin* UAssetGraphSchema_GenericGraph::DropPinOnNode(UEdGraphNode* InTargetNode, const FString& InSourcePinName, const FEdGraphPinType& InSourcePinType, EEdGraphPinDirection InSourcePinDirection) const
+UEdGraphPin* UAssetGraphSchema_GenericGraph::DropPinOnNode(UEdGraphNode* InTargetNode, const FName& InSourcePinName, const FEdGraphPinType& InSourcePinType, EEdGraphPinDirection InSourcePinDirection) const
 {
 	UEdNode_GenericGraphNode* EdNode = Cast<UEdNode_GenericGraphNode>(InTargetNode);
 	switch (InSourcePinDirection)

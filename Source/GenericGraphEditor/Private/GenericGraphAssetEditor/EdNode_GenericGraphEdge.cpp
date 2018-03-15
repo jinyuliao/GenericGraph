@@ -11,9 +11,9 @@ void UEdNode_GenericGraphEdge::SetEdge(UGenericGraphEdge* Edge)
 
 void UEdNode_GenericGraphEdge::AllocateDefaultPins()
 {
-	UEdGraphPin* Inputs = CreatePin(EGPD_Input, TEXT("Edge"), FString(), nullptr, TEXT("In"));
+	UEdGraphPin* Inputs = CreatePin(EGPD_Input, TEXT("Edge"), FName(), TEXT("In"));
 	Inputs->bHidden = true;
-	UEdGraphPin* Outputs = CreatePin(EGPD_Output, TEXT("Edge"), FString(), nullptr, TEXT("Out"));
+	UEdGraphPin* Outputs = CreatePin(EGPD_Output, TEXT("Edge"), FName(), TEXT("Out"));
 	Outputs->bHidden = true;
 }
 

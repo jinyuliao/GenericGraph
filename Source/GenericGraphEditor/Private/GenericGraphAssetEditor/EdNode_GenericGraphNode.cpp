@@ -17,8 +17,8 @@ UEdNode_GenericGraphNode::~UEdNode_GenericGraphNode()
 
 void UEdNode_GenericGraphNode::AllocateDefaultPins()
 {
-	CreatePin(EGPD_Input, "MultipleNodes", FString(), nullptr, TEXT("In"));
-	CreatePin(EGPD_Output, "MultipleNodes", FString(), nullptr, TEXT("Out"));
+	CreatePin(EGPD_Input, "MultipleNodes", FName(), TEXT("In"));
+	CreatePin(EGPD_Output, "MultipleNodes", FName(), TEXT("Out"));
 }
 
 UEdGraph_GenericGraph* UEdNode_GenericGraphNode::GetGenericGraphEdGraph()
