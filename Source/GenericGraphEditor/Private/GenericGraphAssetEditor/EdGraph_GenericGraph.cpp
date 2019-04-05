@@ -51,10 +51,10 @@ void UEdGraph_GenericGraph::RebuildGenericGraph()
 					}
 					else if (UEdNode_GenericGraphEdge* EdNode_Edge = Cast<UEdNode_GenericGraphEdge>(Pin->LinkedTo[LinkToIdx]->GetOwningNode()))
 					{
-						UEdNode_GenericGraphNode* EdNode_Child = EdNode_Edge->GetEndNode();;
-						if (EdNode_Child != nullptr)
+						UEdNode_GenericGraphNode* Child = EdNode_Edge->GetEndNode();;
+						if (Child != nullptr)
 						{
-							ChildNode = EdNode_Child->GenericGraphNode;
+							ChildNode = Child->GenericGraphNode;
 						}
 					}
 

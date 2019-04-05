@@ -17,7 +17,7 @@ public:
 	UAutoLayoutStrategy();
 	virtual ~UAutoLayoutStrategy();
 
-	virtual void Layout(UEdGraph* EdGraph) {};
+	virtual void Layout(UEdGraph* G) {};
 
 	class UGenericGraphEditorSettings* Settings;
 
