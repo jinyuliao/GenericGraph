@@ -38,7 +38,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GenericGraphNode")
 	UGenericGraph* GetGraph() const;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "MissionNode")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "GenericGraphNode")
 	FText GetDescription() const;
 	virtual FText GetDescription_Implementation() const;
 
