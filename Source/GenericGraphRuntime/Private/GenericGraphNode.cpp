@@ -28,6 +28,10 @@ FText UGenericGraphNode::GetDescription_Implementation() const
 }
 
 #if WITH_EDITOR
+bool UGenericGraphNode::IsNameEditable() const
+{
+	return true;
+}
 
 FLinearColor UGenericGraphNode::GetBackgroundColor() const
 {

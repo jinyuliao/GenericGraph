@@ -288,7 +288,7 @@ bool SEdNode_GenericGraphNode::IsNameReadOnly() const
 	UGenericGraph* GenericGraph = EdNode_Node->GenericGraphNode->Graph;
 	check(GenericGraph != nullptr);
 
-	return !GenericGraph->bCanRenameNode || SGraphNode::IsNameReadOnly();
+	return (!GenericGraph->bCanRenameNode || !EdNode_Node->GenericGraphNode->IsNameEditable()) || SGraphNode::IsNameReadOnly();
 }
 
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
