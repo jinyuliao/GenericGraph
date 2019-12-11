@@ -1,4 +1,5 @@
 #include "AssetGraphSchema_GenericGraph.h"
+#include "ToolMenus.h"
 #include "GenericGraphEditorPCH.h"
 #include "EdNode_GenericGraphNode.h"
 #include "EdNode_GenericGraphEdge.h"
@@ -133,10 +134,12 @@ void FAssetSchemaAction_GenericGraph_NewEdge::AddReferencedObjects(FReferenceCol
 	Collector.AddReferencedObject(NodeTemplate);
 }
 
-void UAssetGraphSchema_GenericGraph::GetBreakLinkToSubMenuActions(class FMenuBuilder& MenuBuilder, class UEdGraphPin* InGraphPin)
+void UAssetGraphSchema_GenericGraph::GetBreakLinkToSubMenuActions(UToolMenu* Menu, UEdGraphPin* InGraphPin)
 {
 	// Make sure we have a unique name for every entry in the list
 	TMap< FString, uint32 > LinkTitleCount;
+
+	FToolMenuSection& Section = Menu->FindOrAddSection("GenericGraphAssetGraphSchemaPinActions");
 
 	// Add all the links we could break from
 	for (TArray<class UEdGraphPin*>::TConstIterator Links(InGraphPin->LinkedTo); Links; ++Links)
@@ -155,7 +158,7 @@ void UAssetGraphSchema_GenericGraph::GetBreakLinkToSubMenuActions(class FMenuBui
 			Title = FText::Format(LOCTEXT("BreakDescPin", "{NodeTitle} ({PinName})"), Args);
 		}
 
-		uint32 &Count = LinkTitleCount.FindOrAdd(TitleString);
+		uint32& Count = LinkTitleCount.FindOrAdd(TitleString);
 
 		FText Description;
 		FFormatNamedArguments Args;
@@ -172,7 +175,7 @@ void UAssetGraphSchema_GenericGraph::GetBreakLinkToSubMenuActions(class FMenuBui
 		}
 		++Count;
 
-		MenuBuilder.AddMenuEntry(Description, Description, FSlateIcon(), FUIAction(
+		Section.AddMenuEntry(NAME_None, Description, Description, FSlateIcon(), FUIAction(
 			FExecuteAction::CreateUObject(this, &UAssetGraphSchema_GenericGraph::BreakSinglePinLink, const_cast<UEdGraphPin*>(InGraphPin), *Links)));
 	}
 }
@@ -249,48 +252,47 @@ void UAssetGraphSchema_GenericGraph::GetGraphContextActions(FGraphContextMenuBui
 	}
 }
 
-void UAssetGraphSchema_GenericGraph::GetContextMenuActions(const UEdGraph* CurrentGraph, const UEdGraphNode* InGraphNode, const UEdGraphPin* InGraphPin, class FMenuBuilder* MenuBuilder, bool bIsDebugging) const
+void UAssetGraphSchema_GenericGraph::GetContextMenuActions(UToolMenu* Menu, UGraphNodeContextMenuContext* Context) const
 {
-	if (InGraphPin != nullptr)
+	if (Context->Pin)
 	{
-		MenuBuilder->BeginSection("GenericGraphAssetGraphSchemaNodeActions", LOCTEXT("PinActionsMenuHeader", "Pin Actions"));
 		{
-			// Only display the 'Break Link' option if there is a link to break!
-			if (InGraphPin->LinkedTo.Num() > 0)
+			FToolMenuSection& Section = Menu->AddSection("GenericGraphAssetGraphSchemaNodeActions", LOCTEXT("PinActionsMenuHeader", "Pin Actions"));
+			// Only display the 'Break Links' option if there is a link to break!
+			if (Context->Pin->LinkedTo.Num() > 0)
 			{
-				MenuBuilder->AddMenuEntry(FGraphEditorCommands::Get().BreakPinLinks);
+				Section.AddMenuEntry(FGraphEditorCommands::Get().BreakPinLinks);
 
 				// add sub menu for break link to
-				if (InGraphPin->LinkedTo.Num() > 1)
+				if (Context->Pin->LinkedTo.Num() > 1)
 				{
-					MenuBuilder->AddSubMenu(
+					Section.AddSubMenu(
+						"BreakLinkTo",
 						LOCTEXT("BreakLinkTo", "Break Link To..."),
 						LOCTEXT("BreakSpecificLinks", "Break a specific link..."),
-						FNewMenuDelegate::CreateUObject((UAssetGraphSchema_GenericGraph*const)this, &UAssetGraphSchema_GenericGraph::GetBreakLinkToSubMenuActions, const_cast<UEdGraphPin*>(InGraphPin)));
+						FNewToolMenuDelegate::CreateUObject((UAssetGraphSchema_GenericGraph* const)this, &UAssetGraphSchema_GenericGraph::GetBreakLinkToSubMenuActions, const_cast<UEdGraphPin*>(Context->Pin)));
 				}
 				else
 				{
-					((UAssetGraphSchema_GenericGraph*const)this)->GetBreakLinkToSubMenuActions(*MenuBuilder, const_cast<UEdGraphPin*>(InGraphPin));
+					((UAssetGraphSchema_GenericGraph* const)this)->GetBreakLinkToSubMenuActions(Menu, const_cast<UEdGraphPin*>(Context->Pin));
 				}
 			}
 		}
-		MenuBuilder->EndSection();
 	}
-	else if(InGraphNode != nullptr)
+	else if (Context->Node)
 	{
-		MenuBuilder->BeginSection("GenericGraphAssetGraphSchemaNodeActions", LOCTEXT("NodeActionsMenuHeader", "Node Actions"));
 		{
-			MenuBuilder->AddMenuEntry(FGenericCommands::Get().Delete);
-			MenuBuilder->AddMenuEntry(FGenericCommands::Get().Cut);
-			MenuBuilder->AddMenuEntry(FGenericCommands::Get().Copy);
-			MenuBuilder->AddMenuEntry(FGenericCommands::Get().Duplicate);
+			FToolMenuSection& Section = Menu->AddSection("GenericGraphAssetGraphSchemaNodeActions", LOCTEXT("ClassActionsMenuHeader", "Node Actions"));
+			Section.AddMenuEntry(FGenericCommands::Get().Delete);
+			Section.AddMenuEntry(FGenericCommands::Get().Cut);
+			Section.AddMenuEntry(FGenericCommands::Get().Copy);
+			Section.AddMenuEntry(FGenericCommands::Get().Duplicate);
 
-			MenuBuilder->AddMenuEntry(FGraphEditorCommands::Get().BreakNodeLinks);
+			Section.AddMenuEntry(FGraphEditorCommands::Get().BreakNodeLinks);
 		}
-		MenuBuilder->EndSection();
 	}
 
-	Super::GetContextMenuActions(CurrentGraph, InGraphNode, InGraphPin, MenuBuilder, bIsDebugging);
+	Super::GetContextMenuActions(Menu, Context);
 }
 
 const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection(const UEdGraphPin* A, const UEdGraphPin* B) const

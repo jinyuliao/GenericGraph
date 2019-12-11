@@ -6,7 +6,7 @@
 #include "EdGraph_GenericGraph.h"
 #include "AssetToolsModule.h"
 #include "HAL/PlatformApplicationMisc.h"
-#include "GenericCommands.h"
+#include "Framework/Commands/GenericCommands.h"
 #include "GraphEditorActions.h"
 #include "IDetailsView.h"
 #include "PropertyEditorModule.h"

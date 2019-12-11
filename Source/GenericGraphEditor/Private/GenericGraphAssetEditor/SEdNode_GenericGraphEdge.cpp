@@ -61,26 +61,16 @@ void SEdNode_GenericGraphEdge::UpdateGraphNode()
 		.VAlign(VAlign_Center)
 		[
 			SNew(SOverlay)
-			+SOverlay::Slot()
+			+ SOverlay::Slot()
 			[
 				SNew(SImage)
-				.Image( FEditorStyle::GetBrush("Graph.TransitionNode.Body") )
+				.Image(FEditorStyle::GetBrush("Graph.TransitionNode.ColorSpill"))
+				.ColorAndOpacity(this, &SEdNode_GenericGraphEdge::GetEdgeColor)
 			]
-			+SOverlay::Slot()
+			+ SOverlay::Slot()
 			[
 				SNew(SImage)
-				.Image( FEditorStyle::GetBrush("Graph.TransitionNode.ColorSpill") )
-				.ColorAndOpacity( this, &SEdNode_GenericGraphEdge::GetEdgeColor )
-			]
-			+SOverlay::Slot()
-			[
-				SNew(SImage)
-				.Image( FEditorStyle::GetBrush("Graph.TransitionNode.Icon") )
-			]
-			+SOverlay::Slot()
-			[
-				SNew(SImage)
-				.Image( FEditorStyle::GetBrush("Graph.TransitionNode.Gloss") )
+				.Image(FEditorStyle::GetBrush("Graph.TransitionNode.Icon"))
 			]
 		];
 }
