@@ -2,7 +2,7 @@
 #include "GenericGraphEditorPCH.h"
 #include "Colors_GenericGraph.h"
 #include "SLevelOfDetailBranchNode.h"
-#include "SInlineEditableTextBlock.h"
+#include "Widgets/Text/SInlineEditableTextBlock.h"
 #include "SCommentBubble.h"
 #include "SlateOptMacros.h"
 #include "SGraphPin.h"

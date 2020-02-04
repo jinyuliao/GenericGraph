@@ -5,8 +5,10 @@ public class GenericGraphEditor : ModuleRules
 	public GenericGraphEditor(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+		bLegacyPublicIncludePaths = false;
+		ShadowVariableWarningLevel = WarningLevel.Error;
 
-        PublicIncludePaths.AddRange(
+		PublicIncludePaths.AddRange(
 			new string[] {
 				// ... add public include paths required here ...
 			}
@@ -43,6 +45,7 @@ public class GenericGraphEditor : ModuleRules
                 "Kismet",
                 "KismetWidgets",
                 "ApplicationCore",
+				"ToolMenus",
 				// ... add private dependencies that you statically link with here ...
 			}
 			);

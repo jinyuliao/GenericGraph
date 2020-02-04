@@ -1,8 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SubclassOf.h"
-#include "TextProperty.h"
+#include "Templates/SubclassOf.h"
 #include "GenericGraphNode.generated.h"
 
 class UGenericGraph;
