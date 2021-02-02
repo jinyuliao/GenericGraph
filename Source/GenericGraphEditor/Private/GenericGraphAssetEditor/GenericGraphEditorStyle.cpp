@@ -13,6 +13,7 @@ TSharedPtr<FSlateStyleSet> FGenericGraphEditorStyle::StyleSet = nullptr;
 
 void FGenericGraphEditorStyle::Initialize()
 {
+	const FVector2D Icon20x20(20.0f, 20.0f);
 	const FVector2D Icon40x40(40.0f, 40.0f);
 	const FVector2D Icon64x64(64.0f, 64.0f);
 
@@ -26,6 +27,7 @@ void FGenericGraphEditorStyle::Initialize()
 	StyleSet->SetContentRoot(FPaths::ProjectPluginsDir() / TEXT("GenericGraph/Resources"));
 
 	StyleSet->Set("GenericGraphEditor.AutoArrange", new IMAGE_BRUSH("AutoArrangeIcon", Icon40x40));
+	StyleSet->Set("GenericGraphEditor.AutoArrange.Small", new IMAGE_BRUSH( "AutoArrangeIcon", Icon20x20 ) );
 
 	FSlateStyleRegistry::RegisterSlateStyle(*StyleSet.Get());
 }
