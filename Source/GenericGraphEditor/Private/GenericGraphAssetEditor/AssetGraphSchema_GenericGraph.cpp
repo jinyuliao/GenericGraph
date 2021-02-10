@@ -327,18 +327,21 @@ const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinError", "Not a valid UGenericGraphEdNode"));
 	}
-
+	
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Node A 0: %d, Node A 1: %d"), EdNode_A->Pins[0]->LinkedTo.Num(), EdNode_A->Pins[1]->LinkedTo.Num()));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Node B 0: %d, Node B 1: %d"), EdNode_B->Pins[0]->LinkedTo.Num(), EdNode_B->Pins[1]->LinkedTo.Num()));
+	// currents childrens EdNode_A->Pins[1]->LinkedTo.Num()
 	FText ErrorMessage;
 	if (A->Direction == EGPD_Input)
 	{
-		if (!EdNode_A->GenericGraphNode->CanCreateConnection(EdNode_B->GenericGraphNode, ErrorMessage))
+		if (!EdNode_A->GenericGraphNode->CanCreateConnection(EdNode_B->GenericGraphNode,EdNode_B->Pins[1]->LinkedTo.Num(), ErrorMessage))
 		{
 			return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, ErrorMessage);
 		}
 	}
 	else
 	{
-		if (!EdNode_B->GenericGraphNode->CanCreateConnection(EdNode_A->GenericGraphNode, ErrorMessage))
+		if (!EdNode_B->GenericGraphNode->CanCreateConnection(EdNode_A->GenericGraphNode,EdNode_A->Pins[1]->LinkedTo.Num(), ErrorMessage))
 		{
 			return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, ErrorMessage);
 		}
