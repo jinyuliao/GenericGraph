@@ -328,19 +328,17 @@ const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinError", "Not a valid UGenericGraphEdNode"));
 	}
 	
-	
 	FText ErrorMessage;
 	if (A->Direction == EGPD_Input)
 	{
-		// currents childrens EdNode_A->Pins[1]->LinkedTo.Num()
-		if (!EdNode_A->GenericGraphNode->CanCreateConnection(EdNode_B->GenericGraphNode,EdNode_B->Pins[1]->LinkedTo.Num(), ErrorMessage))
+		if (!EdNode_A->GenericGraphNode->CanCreateConnection(EdNode_B->GenericGraphNode,EdNode_B->Pins[1]->LinkedTo.Num(),EdNode_A->Pins[0]->LinkedTo.Num(), ErrorMessage))
 		{
 			return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, ErrorMessage);
 		}
 	}
 	else
 	{
-		if (!EdNode_B->GenericGraphNode->CanCreateConnection(EdNode_A->GenericGraphNode,EdNode_A->Pins[1]->LinkedTo.Num(), ErrorMessage))
+		if (!EdNode_B->GenericGraphNode->CanCreateConnection(EdNode_A->GenericGraphNode,EdNode_A->Pins[1]->LinkedTo.Num(), EdNode_B->Pins[0]->LinkedTo.Num(), ErrorMessage))
 		{
 			return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, ErrorMessage);
 		}

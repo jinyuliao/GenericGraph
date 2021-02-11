@@ -8,7 +8,7 @@ class UGenericGraph;
 class UGenericGraphEdge;
 
 UENUM(BlueprintType)
-enum class ENodeChildrenLimit : uint8
+enum class ENodeLimit : uint8
 {
 	Unlimited,
     Limited
@@ -64,9 +64,15 @@ public:
 	FText ContextMenuName;
 
 	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode_Editor")
-	ENodeChildrenLimit ChildrenLimitType;
+	ENodeLimit ParentLimitType;
 
-	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode_Editor" ,meta = (ClampMin = "0",EditCondition = "ChildrenLimitType == ENodeChildrenLimit::Limited", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode_Editor" ,meta = (ClampMin = "0",EditCondition = "ParentLimitType == ENodeLimit::Limited", EditConditionHides))
+	int32 ParentLimit;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode_Editor")
+	ENodeLimit ChildrenLimitType;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode_Editor" ,meta = (ClampMin = "0",EditCondition = "ChildrenLimitType == ENodeLimit::Limited", EditConditionHides))
 	int32 ChildrenLimit;
 	
 #endif
@@ -79,6 +85,6 @@ public:
 	virtual void SetNodeTitle(const FText& NewTitle);
 
 	//virtual bool CanCreateConnection(UGenericGraphNode* Other, FText& ErrorMessage);
-	virtual bool CanCreateConnection(UGenericGraphNode* Other,int32 OtherNumberOfLinkedNodes, FText& ErrorMessage);
+	virtual bool CanCreateConnection(UGenericGraphNode* Other, int32 OtherNumberOfChildrenNodes, int32 NumberOfParentNodes, FText& ErrorMessage);
 #endif
 };
