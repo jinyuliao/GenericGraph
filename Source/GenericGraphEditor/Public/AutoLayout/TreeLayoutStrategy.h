@@ -5,7 +5,7 @@
 #include "TreeLayoutStrategy.generated.h"
 
 UCLASS()
-class UTreeLayoutStrategy : public UAutoLayoutStrategy
+class GENERICGRAPHEDITOR_API UTreeLayoutStrategy : public UAutoLayoutStrategy
 {
 	GENERATED_BODY()
 public:

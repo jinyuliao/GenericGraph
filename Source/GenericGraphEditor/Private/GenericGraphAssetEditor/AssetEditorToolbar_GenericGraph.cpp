@@ -1,7 +1,7 @@
-#include "AssetEditorToolbar_GenericGraph.h"
-#include "AssetEditor_GenericGraph.h"
-#include "EditorCommands_GenericGraph.h"
-#include "GenericGraphEditorStyle.h"
+#include "GenericGraphAssetEditor/AssetEditorToolbar_GenericGraph.h"
+#include "GenericGraphAssetEditor/AssetEditor_GenericGraph.h"
+#include "GenericGraphAssetEditor/EditorCommands_GenericGraph.h"
+#include "GenericGraphAssetEditor/GenericGraphEditorStyle.h"
 
 #define LOCTEXT_NAMESPACE "AssetEditorToolbar_GenericGraph"
 

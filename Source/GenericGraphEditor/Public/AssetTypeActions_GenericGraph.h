@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "AssetTypeActions_Base.h"
 
-class FAssetTypeActions_GenericGraph : public FAssetTypeActions_Base
+class GENERICGRAPHEDITOR_API FAssetTypeActions_GenericGraph : public FAssetTypeActions_Base
 {
 public:
 	FAssetTypeActions_GenericGraph(EAssetTypeCategories::Type InAssetCategory);

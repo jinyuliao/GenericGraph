@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "ConnectionDrawingPolicy.h"
 
-class FConnectionDrawingPolicy_GenericGraph : public FConnectionDrawingPolicy
+class GENERICGRAPHEDITOR_API FConnectionDrawingPolicy_GenericGraph : public FConnectionDrawingPolicy
 {
 protected:
 	UEdGraph* GraphObj;

@@ -11,7 +11,7 @@ class UEdNode_GenericGraphNode;
 class UEdNode_GenericGraphEdge;
 
 UCLASS()
-class UEdGraph_GenericGraph : public UEdGraph
+class GENERICGRAPHEDITOR_API UEdGraph_GenericGraph : public UEdGraph
 {
 	GENERATED_BODY()
 
