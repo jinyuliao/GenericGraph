@@ -42,7 +42,7 @@ public:
 
 	UGenericGraphEditorSettings* GetSettings() const;
 
-private:
+protected:
 	TSharedRef<SDockTab> SpawnTab_Viewport(const FSpawnTabArgs& Args);
 	TSharedRef<SDockTab> SpawnTab_Details(const FSpawnTabArgs& Args);
 	TSharedRef<SDockTab> SpawnTab_EditorSettings(const FSpawnTabArgs& Args);
@@ -98,7 +98,7 @@ private:
 
 	void OnPackageSaved(const FString& PackageFileName, UObject* Outer);
 
-private:
+protected:
 	UGenericGraphEditorSettings* GenricGraphEditorSettings;
 
 	UGenericGraph* EditingGraph;
