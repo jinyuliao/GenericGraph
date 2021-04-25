@@ -67,7 +67,7 @@ void FGenericGraphDragConnection::HoverTargetChanged()
 			}
 		}
 	}
-	else if(UEdGraphNode* TargetNodeObj = GetHoveredNode())
+	else if (UEdNode_GenericGraphNode* TargetNodeObj = Cast<UEdNode_GenericGraphNode>(GetHoveredNode()))
 	{
 		TArray<UEdGraphPin*> ValidSourcePins;
 		ValidateGraphPinList(/*out*/ ValidSourcePins);
@@ -77,21 +77,30 @@ void FGenericGraphDragConnection::HoverTargetChanged()
 		{
 			FPinConnectionResponse Response;			
 			FText ResponseText;
-			if (StartingPinObj->GetOwningNode() != TargetNodeObj && StartingPinObj->GetSchema()->SupportsDropPinOnNode(TargetNodeObj, StartingPinObj->PinType, StartingPinObj->Direction, ResponseText))
 
+			const UEdGraphSchema *Schema = StartingPinObj->GetSchema();
+			UEdGraphPin *TargetPin = TargetNodeObj->GetInputPin();
+
+			if (Schema && TargetPin)
 			{
-				Response.Response = ECanCreateConnectionResponse::CONNECT_RESPONSE_MAKE;
+				Response = Schema->CanCreateConnection(StartingPinObj, TargetPin);
+				if (Response.Response == ECanCreateConnectionResponse::CONNECT_RESPONSE_DISALLOW)
+				{
+					TSharedPtr<SGraphNode> NodeWidget = TargetPin->GetOwningNode()->DEPRECATED_NodeWidget.Pin();
+					if (NodeWidget.IsValid())
+					{
+						NodeWidget->NotifyDisallowedPinConnection(StartingPinObj, TargetPinObj);
+					}
+				}
 			}
 			else
 			{
-				Response.Response = ECanCreateConnectionResponse::CONNECT_RESPONSE_DISALLOW;
+#define LOCTEXT_NAMESPACE "AssetSchema_GenericGraph"
+				Response = FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinError", "Not a valid UGenericGraphEdNode"));				
+#undef LOCTEXT_NAMESPACE
 			}
 
-			if (!ResponseText.IsEmpty())
-			{
-				Response.Message = ResponseText;
 			UniqueMessages.AddUnique(Response);
-			}
 		}
 	}
 	else if (UEdGraph* CurrentHoveredGraph = GetHoveredGraph())
