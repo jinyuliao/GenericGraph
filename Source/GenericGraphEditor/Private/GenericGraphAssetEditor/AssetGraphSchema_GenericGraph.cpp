@@ -303,34 +303,8 @@ const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorSameNode", "Both are on the same node"));
 	}
 
-	// Compare the directions
-	if ((A->Direction == EGPD_Input) && (B->Direction == EGPD_Input))
-	{
-		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorInput", "Can't connect input node to input node"));
-	}
-	else if ((A->Direction == EGPD_Output) && (B->Direction == EGPD_Output))
-	{
-		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorOutput", "Can't connect output node to output node"));
-	}
-
-	const UEdGraphPin *Out, *In;
-	if (A->Direction == EGPD_Output)
-	{
-		Out = A;
-		In = B;
-	}
-	else
-	{
-		Out = B;
-		In = A;
-	}
-		
-	// check for cycles
-	FNodeVisitorCycleChecker CycleChecker;
-	if (!CycleChecker.CheckForLoop(Out->GetOwningNode(), In->GetOwningNode()))
-	{
-		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorCycle", "Can't create a graph cycle"));
-	}
+	const UEdGraphPin *Out = A;
+	const UEdGraphPin *In = B;
 
 	UEdNode_GenericGraphNode* EdNode_Out = Cast<UEdNode_GenericGraphNode>(Out->GetOwningNode());
 	UEdNode_GenericGraphNode* EdNode_In = Cast<UEdNode_GenericGraphNode>(In->GetOwningNode());
@@ -339,22 +313,13 @@ const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinError", "Not a valid UGenericGraphEdNode"));
 	}
-
-	// Check that this edge doesn't already exist
-	for (UEdGraphPin *TestPin : EdNode_Out->GetOutputPin()->LinkedTo)
+		
+	// check for cycles
+	FNodeVisitorCycleChecker CycleChecker;
+	if (!CycleChecker.CheckForLoop(Out->GetOwningNode(), In->GetOwningNode()))
 	{
-		UEdGraphNode* ChildNode = TestPin->GetOwningNode();
-		if (UEdNode_GenericGraphEdge* EdNode_Edge = Cast<UEdNode_GenericGraphEdge>(ChildNode))
-		{
-			ChildNode = EdNode_Edge->GetEndNode();
-		}
-
-		if (ChildNode == EdNode_In)
-		{
-			return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinError", "Nodes are already connected"));
-		}
+		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorCycle", "Can't create a graph cycle"));
 	}
-
 
 	FText ErrorMessage;
 	if (!EdNode_Out->GenericGraphNode->CanCreateConnection(EdNode_In->GenericGraphNode, ErrorMessage))
@@ -374,14 +339,26 @@ const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection
 
 bool UAssetGraphSchema_GenericGraph::CreateAutomaticConversionNodeAndConnections(UEdGraphPin* A, UEdGraphPin* B) const
 {
+	// We don't actually care about the pin, we want the node that is being dragged between
 	UEdNode_GenericGraphNode* NodeA = Cast<UEdNode_GenericGraphNode>(A->GetOwningNode());
 	UEdNode_GenericGraphNode* NodeB = Cast<UEdNode_GenericGraphNode>(B->GetOwningNode());
 
-	if (NodeA == nullptr || NodeB == nullptr)
+	// Are nodes and pins all valid?
+	if (!NodeA || !NodeA->GetOutputPin() || !NodeB || !NodeB->GetInputPin())
 		return false;
 
-	if (NodeA->GetInputPin() == nullptr || NodeA->GetOutputPin() == nullptr || NodeB->GetInputPin() == nullptr || NodeB->GetOutputPin() == nullptr)
-		return false;
+	// Check that this edge doesn't already exist
+	for (UEdGraphPin *TestPin : NodeA->GetOutputPin()->LinkedTo)
+	{
+		UEdGraphNode* ChildNode = TestPin->GetOwningNode();
+		if (UEdNode_GenericGraphEdge* EdNode_Edge = Cast<UEdNode_GenericGraphEdge>(ChildNode))
+		{
+			ChildNode = EdNode_Edge->GetEndNode();
+		}
+
+		if (ChildNode == NodeB)
+			return false;
+	}
 
 	UGenericGraph* Graph = NodeA->GenericGraphNode->GetGraph();
 
@@ -392,14 +369,8 @@ bool UAssetGraphSchema_GenericGraph::CreateAutomaticConversionNodeAndConnections
 	Action.NodeTemplate->SetEdge(NewObject<UGenericGraphEdge>(Action.NodeTemplate, Graph->EdgeType));
 	UEdNode_GenericGraphEdge* EdgeNode = Cast<UEdNode_GenericGraphEdge>(Action.PerformAction(NodeA->GetGraph(), nullptr, InitPos, false));
 
-	if (A->Direction == EGPD_Output)
-	{
-		EdgeNode->CreateConnections(NodeA, NodeB);
-	}
-	else
-	{
-		EdgeNode->CreateConnections(NodeB, NodeA);
-	}
+	// Always create connections from A to B
+	EdgeNode->CreateConnections(NodeA, NodeB);
 
 	return true;
 }
