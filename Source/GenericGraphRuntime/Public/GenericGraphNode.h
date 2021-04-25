@@ -7,6 +7,14 @@
 class UGenericGraph;
 class UGenericGraphEdge;
 
+UENUM(BlueprintType)
+enum class ENodeLimit : uint8
+{
+	Unlimited,
+    Limited
+};
+
+
 UCLASS(Blueprintable)
 class GENERICGRAPHRUNTIME_API UGenericGraphNode : public UObject
 {
@@ -54,6 +62,19 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode_Editor")
 	FText ContextMenuName;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode_Editor")
+	ENodeLimit ParentLimitType;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode_Editor" ,meta = (ClampMin = "0",EditCondition = "ParentLimitType == ENodeLimit::Limited", EditConditionHides))
+	int32 ParentLimit;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode_Editor")
+	ENodeLimit ChildrenLimitType;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode_Editor" ,meta = (ClampMin = "0",EditCondition = "ChildrenLimitType == ENodeLimit::Limited", EditConditionHides))
+	int32 ChildrenLimit;
+	
 #endif
 
 #if WITH_EDITOR
@@ -63,6 +84,7 @@ public:
 
 	virtual void SetNodeTitle(const FText& NewTitle);
 
-	virtual bool CanCreateConnection(UGenericGraphNode* Other, FText& ErrorMessage);
+	//virtual bool CanCreateConnection(UGenericGraphNode* Other, FText& ErrorMessage);
+	virtual bool CanCreateConnection(UGenericGraphNode* Other, int32 OtherNumberOfChildrenNodes, int32 NumberOfParentNodes, FText& ErrorMessage);
 #endif
 };
