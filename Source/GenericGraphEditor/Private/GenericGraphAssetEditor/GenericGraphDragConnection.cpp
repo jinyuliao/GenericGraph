@@ -46,25 +46,22 @@ void FGenericGraphDragConnection::HoverTargetChanged()
 		// Check the schema for connection responses
 		for (UEdGraphPin* StartingPinObj : ValidSourcePins)
 		{
-			if (TargetPinObj != StartingPinObj)
+			// The Graph object in which the pins reside.
+			UEdGraph* GraphObj = StartingPinObj->GetOwningNode()->GetGraph();
+
+			// Determine what the schema thinks about the wiring action
+			const FPinConnectionResponse Response = GraphObj->GetSchema()->CanCreateConnection(StartingPinObj, TargetPinObj);
+
+			if (Response.Response == ECanCreateConnectionResponse::CONNECT_RESPONSE_DISALLOW)
 			{
-				// The Graph object in which the pins reside.
-				UEdGraph* GraphObj = StartingPinObj->GetOwningNode()->GetGraph();
-
-				// Determine what the schema thinks about the wiring action
-				const FPinConnectionResponse Response = GraphObj->GetSchema()->CanCreateConnection(StartingPinObj, TargetPinObj);
-
-				if (Response.Response == ECanCreateConnectionResponse::CONNECT_RESPONSE_DISALLOW)
+				TSharedPtr<SGraphNode> NodeWidget = TargetPinObj->GetOwningNode()->DEPRECATED_NodeWidget.Pin();
+				if (NodeWidget.IsValid())
 				{
-					TSharedPtr<SGraphNode> NodeWidget = TargetPinObj->GetOwningNode()->DEPRECATED_NodeWidget.Pin();
-					if (NodeWidget.IsValid())
-					{
-						NodeWidget->NotifyDisallowedPinConnection(StartingPinObj, TargetPinObj);
-					}
+					NodeWidget->NotifyDisallowedPinConnection(StartingPinObj, TargetPinObj);
 				}
-
-				UniqueMessages.AddUnique(Response);
 			}
+
+			UniqueMessages.AddUnique(Response);
 		}
 	}
 	else if (UEdNode_GenericGraphNode* TargetNodeObj = Cast<UEdNode_GenericGraphNode>(GetHoveredNode()))
@@ -96,7 +93,7 @@ void FGenericGraphDragConnection::HoverTargetChanged()
 			else
 			{
 #define LOCTEXT_NAMESPACE "AssetSchema_GenericGraph"
-				Response = FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinError", "Not a valid UGenericGraphEdNode"));				
+				Response = FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinError", "Not a valid UGenericGraphEdNode"));
 #undef LOCTEXT_NAMESPACE
 			}
 
