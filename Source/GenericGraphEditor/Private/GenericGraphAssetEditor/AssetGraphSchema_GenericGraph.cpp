@@ -340,15 +340,11 @@ const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection
 	}
 }
 
-bool UAssetGraphSchema_GenericGraph::CreateAutomaticConversionNodeAndConnections(UEdGraphPin* A, UEdGraphPin* B) const
+bool UAssetGraphSchema_GenericGraph::TryCreateConnection(UEdGraphPin* A, UEdGraphPin* B) const
 {
 	// We don't actually care about the pin, we want the node that is being dragged between
 	UEdNode_GenericGraphNode* NodeA = Cast<UEdNode_GenericGraphNode>(A->GetOwningNode());
 	UEdNode_GenericGraphNode* NodeB = Cast<UEdNode_GenericGraphNode>(B->GetOwningNode());
-
-	// Are nodes and pins all valid?
-	if (!NodeA || !NodeA->GetOutputPin() || !NodeB || !NodeB->GetInputPin())
-		return false;
 
 	// Check that this edge doesn't already exist
 	for (UEdGraphPin *TestPin : NodeA->GetOutputPin()->LinkedTo)
@@ -363,6 +359,27 @@ bool UAssetGraphSchema_GenericGraph::CreateAutomaticConversionNodeAndConnections
 			return false;
 	}
 
+	if (NodeA && NodeB)
+	{
+		// Always create connections from node A to B, don't allow adding in reverse
+		Super::TryCreateConnection(NodeA->GetOutputPin(), NodeB->GetInputPin());
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool UAssetGraphSchema_GenericGraph::CreateAutomaticConversionNodeAndConnections(UEdGraphPin* A, UEdGraphPin* B) const
+{
+	UEdNode_GenericGraphNode* NodeA = Cast<UEdNode_GenericGraphNode>(A->GetOwningNode());
+	UEdNode_GenericGraphNode* NodeB = Cast<UEdNode_GenericGraphNode>(B->GetOwningNode());
+
+	// Are nodes and pins all valid?
+	if (!NodeA || !NodeA->GetOutputPin() || !NodeB || !NodeB->GetInputPin())
+		return false;
+	
 	UGenericGraph* Graph = NodeA->GenericGraphNode->GetGraph();
 
 	FVector2D InitPos((NodeA->NodePosX + NodeB->NodePosX) / 2, (NodeA->NodePosY + NodeB->NodePosY) / 2);
@@ -372,7 +389,7 @@ bool UAssetGraphSchema_GenericGraph::CreateAutomaticConversionNodeAndConnections
 	Action.NodeTemplate->SetEdge(NewObject<UGenericGraphEdge>(Action.NodeTemplate, Graph->EdgeType));
 	UEdNode_GenericGraphEdge* EdgeNode = Cast<UEdNode_GenericGraphEdge>(Action.PerformAction(NodeA->GetGraph(), nullptr, InitPos, false));
 
-	// Always create connections from A to B
+	// Always create connections from node A to B, don't allow adding in reverse
 	EdgeNode->CreateConnections(NodeA, NodeB);
 
 	return true;
