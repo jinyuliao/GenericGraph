@@ -40,7 +40,7 @@ void FAssetTypeActions_GenericGraph::OpenAssetEditor(const TArray<UObject*>& InO
 
 uint32 FAssetTypeActions_GenericGraph::GetCategories()
 {
-	return EAssetTypeCategories::Animation | MyAssetCategory;
+	return MyAssetCategory;
 }
 
 //////////////////////////////////////////////////////////////////////////
