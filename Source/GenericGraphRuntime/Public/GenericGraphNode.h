@@ -78,6 +78,8 @@ public:
 #endif
 
 #if WITH_EDITOR
+	virtual bool IsNameEditable() const;
+
 	virtual FLinearColor GetBackgroundColor() const;
 
 	virtual FText GetNodeTitle() const;
