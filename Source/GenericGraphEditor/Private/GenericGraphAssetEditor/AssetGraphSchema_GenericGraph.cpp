@@ -340,6 +340,22 @@ const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinError", "Not a valid UGenericGraphEdNode"));
 	}
 
+	// Check that this edge doesn't already exist
+	for (UEdGraphPin *TestPin : EdNode_Out->GetOutputPin()->LinkedTo)
+	{
+		UEdGraphNode* ChildNode = TestPin->GetOwningNode();
+		if (UEdNode_GenericGraphEdge* EdNode_Edge = Cast<UEdNode_GenericGraphEdge>(ChildNode))
+		{
+			ChildNode = EdNode_Edge->GetEndNode();
+		}
+
+		if (ChildNode == EdNode_In)
+		{
+			return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinError", "Nodes are already connected"));
+		}
+	}
+
+
 	FText ErrorMessage;
 	if (!EdNode_Out->GenericGraphNode->CanCreateConnection(EdNode_In->GenericGraphNode, ErrorMessage))
 	{
