@@ -43,22 +43,33 @@ void UGenericGraphNode::SetNodeTitle(const FText& NewTitle)
 	NodeTitle = NewTitle;
 }
 
-bool UGenericGraphNode::CanCreateConnection(UGenericGraphNode* Other,int32 OtherNumberOfChildrenNodes, int32 NumberOfParentNodes,FText& ErrorMessage)
+bool UGenericGraphNode::CanCreateConnection(UGenericGraphNode* Other, FText& ErrorMessage)
+{	
+	return true;
+}
+
+bool UGenericGraphNode::CanCreateConnectionTo(UGenericGraphNode* Other, int32 NumberOfChildrenNodes, FText& ErrorMessage)
+{
+	if (ChildrenLimitType == ENodeLimit::Limited && NumberOfChildrenNodes >= ChildrenLimit)
+	{
+		ErrorMessage = FText::FromString("Children limit exceeded");
+		return false;
+	}
+
+	return CanCreateConnection(Other, ErrorMessage);
+}
+
+bool UGenericGraphNode::CanCreateConnectionFrom(UGenericGraphNode* Other, int32 NumberOfParentNodes, FText& ErrorMessage)
 {
 	if (ParentLimitType == ENodeLimit::Limited && NumberOfParentNodes >= ParentLimit)
 	{
 		ErrorMessage = FText::FromString("Parent limit exceeded");
 		return false;
 	}
-	
-	if (Other->ChildrenLimitType == ENodeLimit::Limited && OtherNumberOfChildrenNodes >= Other->ChildrenLimit)
-	{
-		ErrorMessage = FText::FromString("Children limit exceeded");
-		return false;
-	}
-	
+
 	return true;
 }
+
 
 #endif
 

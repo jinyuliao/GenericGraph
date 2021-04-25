@@ -84,7 +84,9 @@ public:
 
 	virtual void SetNodeTitle(const FText& NewTitle);
 
-	//virtual bool CanCreateConnection(UGenericGraphNode* Other, FText& ErrorMessage);
-	virtual bool CanCreateConnection(UGenericGraphNode* Other, int32 OtherNumberOfChildrenNodes, int32 NumberOfParentNodes, FText& ErrorMessage);
+	virtual bool CanCreateConnection(UGenericGraphNode* Other, FText& ErrorMessage);
+
+	virtual bool CanCreateConnectionTo(UGenericGraphNode* Other, int32 NumberOfChildrenNodes, FText& ErrorMessage);
+	virtual bool CanCreateConnectionFrom(UGenericGraphNode* Other, int32 NumberOfParentNodes, FText& ErrorMessage);
 #endif
 };
