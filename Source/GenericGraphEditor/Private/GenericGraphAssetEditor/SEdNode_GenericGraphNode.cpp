@@ -8,6 +8,7 @@
 #include "SGraphPin.h"
 #include "GraphEditorSettings.h"
 #include "EdNode_GenericGraphNode.h"
+#include "GenericGraphDragConnection.h"
 
 #define LOCTEXT_NAMESPACE "EdNode_GenericGraph"
 
@@ -54,6 +55,22 @@ protected:
 	{
 		return FEditorStyle::GetBrush(TEXT("Graph.StateNode.Body"));
 	}
+
+	virtual TSharedRef<FDragDropOperation> SpawnPinDragEvent(const TSharedRef<class SGraphPanel>& InGraphPanel, const TArray< TSharedRef<SGraphPin> >& InStartingPins) override
+	{
+		FGenericGraphDragConnection::FDraggedPinTable PinHandles;
+		PinHandles.Reserve(InStartingPins.Num());
+		// since the graph can be refreshed and pins can be reconstructed/replaced 
+		// behind the scenes, the DragDropOperation holds onto FGraphPinHandles 
+		// instead of direct widgets/graph-pins
+		for (const TSharedRef<SGraphPin>& PinWidget : InStartingPins)
+		{
+			PinHandles.Add(PinWidget->GetPinObj());
+		}
+
+		return FGenericGraphDragConnection::New(InGraphPanel, PinHandles);
+	}
+
 };
 
 
