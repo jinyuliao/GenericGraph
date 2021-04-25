@@ -24,6 +24,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphEdge")
 	UGenericGraphNode* EndNode;
 
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphEdge")
+	FLinearColor EdgeColour = FLinearColor(0.9f, 0.9f, 0.9f, 1.0f);
+
 	UFUNCTION(BlueprintPure, Category = "GenericGraphEdge")
 	UGenericGraph* GetGraph() const;
+
+	UFUNCTION(BlueprintNativeEvent, Category = "GenericGraphEdge")
+	FLinearColor GetEdgeColour() const;
+	virtual FLinearColor GetEdgeColour_Implementation() const { return EdgeColour; }
+
 };

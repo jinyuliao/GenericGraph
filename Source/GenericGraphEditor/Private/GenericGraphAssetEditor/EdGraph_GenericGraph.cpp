@@ -147,9 +147,12 @@ void UEdGraph_GenericGraph::Clear()
 		if (UEdNode_GenericGraphNode* EdNode = Cast<UEdNode_GenericGraphNode>(Nodes[i]))
 		{
 			UGenericGraphNode* GenericGraphNode = EdNode->GenericGraphNode;
-			GenericGraphNode->ParentNodes.Reset();
-			GenericGraphNode->ChildrenNodes.Reset();
-			GenericGraphNode->Edges.Reset();
+			if (GenericGraphNode)
+			{
+				GenericGraphNode->ParentNodes.Reset();
+				GenericGraphNode->ChildrenNodes.Reset();
+				GenericGraphNode->Edges.Reset();
+			}
 		}
 	}
 }

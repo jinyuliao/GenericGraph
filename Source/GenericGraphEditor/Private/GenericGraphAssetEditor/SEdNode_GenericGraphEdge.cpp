@@ -123,6 +123,11 @@ void SEdNode_GenericGraphEdge::PositionBetweenTwoNodesWithOffset(const FGeometry
 
 FSlateColor SEdNode_GenericGraphEdge::GetEdgeColor() const
 {
+	UEdNode_GenericGraphEdge* EdgeNode = CastChecked<UEdNode_GenericGraphEdge>(GraphNode);
+	if (EdgeNode != nullptr && EdgeNode->GenericGraphEdge != nullptr)
+	{
+		return EdgeNode->GenericGraphEdge->GetEdgeColour();
+	}
 	return FLinearColor(0.9f, 0.9f, 0.9f, 1.0f);
 }
 
