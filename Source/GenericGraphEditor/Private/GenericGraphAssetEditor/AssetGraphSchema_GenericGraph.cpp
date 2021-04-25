@@ -313,38 +313,40 @@ const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorOutput", "Can't connect output node to output node"));
 	}
 
+	const UEdGraphPin *Out, *In;
+	if (A->Direction == EGPD_Output)
+	{
+		Out = A;
+		In = B;
+	}
+	else
+	{
+		Out = B;
+		In = A;
+	}
+		
 	// check for cycles
 	FNodeVisitorCycleChecker CycleChecker;
-	if (!CycleChecker.CheckForLoop(A->GetOwningNode(), B->GetOwningNode()))
+	if (!CycleChecker.CheckForLoop(Out->GetOwningNode(), In->GetOwningNode()))
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorCycle", "Can't create a graph cycle"));
 	}
 
-	UEdNode_GenericGraphNode* EdNode_A = Cast<UEdNode_GenericGraphNode>(A->GetOwningNode());
-	UEdNode_GenericGraphNode* EdNode_B = Cast<UEdNode_GenericGraphNode>(B->GetOwningNode());
+	UEdNode_GenericGraphNode* EdNode_Out = Cast<UEdNode_GenericGraphNode>(Out->GetOwningNode());
+	UEdNode_GenericGraphNode* EdNode_In = Cast<UEdNode_GenericGraphNode>(In->GetOwningNode());
 
-	if (EdNode_A == nullptr || EdNode_B == nullptr)
+	if (EdNode_Out == nullptr || EdNode_In == nullptr)
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinError", "Not a valid UGenericGraphEdNode"));
 	}
 
 	FText ErrorMessage;
-	if (A->Direction == EGPD_Input)
+	if (!EdNode_Out->GenericGraphNode->CanCreateConnection(EdNode_In->GenericGraphNode, ErrorMessage))
 	{
-		if (!EdNode_A->GenericGraphNode->CanCreateConnection(EdNode_B->GenericGraphNode, ErrorMessage))
-		{
-			return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, ErrorMessage);
-		}
-	}
-	else
-	{
-		if (!EdNode_B->GenericGraphNode->CanCreateConnection(EdNode_A->GenericGraphNode, ErrorMessage))
-		{
-			return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, ErrorMessage);
-		}
+		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, ErrorMessage);
 	}
 
-	if (EdNode_A->GenericGraphNode->GetGraph()->bEdgeEnabled)
+	if (EdNode_Out->GenericGraphNode->GetGraph()->bEdgeEnabled)
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_MAKE_WITH_CONVERSION_NODE, LOCTEXT("PinConnect", "Connect nodes with edge"));
 	}
