@@ -13,51 +13,54 @@
 
 int32 UAssetGraphSchema_GenericGraph::CurrentCacheRefreshID = 0;
 
+
 class FNodeVisitorCycleChecker
 {
 public:
 	/** Check whether a loop in the graph would be caused by linking the passed-in nodes */
 	bool CheckForLoop(UEdGraphNode* StartNode, UEdGraphNode* EndNode)
 	{
+
 		VisitedNodes.Add(StartNode);
 
-		return TraverseInputNodesToRoot(EndNode);
+		return TraverseNodes(EndNode);
 	}
 
 private:
-	bool TraverseInputNodesToRoot(UEdGraphNode* Node)
+	bool TraverseNodes(UEdGraphNode* Node)
 	{
 		VisitedNodes.Add(Node);
 
-		for (int32 PinIndex = 0; PinIndex < Node->Pins.Num(); ++PinIndex)
+		for (auto MyPin : Node->Pins)
 		{
-			UEdGraphPin* MyPin = Node->Pins[PinIndex];
-
 			if (MyPin->Direction == EGPD_Output)
 			{
-				for (int32 LinkedPinIndex = 0; LinkedPinIndex < MyPin->LinkedTo.Num(); ++LinkedPinIndex)
+				for (auto OtherPin : MyPin->LinkedTo)
 				{
-					UEdGraphPin* OtherPin = MyPin->LinkedTo[LinkedPinIndex];
-					if (OtherPin)
+					UEdGraphNode* OtherNode = OtherPin->GetOwningNode();
+					if (VisitedNodes.Contains(OtherNode))
 					{
-						UEdGraphNode* OtherNode = OtherPin->GetOwningNode();
-						if (VisitedNodes.Contains(OtherNode))
-						{
+						// Only  an issue if this is a back-edge
+						return false;
+					}
+					else if (!FinishedNodes.Contains(OtherNode))
+					{
+						// Only should traverse if this node hasn't been traversed
+						if (!TraverseNodes(OtherNode))
 							return false;
-						}
-						else
-						{
-							return TraverseInputNodesToRoot(OtherNode);
-						}
 					}
 				}
 			}
 		}
 
+		VisitedNodes.Remove(Node);
+		FinishedNodes.Add(Node);
 		return true;
-	}
+	};
+
 
 	TSet<UEdGraphNode*> VisitedNodes;
+	TSet<UEdGraphNode*> FinishedNodes;
 };
 
 UEdGraphNode* FAssetSchemaAction_GenericGraph_NewNode::PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode /*= true*/)
@@ -300,7 +303,7 @@ const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection
 	// Make sure the pins are not on the same node
 	if (A->GetOwningNode() == B->GetOwningNode())
 	{
-		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorSameNode", "Both are on the same node"));
+		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorSameNode", "Can't connect node to itself"));
 	}
 
 	const UEdGraphPin *Out = A;
@@ -337,15 +340,11 @@ const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection
 	}
 }
 
-bool UAssetGraphSchema_GenericGraph::CreateAutomaticConversionNodeAndConnections(UEdGraphPin* A, UEdGraphPin* B) const
+bool UAssetGraphSchema_GenericGraph::TryCreateConnection(UEdGraphPin* A, UEdGraphPin* B) const
 {
 	// We don't actually care about the pin, we want the node that is being dragged between
 	UEdNode_GenericGraphNode* NodeA = Cast<UEdNode_GenericGraphNode>(A->GetOwningNode());
 	UEdNode_GenericGraphNode* NodeB = Cast<UEdNode_GenericGraphNode>(B->GetOwningNode());
-
-	// Are nodes and pins all valid?
-	if (!NodeA || !NodeA->GetOutputPin() || !NodeB || !NodeB->GetInputPin())
-		return false;
 
 	// Check that this edge doesn't already exist
 	for (UEdGraphPin *TestPin : NodeA->GetOutputPin()->LinkedTo)
@@ -360,6 +359,27 @@ bool UAssetGraphSchema_GenericGraph::CreateAutomaticConversionNodeAndConnections
 			return false;
 	}
 
+	if (NodeA && NodeB)
+	{
+		// Always create connections from node A to B, don't allow adding in reverse
+		Super::TryCreateConnection(NodeA->GetOutputPin(), NodeB->GetInputPin());
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool UAssetGraphSchema_GenericGraph::CreateAutomaticConversionNodeAndConnections(UEdGraphPin* A, UEdGraphPin* B) const
+{
+	UEdNode_GenericGraphNode* NodeA = Cast<UEdNode_GenericGraphNode>(A->GetOwningNode());
+	UEdNode_GenericGraphNode* NodeB = Cast<UEdNode_GenericGraphNode>(B->GetOwningNode());
+
+	// Are nodes and pins all valid?
+	if (!NodeA || !NodeA->GetOutputPin() || !NodeB || !NodeB->GetInputPin())
+		return false;
+	
 	UGenericGraph* Graph = NodeA->GenericGraphNode->GetGraph();
 
 	FVector2D InitPos((NodeA->NodePosX + NodeB->NodePosX) / 2, (NodeA->NodePosY + NodeB->NodePosY) / 2);
@@ -369,7 +389,7 @@ bool UAssetGraphSchema_GenericGraph::CreateAutomaticConversionNodeAndConnections
 	Action.NodeTemplate->SetEdge(NewObject<UGenericGraphEdge>(Action.NodeTemplate, Graph->EdgeType));
 	UEdNode_GenericGraphEdge* EdgeNode = Cast<UEdNode_GenericGraphEdge>(Action.PerformAction(NodeA->GetGraph(), nullptr, InitPos, false));
 
-	// Always create connections from A to B
+	// Always create connections from node A to B, don't allow adding in reverse
 	EdgeNode->CreateConnections(NodeA, NodeB);
 
 	return true;
