@@ -165,12 +165,12 @@ FText FAssetEditor_GenericGraph::GetBaseToolkitName() const
 
 FText FAssetEditor_GenericGraph::GetToolkitName() const
 {
-	const bool bDirtyState = EditingGraph->GetOutermost()->IsDirty();
+	if (EditingGraph != nullptr)
+	{
+		return FAssetEditorToolkit::GetLabelForObject(EditingGraph);
+	}
 
-	FFormatNamedArguments Args;
-	Args.Add(TEXT("GenericGraphName"), FText::FromString(EditingGraph->GetName()));
-	Args.Add(TEXT("DirtyState"), bDirtyState ? FText::FromString(TEXT("*")) : FText::GetEmpty());
-	return FText::Format(LOCTEXT("GenericGraphEditorToolkitName", "{GenericGraphName}{DirtyState}"), Args);
+	return FText();
 }
 
 FText FAssetEditor_GenericGraph::GetToolkitToolTipText() const
