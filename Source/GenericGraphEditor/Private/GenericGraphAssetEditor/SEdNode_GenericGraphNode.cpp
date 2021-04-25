@@ -8,7 +8,7 @@
 #include "SGraphPin.h"
 #include "GraphEditorSettings.h"
 #include "GenericGraphAssetEditor/EdNode_GenericGraphNode.h"
-#include "GenericGraphDragConnection.h"
+#include "GenericGraphAssetEditor/GenericGraphDragConnection.h"
 
 #define LOCTEXT_NAMESPACE "EdNode_GenericGraph"
 

@@ -1,7 +1,7 @@
 ﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 
-#include "GenericGraphDragConnection.h"
+#include "GenericGraphAssetEditor/GenericGraphDragConnection.h"
 #include "Widgets/SBoxPanel.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Widgets/Images/SImage.h"
