@@ -7,7 +7,7 @@ class FAssetEditor_GenericGraph;
 class FExtender;
 class FToolBarBuilder;
 
-class FAssetEditorToolbar_GenericGraph : public TSharedFromThis<FAssetEditorToolbar_GenericGraph>
+class GENERICGRAPHEDITOR_API FAssetEditorToolbar_GenericGraph : public TSharedFromThis<FAssetEditorToolbar_GenericGraph>
 {
 public:
 	FAssetEditorToolbar_GenericGraph(TSharedPtr<FAssetEditor_GenericGraph> InGenericGraphEditor)

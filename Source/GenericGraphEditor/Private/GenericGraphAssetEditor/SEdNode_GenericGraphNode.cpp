@@ -1,14 +1,14 @@
-#include "SEdNode_GenericGraphNode.h"
+#include "GenericGraphAssetEditor/SEdNode_GenericGraphNode.h"
 #include "GenericGraphEditorPCH.h"
-#include "Colors_GenericGraph.h"
+#include "GenericGraphAssetEditor/Colors_GenericGraph.h"
 #include "SLevelOfDetailBranchNode.h"
 #include "Widgets/Text/SInlineEditableTextBlock.h"
 #include "SCommentBubble.h"
 #include "SlateOptMacros.h"
 #include "SGraphPin.h"
 #include "GraphEditorSettings.h"
-#include "EdNode_GenericGraphNode.h"
-#include "GenericGraphDragConnection.h"
+#include "GenericGraphAssetEditor/EdNode_GenericGraphNode.h"
+#include "GenericGraphAssetEditor/GenericGraphDragConnection.h"
 
 #define LOCTEXT_NAMESPACE "EdNode_GenericGraph"
 

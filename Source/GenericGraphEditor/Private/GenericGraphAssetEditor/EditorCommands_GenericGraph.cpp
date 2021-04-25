@@ -1,4 +1,4 @@
-#include "EditorCommands_GenericGraph.h"
+#include "GenericGraphAssetEditor/EditorCommands_GenericGraph.h"
 
 #define LOCTEXT_NAMESPACE "EditorCommands_GenericGraph"
 

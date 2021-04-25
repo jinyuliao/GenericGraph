@@ -10,7 +10,7 @@
 class SToolTip;
 class UEdNode_GenericGraphEdge;
 
-class SEdNode_GenericGraphEdge : public SGraphNode
+class GENERICGRAPHEDITOR_API SEdNode_GenericGraphEdge : public SGraphNode
 {
 public:
 	SLATE_BEGIN_ARGS(SEdNode_GenericGraphEdge){}

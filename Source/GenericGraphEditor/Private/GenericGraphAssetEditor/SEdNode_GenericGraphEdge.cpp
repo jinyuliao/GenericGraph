@@ -1,12 +1,12 @@
-#include "SEdNode_GenericGraphEdge.h"
+#include "GenericGraphAssetEditor/SEdNode_GenericGraphEdge.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Images/SImage.h"
 #include "Widgets/SToolTip.h"
 #include "SGraphPanel.h"
 #include "EdGraphSchema_K2.h"
-#include "EdNode_GenericGraphNode.h"
-#include "EdNode_GenericGraphEdge.h"
-#include "ConnectionDrawingPolicy_GenericGraph.h"
+#include "GenericGraphAssetEditor/EdNode_GenericGraphNode.h"
+#include "GenericGraphAssetEditor/EdNode_GenericGraphEdge.h"
+#include "GenericGraphAssetEditor/ConnectionDrawingPolicy_GenericGraph.h"
 
 #define LOCTEXT_NAMESPACE "SGenericGraphEdge"
 

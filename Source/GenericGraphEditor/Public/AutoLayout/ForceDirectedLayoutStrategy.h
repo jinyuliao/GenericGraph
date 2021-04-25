@@ -5,7 +5,7 @@
 #include "ForceDirectedLayoutStrategy.generated.h"
 
 UCLASS()
-class UForceDirectedLayoutStrategy : public UAutoLayoutStrategy
+class GENERICGRAPHEDITOR_API UForceDirectedLayoutStrategy : public UAutoLayoutStrategy
 {
 	GENERATED_BODY()
 public:

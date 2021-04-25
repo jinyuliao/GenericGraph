@@ -5,7 +5,7 @@
 
 class UEdNode_GenericGraphNode;
 
-class SEdNode_GenericGraphNode : public SGraphNode
+class GENERICGRAPHEDITOR_API SEdNode_GenericGraphNode : public SGraphNode
 {
 public:
 	SLATE_BEGIN_ARGS(SEdNode_GenericGraphNode) {}

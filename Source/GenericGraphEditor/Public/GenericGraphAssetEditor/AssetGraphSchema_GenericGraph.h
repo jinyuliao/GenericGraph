@@ -12,7 +12,7 @@ class UAutoLayoutStrategy;
 
 /** Action to add a node to the graph */
 USTRUCT()
-struct FAssetSchemaAction_GenericGraph_NewNode : public FEdGraphSchemaAction
+struct GENERICGRAPHEDITOR_API FAssetSchemaAction_GenericGraph_NewNode : public FEdGraphSchemaAction
 {
 	GENERATED_USTRUCT_BODY();
 
@@ -29,7 +29,7 @@ public:
 };
 
 USTRUCT()
-struct FAssetSchemaAction_GenericGraph_NewEdge : public FEdGraphSchemaAction
+struct GENERICGRAPHEDITOR_API FAssetSchemaAction_GenericGraph_NewEdge : public FEdGraphSchemaAction
 {
 	GENERATED_USTRUCT_BODY();
 
