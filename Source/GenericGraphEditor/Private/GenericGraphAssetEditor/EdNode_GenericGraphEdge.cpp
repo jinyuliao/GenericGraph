@@ -4,6 +4,11 @@
 
 #define LOCTEXT_NAMESPACE "EdNode_GenericGraphEdge"
 
+UEdNode_GenericGraphEdge::UEdNode_GenericGraphEdge()
+{
+	bCanRenameNode = true;
+}
+
 void UEdNode_GenericGraphEdge::SetEdge(UGenericGraphEdge* Edge)
 {
 	GenericGraphEdge = Edge;
@@ -19,6 +24,10 @@ void UEdNode_GenericGraphEdge::AllocateDefaultPins()
 
 FText UEdNode_GenericGraphEdge::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
+	if (GenericGraphEdge)
+	{
+		return GenericGraphEdge->GetNodeTitle();
+	}
 	return FText();
 }
 

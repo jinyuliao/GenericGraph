@@ -24,14 +24,25 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "GenericGraphEdge")
 	UGenericGraphNode* EndNode;
 
-	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphEdge")
-	FLinearColor EdgeColour = FLinearColor(0.9f, 0.9f, 0.9f, 1.0f);
-
 	UFUNCTION(BlueprintPure, Category = "GenericGraphEdge")
 	UGenericGraph* GetGraph() const;
 
-	UFUNCTION(BlueprintNativeEvent, Category = "GenericGraphEdge")
-	FLinearColor GetEdgeColour() const;
-	virtual FLinearColor GetEdgeColour_Implementation() const { return EdgeColour; }
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode_Editor")
+	bool bShouldDrawTitle = false;
 
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode_Editor")
+	FText NodeTitle;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphEdge")
+	FLinearColor EdgeColour = FLinearColor(0.9f, 0.9f, 0.9f, 1.0f);
+#endif
+
+#if WITH_EDITOR
+	virtual FText GetNodeTitle() const { return NodeTitle; }
+	FLinearColor GetEdgeColour() { return EdgeColour; }
+
+	virtual void SetNodeTitle(const FText& NewTitle);
+#endif
+	
 };
