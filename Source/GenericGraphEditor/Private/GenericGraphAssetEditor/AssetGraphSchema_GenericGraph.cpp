@@ -13,51 +13,54 @@
 
 int32 UAssetGraphSchema_GenericGraph::CurrentCacheRefreshID = 0;
 
+
 class FNodeVisitorCycleChecker
 {
 public:
 	/** Check whether a loop in the graph would be caused by linking the passed-in nodes */
 	bool CheckForLoop(UEdGraphNode* StartNode, UEdGraphNode* EndNode)
 	{
+
 		VisitedNodes.Add(StartNode);
 
-		return TraverseInputNodesToRoot(EndNode);
+		return TraverseNodes(EndNode);
 	}
 
 private:
-	bool TraverseInputNodesToRoot(UEdGraphNode* Node)
+	bool TraverseNodes(UEdGraphNode* Node)
 	{
 		VisitedNodes.Add(Node);
 
-		for (int32 PinIndex = 0; PinIndex < Node->Pins.Num(); ++PinIndex)
+		for (auto MyPin : Node->Pins)
 		{
-			UEdGraphPin* MyPin = Node->Pins[PinIndex];
-
 			if (MyPin->Direction == EGPD_Output)
 			{
-				for (int32 LinkedPinIndex = 0; LinkedPinIndex < MyPin->LinkedTo.Num(); ++LinkedPinIndex)
+				for (auto OtherPin : MyPin->LinkedTo)
 				{
-					UEdGraphPin* OtherPin = MyPin->LinkedTo[LinkedPinIndex];
-					if (OtherPin)
+					UEdGraphNode* OtherNode = OtherPin->GetOwningNode();
+					if (VisitedNodes.Contains(OtherNode))
 					{
-						UEdGraphNode* OtherNode = OtherPin->GetOwningNode();
-						if (VisitedNodes.Contains(OtherNode))
-						{
+						// Only  an issue if this is a back-edge
+						return false;
+					}
+					else if (!FinishedNodes.Contains(OtherNode))
+					{
+						// Only should traverse if this node hasn't been traversed
+						if (!TraverseNodes(OtherNode))
 							return false;
-						}
-						else
-						{
-							return TraverseInputNodesToRoot(OtherNode);
-						}
 					}
 				}
 			}
 		}
 
+		VisitedNodes.Remove(Node);
+		FinishedNodes.Add(Node);
 		return true;
-	}
+	};
+
 
 	TSet<UEdGraphNode*> VisitedNodes;
+	TSet<UEdGraphNode*> FinishedNodes;
 };
 
 UEdGraphNode* FAssetSchemaAction_GenericGraph_NewNode::PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode /*= true*/)
