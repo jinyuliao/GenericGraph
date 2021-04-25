@@ -114,22 +114,27 @@ void SEdNode_GenericGraphNode::UpdateGraphNode()
 			[
 				SNew(SOverlay)
 
-				// Input Pin Area
 				+ SOverlay::Slot()
 				.HAlign(HAlign_Fill)
 				.VAlign(VAlign_Fill)
 				[
-					SAssignNew(LeftNodeBox, SVerticalBox)
+					SNew(SVerticalBox)
+
+					// Input Pin Area
+					+ SVerticalBox::Slot()
+					.FillHeight(1)
+					[
+						SAssignNew(LeftNodeBox, SVerticalBox)
+					]
+
+					// Output Pin Area	
+					+ SVerticalBox::Slot()
+					.FillHeight(1)
+					[
+						SAssignNew(RightNodeBox, SVerticalBox)
+					]
 				]
-	
-				// Output Pin Area	
-				+ SOverlay::Slot()
-				.HAlign(HAlign_Fill)
-				.VAlign(VAlign_Fill)
-				[
-					SAssignNew(RightNodeBox, SVerticalBox)
-				]
-	
+
 				+ SOverlay::Slot()
 				.HAlign(HAlign_Center)
 				.VAlign(VAlign_Center)
