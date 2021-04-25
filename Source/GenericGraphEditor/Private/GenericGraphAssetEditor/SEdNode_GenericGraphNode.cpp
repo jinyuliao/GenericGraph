@@ -36,7 +36,7 @@ public:
 			.BorderBackgroundColor(this, &SGenericGraphPin::GetPinColor)
 			.OnMouseButtonDown(this, &SGenericGraphPin::OnPinMouseDown)
 			.Cursor(this, &SGenericGraphPin::GetPinCursor)
-			.Padding(FMargin(10.0f))
+			.Padding(FMargin(5.0f))
 		);
 	}
 
@@ -85,7 +85,8 @@ void SEdNode_GenericGraphNode::Construct(const FArguments& InArgs, UEdNode_Gener
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 void SEdNode_GenericGraphNode::UpdateGraphNode()
 {
-	const FMargin NodePadding = FMargin(2.0f);
+	const FMargin NodePadding = FMargin(5);
+	const FMargin NamePadding = FMargin(2);
 
 	InputPins.Empty();
 	OutputPins.Empty();
@@ -93,9 +94,12 @@ void SEdNode_GenericGraphNode::UpdateGraphNode()
 	// Reset variables that are going to be exposed, in case we are refreshing an already setup node.
 	RightNodeBox.Reset();
 	LeftNodeBox.Reset();
-	OutputPinBox.Reset();
 
+	const FSlateBrush *NodeTypeIcon = GetNameIcon();
+
+	FLinearColor TitleShadowColor(0.6f, 0.6f, 0.6f);
 	TSharedPtr<SErrorText> ErrorText;
+	TSharedPtr<SVerticalBox> NodeBody;
 	TSharedPtr<SNodeTitle> NodeTitle = SNew(SNodeTitle, GraphNode);
 
 	this->ContentScale.Bind(this, &SGraphNode::GetContentScale);
@@ -110,107 +114,89 @@ void SEdNode_GenericGraphNode::UpdateGraphNode()
 			[
 				SNew(SOverlay)
 
-				// Pins and node details
 				+ SOverlay::Slot()
 				.HAlign(HAlign_Fill)
 				.VAlign(VAlign_Fill)
 				[
 					SNew(SVerticalBox)
 
-					// INPUT PIN AREA
+					// Input Pin Area
 					+ SVerticalBox::Slot()
-					.AutoHeight()
+					.FillHeight(1)
 					[
-						SNew(SBox)
-						.MinDesiredHeight(NodePadding.Top)
-						[
-							SAssignNew(LeftNodeBox, SVerticalBox)
-						]
+						SAssignNew(LeftNodeBox, SVerticalBox)
 					]
 
-					// STATE NAME AREA
+					// Output Pin Area	
 					+ SVerticalBox::Slot()
-					.Padding(FMargin(NodePadding.Left, 0.0f, NodePadding.Right, 0.0f))
+					.FillHeight(1)
 					[
-						SNew(SVerticalBox)
+						SAssignNew(RightNodeBox, SVerticalBox)
+					]
+				]
+
+				+ SOverlay::Slot()
+				.HAlign(HAlign_Center)
+				.VAlign(VAlign_Center)
+				.Padding(8.0f)
+				[
+					SNew(SBorder)
+					.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.ColorSpill"))
+					.BorderBackgroundColor(TitleShadowColor)
+					.HAlign(HAlign_Center)
+					.VAlign(VAlign_Center)
+					.Visibility(EVisibility::SelfHitTestInvisible)
+					.Padding(6.0f)
+					[
+						SAssignNew(NodeBody, SVerticalBox)
+									
+						// Title
 						+ SVerticalBox::Slot()
 						.AutoHeight()
 						[
-							SAssignNew(NodeBody, SBorder)
-							.BorderImage(FEditorStyle::GetBrush("BTEditor.Graph.BTNode.Body"))
-							.BorderBackgroundColor(this, &SEdNode_GenericGraphNode::GetBackgroundColor)
-							.HAlign(HAlign_Fill)
-							.VAlign(VAlign_Center)
-							.Visibility(EVisibility::SelfHitTestInvisible)
-							[
-								SNew(SOverlay)
-								+ SOverlay::Slot()
-								.HAlign(HAlign_Fill)
-								.VAlign(VAlign_Fill)
-								[
-									SNew(SVerticalBox)
-									+ SVerticalBox::Slot()
-									.AutoHeight()
-									[
-										SNew(SHorizontalBox)
-										+ SHorizontalBox::Slot()
-										.AutoWidth()
-										[
-											// POPUP ERROR MESSAGE
-											SAssignNew(ErrorText, SErrorText)
-											.BackgroundColor(this, &SEdNode_GenericGraphNode::GetErrorColor)
-											.ToolTipText(this, &SEdNode_GenericGraphNode::GetErrorMsgToolTip)
-										]
+							SNew(SHorizontalBox)
 
-										+ SHorizontalBox::Slot()
-										.AutoWidth()
-										[
-											SNew(SHorizontalBox)
-											+ SHorizontalBox::Slot()
-											.Padding(FMargin(4.0f, 0.0f, 4.0f, 0.0f))
-											[
-												SNew(SVerticalBox)
-												+ SVerticalBox::Slot()
-												.AutoHeight()
-												[
-													SAssignNew(InlineEditableText, SInlineEditableTextBlock)
-													.Style(FEditorStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
-													.Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
-													.OnVerifyTextChanged(this, &SEdNode_GenericGraphNode::OnVerifyNameTextChanged)
-													.OnTextCommitted(this, &SEdNode_GenericGraphNode::OnNameTextCommited)
-													.IsReadOnly(this, &SEdNode_GenericGraphNode::IsNameReadOnly)
-													.IsSelected(this, &SEdNode_GenericGraphNode::IsSelectedExclusively)
-												]
-												+ SVerticalBox::Slot()
-												.AutoHeight()
-												[
-													NodeTitle.ToSharedRef()
-												]
-											]
-										]
-									]
+							// Error message
+							+ SHorizontalBox::Slot()
+							.AutoWidth()
+							[
+								SAssignNew(ErrorText, SErrorText)
+								.BackgroundColor(this, &SEdNode_GenericGraphNode::GetErrorColor)
+								.ToolTipText(this, &SEdNode_GenericGraphNode::GetErrorMsgToolTip)
+							]
+
+							// Icon
+							+SHorizontalBox::Slot()
+							.AutoWidth()
+							.VAlign(VAlign_Center)
+							[
+								SNew(SImage)
+								.Image(NodeTypeIcon)
+							]
+										
+							// Node Title
+							+ SHorizontalBox::Slot()
+							.Padding(FMargin(4.0f, 0.0f, 4.0f, 0.0f))
+							[
+								SNew(SVerticalBox)
+								+ SVerticalBox::Slot()
+								.AutoHeight()
+								[
+									SAssignNew(InlineEditableText, SInlineEditableTextBlock)
+									.Style(FEditorStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
+									.Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
+									.OnVerifyTextChanged(this, &SEdNode_GenericGraphNode::OnVerifyNameTextChanged)
+									.OnTextCommitted(this, &SEdNode_GenericGraphNode::OnNameTextCommited)
+									.IsReadOnly(this, &SEdNode_GenericGraphNode::IsNameReadOnly)
+									.IsSelected(this, &SEdNode_GenericGraphNode::IsSelectedExclusively)
+								]
+								+ SVerticalBox::Slot()
+								.AutoHeight()
+								[
+									NodeTitle.ToSharedRef()
 								]
 							]
-						]
-					]
-
-					// OUTPUT PIN AREA
-					+ SVerticalBox::Slot()
-					.AutoHeight()
-					[
-						SNew(SBox)
-						.MinDesiredHeight(NodePadding.Bottom)
-						[
-							SAssignNew(RightNodeBox, SVerticalBox)
-							+ SVerticalBox::Slot()
-							.HAlign(HAlign_Fill)
-							.VAlign(VAlign_Fill)
-							.Padding(20.0f, 0.0f)
-							.FillHeight(1.0f)
-							[
-								SAssignNew(OutputPinBox, SHorizontalBox)
-							]
-						]
+						]					
 					]
 				]
 			]
@@ -272,28 +258,28 @@ void SEdNode_GenericGraphNode::AddPin(const TSharedRef<SGraphPin>& PinToAdd)
 		PinToAdd->SetVisibility( TAttribute<EVisibility>(PinToAdd, &SGraphPin::IsPinVisibleAsAdvanced) );
 	}
 
+	TSharedPtr<SVerticalBox> PinBox;
 	if (PinToAdd->GetDirection() == EEdGraphPinDirection::EGPD_Input)
 	{
-		LeftNodeBox->AddSlot()
-			.HAlign(HAlign_Fill)
-			.VAlign(VAlign_Fill)
-			.FillHeight(1.0f)
-			.Padding(20.0f,0.0f)
-			[
-				PinToAdd
-			];
+		PinBox = LeftNodeBox;
 		InputPins.Add(PinToAdd);
 	}
 	else // Direction == EEdGraphPinDirection::EGPD_Output
 	{
-		OutputPinBox->AddSlot()
+		PinBox = RightNodeBox;
+		OutputPins.Add(PinToAdd);
+	}
+
+	if (PinBox)
+	{
+		PinBox->AddSlot()
 			.HAlign(HAlign_Fill)
 			.VAlign(VAlign_Fill)
-			.FillWidth(1.0f)
+			.FillHeight(1.0f)
+			//.Padding(6.0f, 0.0f)
 			[
 				PinToAdd
 			];
-		OutputPins.Add(PinToAdd);
 	}
 }
 

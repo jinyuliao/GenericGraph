@@ -28,6 +28,5 @@ public:
 	virtual const FSlateBrush* GetNameIcon() const;
 
 protected:
-	TSharedPtr<SBorder> NodeBody;
-	TSharedPtr<SHorizontalBox> OutputPinBox;
 };
+
