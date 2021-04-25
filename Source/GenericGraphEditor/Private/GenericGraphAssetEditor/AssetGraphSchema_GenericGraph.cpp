@@ -333,10 +333,15 @@ const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection
 	}
 
 	FText ErrorMessage;
-	if (!EdNode_Out->GenericGraphNode->CanCreateConnection(EdNode_In->GenericGraphNode, ErrorMessage))
+	if (!EdNode_Out->GenericGraphNode->CanCreateConnectionTo(EdNode_In->GenericGraphNode, EdNode_Out->GetOutputPin()->LinkedTo.Num(), ErrorMessage))
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, ErrorMessage);
 	}
+	if (!EdNode_In->GenericGraphNode->CanCreateConnectionFrom(EdNode_Out->GenericGraphNode, EdNode_In->GetInputPin()->LinkedTo.Num(), ErrorMessage))
+	{
+		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, ErrorMessage);
+	}
+
 
 	if (EdNode_Out->GenericGraphNode->GetGraph()->bEdgeEnabled)
 	{
