@@ -325,9 +325,17 @@ const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection
 		In = A;
 	}
 		
+	//Determine if we can have cycles or not
+	bool bAllowCycles = false;
+	auto EdGraph = Cast<UEdGraph_GenericGraph>(A->GetOwningNode()->GetGraph());
+	if (EdGraph != nullptr)
+	{
+		bAllowCycles = EdGraph->GetGenericGraph()->bCanBeCyclical;
+	}
+
 	// check for cycles
 	FNodeVisitorCycleChecker CycleChecker;
-	if (!CycleChecker.CheckForLoop(Out->GetOwningNode(), In->GetOwningNode()))
+	if (!bAllowCycles && !CycleChecker.CheckForLoop(Out->GetOwningNode(), In->GetOwningNode()))
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorCycle", "Can't create a graph cycle"));
 	}
