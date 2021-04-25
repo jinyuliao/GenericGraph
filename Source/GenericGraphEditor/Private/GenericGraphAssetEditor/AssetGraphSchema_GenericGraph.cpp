@@ -357,7 +357,7 @@ const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection
 
 
 	FText ErrorMessage;
-	if (!EdNode_Out->GenericGraphNode->CanCreateConnection(EdNode_In->GenericGraphNode, ErrorMessage))
+	if (!EdNode_Out->GenericGraphNode->CanCreateConnection(EdNode_In->GenericGraphNode, EdNode_In->Pins[1]->LinkedTo.Num(),EdNode_Out->Pins[0]->LinkedTo.Num(), ErrorMessage))
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, ErrorMessage);
 	}
