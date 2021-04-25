@@ -317,9 +317,17 @@ const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinError", "Not a valid UGenericGraphEdNode"));
 	}
 		
+	//Determine if we can have cycles or not
+	bool bAllowCycles = false;
+	auto EdGraph = Cast<UEdGraph_GenericGraph>(Out->GetOwningNode()->GetGraph());
+	if (EdGraph != nullptr)
+	{
+		bAllowCycles = EdGraph->GetGenericGraph()->bCanBeCyclical;
+	}
+
 	// check for cycles
 	FNodeVisitorCycleChecker CycleChecker;
-	if (!CycleChecker.CheckForLoop(Out->GetOwningNode(), In->GetOwningNode()))
+	if (!bAllowCycles && !CycleChecker.CheckForLoop(Out->GetOwningNode(), In->GetOwningNode()))
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorCycle", "Can't create a graph cycle"));
 	}
