@@ -313,38 +313,56 @@ const FPinConnectionResponse UAssetGraphSchema_GenericGraph::CanCreateConnection
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorOutput", "Can't connect output node to output node"));
 	}
 
+	const UEdGraphPin *Out, *In;
+	if (A->Direction == EGPD_Output)
+	{
+		Out = A;
+		In = B;
+	}
+	else
+	{
+		Out = B;
+		In = A;
+	}
+		
 	// check for cycles
 	FNodeVisitorCycleChecker CycleChecker;
-	if (!CycleChecker.CheckForLoop(A->GetOwningNode(), B->GetOwningNode()))
+	if (!CycleChecker.CheckForLoop(Out->GetOwningNode(), In->GetOwningNode()))
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinErrorCycle", "Can't create a graph cycle"));
 	}
 
-	UEdNode_GenericGraphNode* EdNode_A = Cast<UEdNode_GenericGraphNode>(A->GetOwningNode());
-	UEdNode_GenericGraphNode* EdNode_B = Cast<UEdNode_GenericGraphNode>(B->GetOwningNode());
+	UEdNode_GenericGraphNode* EdNode_Out = Cast<UEdNode_GenericGraphNode>(Out->GetOwningNode());
+	UEdNode_GenericGraphNode* EdNode_In = Cast<UEdNode_GenericGraphNode>(In->GetOwningNode());
 
-	if (EdNode_A == nullptr || EdNode_B == nullptr)
+	if (EdNode_Out == nullptr || EdNode_In == nullptr)
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinError", "Not a valid UGenericGraphEdNode"));
 	}
 
-	FText ErrorMessage;
-	if (A->Direction == EGPD_Input)
+	// Check that this edge doesn't already exist
+	for (UEdGraphPin *TestPin : EdNode_Out->GetOutputPin()->LinkedTo)
 	{
-		if (!EdNode_A->GenericGraphNode->CanCreateConnection(EdNode_B->GenericGraphNode, ErrorMessage))
+		UEdGraphNode* ChildNode = TestPin->GetOwningNode();
+		if (UEdNode_GenericGraphEdge* EdNode_Edge = Cast<UEdNode_GenericGraphEdge>(ChildNode))
 		{
-			return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, ErrorMessage);
+			ChildNode = EdNode_Edge->GetEndNode();
 		}
-	}
-	else
-	{
-		if (!EdNode_B->GenericGraphNode->CanCreateConnection(EdNode_A->GenericGraphNode, ErrorMessage))
+
+		if (ChildNode == EdNode_In)
 		{
-			return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, ErrorMessage);
+			return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinError", "Nodes are already connected"));
 		}
 	}
 
-	if (EdNode_A->GenericGraphNode->GetGraph()->bEdgeEnabled)
+
+	FText ErrorMessage;
+	if (!EdNode_Out->GenericGraphNode->CanCreateConnection(EdNode_In->GenericGraphNode, ErrorMessage))
+	{
+		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, ErrorMessage);
+	}
+
+	if (EdNode_Out->GenericGraphNode->GetGraph()->bEdgeEnabled)
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_MAKE_WITH_CONVERSION_NODE, LOCTEXT("PinConnect", "Connect nodes with edge"));
 	}
