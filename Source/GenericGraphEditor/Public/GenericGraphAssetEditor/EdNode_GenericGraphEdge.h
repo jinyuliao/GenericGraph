@@ -14,6 +14,8 @@ class UEdNode_GenericGraphEdge : public UEdGraphNode
 	GENERATED_BODY()
 
 public:
+	UEdNode_GenericGraphEdge();
+
 	UPROPERTY()
 	class UEdGraph* Graph;
 

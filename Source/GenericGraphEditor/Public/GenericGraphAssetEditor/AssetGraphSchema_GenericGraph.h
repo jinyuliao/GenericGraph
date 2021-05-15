@@ -12,7 +12,7 @@ class UAutoLayoutStrategy;
 
 /** Action to add a node to the graph */
 USTRUCT()
-struct FAssetSchemaAction_GenericGraph_NewNode : public FEdGraphSchemaAction
+struct GENERICGRAPHEDITOR_API FAssetSchemaAction_GenericGraph_NewNode : public FEdGraphSchemaAction
 {
 	GENERATED_USTRUCT_BODY();
 
@@ -29,7 +29,7 @@ public:
 };
 
 USTRUCT()
-struct FAssetSchemaAction_GenericGraph_NewEdge : public FEdGraphSchemaAction
+struct GENERICGRAPHEDITOR_API FAssetSchemaAction_GenericGraph_NewEdge : public FEdGraphSchemaAction
 {
 	GENERATED_USTRUCT_BODY();
 
@@ -61,6 +61,7 @@ public:
 
  	virtual const FPinConnectionResponse CanCreateConnection(const UEdGraphPin* A, const UEdGraphPin* B) const override;
 
+	virtual bool TryCreateConnection(UEdGraphPin* A, UEdGraphPin* B) const override;
 	virtual bool CreateAutomaticConversionNodeAndConnections(UEdGraphPin* A, UEdGraphPin* B) const override;
 
 	virtual class FConnectionDrawingPolicy* CreateConnectionDrawingPolicy(int32 InBackLayerID, int32 InFrontLayerID, float InZoomFactor, const FSlateRect& InClippingRect, class FSlateWindowElementList& InDrawElements, class UEdGraph* InGraphObj) const override;

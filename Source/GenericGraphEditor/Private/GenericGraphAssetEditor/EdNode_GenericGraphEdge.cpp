@@ -1,8 +1,13 @@
-#include "EdNode_GenericGraphEdge.h"
+#include "GenericGraphAssetEditor/EdNode_GenericGraphEdge.h"
 #include "GenericGraphEdge.h"
-#include "EdNode_GenericGraphNode.h"
+#include "GenericGraphAssetEditor/EdNode_GenericGraphNode.h"
 
 #define LOCTEXT_NAMESPACE "EdNode_GenericGraphEdge"
+
+UEdNode_GenericGraphEdge::UEdNode_GenericGraphEdge()
+{
+	bCanRenameNode = true;
+}
 
 void UEdNode_GenericGraphEdge::SetEdge(UGenericGraphEdge* Edge)
 {
@@ -19,6 +24,10 @@ void UEdNode_GenericGraphEdge::AllocateDefaultPins()
 
 FText UEdNode_GenericGraphEdge::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
+	if (GenericGraphEdge)
+	{
+		return GenericGraphEdge->GetNodeTitle();
+	}
 	return FText();
 }
 

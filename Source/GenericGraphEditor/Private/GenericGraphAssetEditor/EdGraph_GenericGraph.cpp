@@ -1,8 +1,8 @@
-#include "EdGraph_GenericGraph.h"
+#include "GenericGraphAssetEditor/EdGraph_GenericGraph.h"
 #include "GenericGraphEditorPCH.h"
 #include "GenericGraph.h"
-#include "EdNode_GenericGraphNode.h"
-#include "EdNode_GenericGraphEdge.h"
+#include "GenericGraphAssetEditor/EdNode_GenericGraphNode.h"
+#include "GenericGraphAssetEditor/EdNode_GenericGraphEdge.h"
 
 UEdGraph_GenericGraph::UEdGraph_GenericGraph()
 {
@@ -147,9 +147,12 @@ void UEdGraph_GenericGraph::Clear()
 		if (UEdNode_GenericGraphNode* EdNode = Cast<UEdNode_GenericGraphNode>(Nodes[i]))
 		{
 			UGenericGraphNode* GenericGraphNode = EdNode->GenericGraphNode;
-			GenericGraphNode->ParentNodes.Reset();
-			GenericGraphNode->ChildrenNodes.Reset();
-			GenericGraphNode->Edges.Reset();
+			if (GenericGraphNode)
+			{
+				GenericGraphNode->ParentNodes.Reset();
+				GenericGraphNode->ChildrenNodes.Reset();
+				GenericGraphNode->Edges.Reset();
+			}
 		}
 	}
 }

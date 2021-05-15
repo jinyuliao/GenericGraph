@@ -1,5 +1,3 @@
-#pragma once
-
 #include"Modules/ModuleManager.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(GenericGraphEditor, Log, All);
@@ -20,7 +18,7 @@ public:
 	 */
 	static IGenericGraphEditor& Get()
 	{
-		return FModuleManager::LoadModuleChecked< IGenericGraphEditor >( "GenericGraphEditor" );
+		return FModuleManager::LoadModuleChecked< IGenericGraphEditor >("GenericGraphEditor");
 	}
 
 	/**
@@ -30,7 +28,7 @@ public:
 	 */
 	static bool IsAvailable()
 	{
-		return FModuleManager::Get().IsModuleLoaded( "GenericGraphEditor" );
+		return FModuleManager::Get().IsModuleLoaded("GenericGraphEditor");
 	}
 };
 

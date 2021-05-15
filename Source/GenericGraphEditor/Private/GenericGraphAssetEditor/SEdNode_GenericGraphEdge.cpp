@@ -1,12 +1,13 @@
-#include "SEdNode_GenericGraphEdge.h"
+#include "GenericGraphAssetEditor/SEdNode_GenericGraphEdge.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Images/SImage.h"
+#include "Widgets/Text/SInlineEditableTextBlock.h"
 #include "Widgets/SToolTip.h"
 #include "SGraphPanel.h"
 #include "EdGraphSchema_K2.h"
-#include "EdNode_GenericGraphNode.h"
-#include "EdNode_GenericGraphEdge.h"
-#include "ConnectionDrawingPolicy_GenericGraph.h"
+#include "GenericGraphAssetEditor/EdNode_GenericGraphNode.h"
+#include "GenericGraphAssetEditor/EdNode_GenericGraphEdge.h"
+#include "GenericGraphAssetEditor/ConnectionDrawingPolicy_GenericGraph.h"
 
 #define LOCTEXT_NAMESPACE "SGenericGraphEdge"
 
@@ -47,6 +48,21 @@ void SEdNode_GenericGraphEdge::PerformSecondPassLayout(const TMap< UObject*, TSh
 	PositionBetweenTwoNodesWithOffset(StartGeom, EndGeom, 0, 1);
 }
 
+void SEdNode_GenericGraphEdge::OnNameTextCommited(const FText& InText, ETextCommit::Type CommitInfo)
+{
+	SGraphNode::OnNameTextCommited(InText, CommitInfo);
+
+	UEdNode_GenericGraphEdge* MyNode = CastChecked<UEdNode_GenericGraphEdge>(GraphNode);
+
+	if (MyNode != nullptr && MyNode->GenericGraphEdge != nullptr)
+	{
+		const FScopedTransaction Transaction(LOCTEXT("GenericGraphEditorRenameEdge", "Generic Graph Editor: Rename Edge"));
+		MyNode->Modify();
+		MyNode->GenericGraphEdge->SetNodeTitle(InText);
+		UpdateGraphNode();
+	}
+}
+
 void SEdNode_GenericGraphEdge::UpdateGraphNode()
 {
 	InputPins.Empty();
@@ -54,6 +70,8 @@ void SEdNode_GenericGraphEdge::UpdateGraphNode()
 
 	RightNodeBox.Reset();
 	LeftNodeBox.Reset();
+
+	TSharedPtr<SNodeTitle> NodeTitle = SNew(SNodeTitle, GraphNode);
 
 	this->ContentScale.Bind( this, &SGraphNode::GetContentScale );
 	this->GetOrAddSlot( ENodeZone::Center )
@@ -70,7 +88,31 @@ void SEdNode_GenericGraphEdge::UpdateGraphNode()
 			+ SOverlay::Slot()
 			[
 				SNew(SImage)
-				.Image(FEditorStyle::GetBrush("Graph.TransitionNode.Icon"))
+				.Image(this, &SEdNode_GenericGraphEdge::GetEdgeImage)
+				.Visibility(this, &SEdNode_GenericGraphEdge::GetEdgeImageVisibility)
+			]
+
+			+ SOverlay::Slot()
+			.Padding(FMargin(4.0f, 4.0f, 4.0f, 4.0f))
+			[
+				SNew(SVerticalBox)
+				+ SVerticalBox::Slot()
+				.HAlign(HAlign_Center)
+				.AutoHeight()
+				[
+					SAssignNew(InlineEditableText, SInlineEditableTextBlock)
+					.ColorAndOpacity(FLinearColor::Black)
+					.Visibility(this, &SEdNode_GenericGraphEdge::GetEdgeTitleVisbility)
+					.Font(FCoreStyle::GetDefaultFontStyle("Regular", 12))
+					.Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
+					.OnTextCommitted(this, &SEdNode_GenericGraphEdge::OnNameTextCommited)
+				]
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				[
+					NodeTitle.ToSharedRef()
+				]
+				
 			]
 		];
 }
@@ -123,7 +165,35 @@ void SEdNode_GenericGraphEdge::PositionBetweenTwoNodesWithOffset(const FGeometry
 
 FSlateColor SEdNode_GenericGraphEdge::GetEdgeColor() const
 {
+	UEdNode_GenericGraphEdge* EdgeNode = CastChecked<UEdNode_GenericGraphEdge>(GraphNode);
+	if (EdgeNode != nullptr && EdgeNode->GenericGraphEdge != nullptr)
+	{
+		return EdgeNode->GenericGraphEdge->GetEdgeColour();
+	}
 	return FLinearColor(0.9f, 0.9f, 0.9f, 1.0f);
+}
+
+const FSlateBrush* SEdNode_GenericGraphEdge::GetEdgeImage() const
+{
+	return FEditorStyle::GetBrush("Graph.TransitionNode.Icon");
+}
+
+EVisibility SEdNode_GenericGraphEdge::GetEdgeImageVisibility() const
+{
+	UEdNode_GenericGraphEdge* EdgeNode = CastChecked<UEdNode_GenericGraphEdge>(GraphNode);
+	if (EdgeNode && EdgeNode->GenericGraphEdge && EdgeNode->GenericGraphEdge->bShouldDrawTitle)
+			return EVisibility::Hidden;
+
+	return EVisibility::Visible;
+}
+
+EVisibility SEdNode_GenericGraphEdge::GetEdgeTitleVisbility() const
+{
+	UEdNode_GenericGraphEdge* EdgeNode = CastChecked<UEdNode_GenericGraphEdge>(GraphNode);
+	if (EdgeNode && EdgeNode->GenericGraphEdge && EdgeNode->GenericGraphEdge->bShouldDrawTitle)
+		return EVisibility::Visible;
+
+	return EVisibility::Collapsed;
 }
 
 #undef LOCTEXT_NAMESPACE

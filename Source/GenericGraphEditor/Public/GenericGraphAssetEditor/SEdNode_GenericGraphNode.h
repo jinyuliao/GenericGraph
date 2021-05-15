@@ -5,7 +5,7 @@
 
 class UEdNode_GenericGraphNode;
 
-class SEdNode_GenericGraphNode : public SGraphNode
+class GENERICGRAPHEDITOR_API SEdNode_GenericGraphNode : public SGraphNode
 {
 public:
 	SLATE_BEGIN_ARGS(SEdNode_GenericGraphNode) {}
@@ -28,6 +28,5 @@ public:
 	virtual const FSlateBrush* GetNameIcon() const;
 
 protected:
-	TSharedPtr<SBorder> NodeBody;
-	TSharedPtr<SHorizontalBox> OutputPinBox;
 };
+

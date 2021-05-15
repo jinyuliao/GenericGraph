@@ -10,7 +10,7 @@
 #include "AutoLayoutStrategy.generated.h"
 
 UCLASS(abstract)
-class UAutoLayoutStrategy : public UObject
+class GENERICGRAPHEDITOR_API UAutoLayoutStrategy : public UObject
 {
 	GENERATED_BODY()
 public:
