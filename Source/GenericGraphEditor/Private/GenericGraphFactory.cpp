@@ -76,8 +76,13 @@ bool UGenericGraphFactory::ConfigureProperties()
 	FClassViewerInitializationOptions Options;
 	Options.Mode = EClassViewerMode::ClassPicker;
 
+#if ENGINE_MAJOR_VERSION < 5
 	TSharedPtr<FAssetClassParentFilter> Filter = MakeShareable(new FAssetClassParentFilter);
 	Options.ClassFilter = Filter;
+#else // #if ENGINE_MAJOR_VERSION < 5
+	TSharedRef<FAssetClassParentFilter> Filter = MakeShareable(new FAssetClassParentFilter);
+	Options.ClassFilters.Add(Filter);
+#endif // #else // #if ENGINE_MAJOR_VERSION < 5
 
 	Filter->DisallowedClassFlags = CLASS_Abstract | CLASS_Deprecated | CLASS_NewerVersionExists | CLASS_HideDropDown;
 	Filter->AllowedChildrenOfClasses.Add(UGenericGraph::StaticClass());
