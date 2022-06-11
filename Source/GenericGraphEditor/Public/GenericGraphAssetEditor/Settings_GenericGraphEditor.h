@@ -11,7 +11,7 @@ enum class EAutoLayoutStrategy : uint8
 };
 
 UCLASS()
-class UGenericGraphEditorSettings : public UObject
+class GENERICGRAPHEDITOR_API UGenericGraphEditorSettings : public UObject
 {
 	GENERATED_BODY()
 

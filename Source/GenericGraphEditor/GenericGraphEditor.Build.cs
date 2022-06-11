@@ -18,6 +18,7 @@ public class GenericGraphEditor : ModuleRules
 			new string[] {
                 // ... add other private include paths required here ...
                 "GenericGraphEditor/Private",
+				"GenericGraphEditor/Public",
 			}
 			);
 
@@ -38,6 +39,7 @@ public class GenericGraphEditor : ModuleRules
                 "GenericGraphRuntime",
                 "AssetTools",
                 "Slate",
+                "InputCore",
                 "SlateCore",
                 "GraphEditor",
                 "PropertyEditor",

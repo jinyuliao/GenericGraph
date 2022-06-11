@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 
-class FEditorCommands_GenericGraph : public TCommands<FEditorCommands_GenericGraph>
+class GENERICGRAPHEDITOR_API FEditorCommands_GenericGraph : public TCommands<FEditorCommands_GenericGraph>
 {
 public:
 	/** Constructor */
