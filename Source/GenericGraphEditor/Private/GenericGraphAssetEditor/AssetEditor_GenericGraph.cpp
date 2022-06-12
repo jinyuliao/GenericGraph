@@ -45,12 +45,20 @@ FAssetEditor_GenericGraph::FAssetEditor_GenericGraph()
 
 	GenricGraphEditorSettings = NewObject<UGenericGraphEditorSettings>(UGenericGraphEditorSettings::StaticClass());
 
+#if ENGINE_MAJOR_VERSION < 5
 	OnPackageSavedDelegateHandle = UPackage::PackageSavedEvent.AddRaw(this, &FAssetEditor_GenericGraph::OnPackageSaved);
+#else // #if ENGINE_MAJOR_VERSION < 5
+	OnPackageSavedDelegateHandle = UPackage::PackageSavedWithContextEvent.AddRaw(this, &FAssetEditor_GenericGraph::OnPackageSavedWithContext);
+#endif // #else // #if ENGINE_MAJOR_VERSION < 5
 }
 
 FAssetEditor_GenericGraph::~FAssetEditor_GenericGraph()
 {
+#if ENGINE_MAJOR_VERSION < 5
 	UPackage::PackageSavedEvent.Remove(OnPackageSavedDelegateHandle);
+#else // #if ENGINE_MAJOR_VERSION < 5
+	UPackage::PackageSavedWithContextEvent.Remove(OnPackageSavedDelegateHandle);
+#endif // #else // #if ENGINE_MAJOR_VERSION < 5
 }
 
 void FAssetEditor_GenericGraph::InitGenericGraphAssetEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UGenericGraph* Graph)
@@ -80,12 +88,14 @@ void FAssetEditor_GenericGraph::InitGenericGraphAssetEditor(const EToolkitMode::
 		->AddArea
 		(
 			FTabManager::NewPrimaryArea()->SetOrientation(Orient_Vertical)
+#if ENGINE_MAJOR_VERSION < 5
 			->Split
 			(
 				FTabManager::NewStack()
 				->SetSizeCoefficient(0.1f)
 				->AddTab(GetToolbarTabId(), ETabState::OpenedTab)->SetHideTabWell(true)
 			)
+#endif // #if ENGINE_MAJOR_VERSION < 5
 			->Split
 			(
 				FTabManager::NewSplitter()->SetOrientation(Orient_Horizontal)->SetSizeCoefficient(0.9f)
@@ -234,7 +244,9 @@ TSharedRef<SDockTab> FAssetEditor_GenericGraph::SpawnTab_Details(const FSpawnTab
 	check(Args.GetTabId() == FGenericGraphAssetEditorTabs::GenericGraphPropertyID);
 
 	return SNew(SDockTab)
+#if ENGINE_MAJOR_VERSION < 5
 		.Icon(FEditorStyle::GetBrush("LevelEditor.Tabs.Details"))
+#endif // #if ENGINE_MAJOR_VERSION < 5
 		.Label(LOCTEXT("Details_Title", "Property"))
 		[
 			PropertyWidget.ToSharedRef()
@@ -246,7 +258,9 @@ TSharedRef<SDockTab> FAssetEditor_GenericGraph::SpawnTab_EditorSettings(const FS
 	check(Args.GetTabId() == FGenericGraphAssetEditorTabs::GenericGraphEditorSettingsID);
 
 	return SNew(SDockTab)
+#if ENGINE_MAJOR_VERSION < 5
 		.Icon(FEditorStyle::GetBrush("LevelEditor.Tabs.Details"))
+#endif // #if ENGINE_MAJOR_VERSION < 5
 		.Label(LOCTEXT("EditorSettings_Title", "Generic Graph Editor Setttings"))
 		[
 			EditorSettingsWidget.ToSharedRef()
@@ -783,10 +797,17 @@ void FAssetEditor_GenericGraph::OnFinishedChangingProperties(const FPropertyChan
 	EditingGraph->EdGraph->GetSchema()->ForceVisualizationCacheClear();
 }
 
+#if ENGINE_MAJOR_VERSION < 5
 void FAssetEditor_GenericGraph::OnPackageSaved(const FString& PackageFileName, UObject* Outer)
 {
 	RebuildGenericGraph();
 }
+#else // #if ENGINE_MAJOR_VERSION < 5
+void FAssetEditor_GenericGraph::OnPackageSavedWithContext(const FString& PackageFileName, UPackage* Package, FObjectPostSaveContext ObjectSaveContext)
+{
+	RebuildGenericGraph();
+}
+#endif // #else // #if ENGINE_MAJOR_VERSION < 5
 
 void FAssetEditor_GenericGraph::RegisterToolbarTab(const TSharedRef<class FTabManager>& InTabManager) 
 {

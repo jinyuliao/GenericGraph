@@ -4,6 +4,10 @@
 #include "Settings_GenericGraphEditor.h"
 #include "GenericGraph.h"
 
+#if ENGINE_MAJOR_VERSION == 5
+#include "UObject/ObjectSaveContext.h"
+#endif // #if ENGINE_MAJOR_VERSION == 5
+
 class FGGAssetEditorToolbar;
 
 class GENERICGRAPHEDITOR_API FAssetEditor_GenericGraph : public FAssetEditorToolkit, public FNotifyHook, public FGCObject
@@ -39,6 +43,15 @@ public:
 	// FSerializableObject interface
 	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
 	// End of FSerializableObject interface
+
+#if ENGINE_MAJOR_VERSION == 5
+	// FGCObject interface
+	virtual FString GetReferencerName() const
+	{
+		return TEXT("FAssetEditor_LTGenericGraph");
+	}
+	// ~FGCObject interface
+#endif // #if ENGINE_MAJOR_VERSION == 5
 
 	UGenericGraphEditorSettings* GetSettings() const;
 
@@ -96,7 +109,11 @@ protected:
 
 	void OnFinishedChangingProperties(const FPropertyChangedEvent& PropertyChangedEvent);
 
+#if ENGINE_MAJOR_VERSION < 5
 	void OnPackageSaved(const FString& PackageFileName, UObject* Outer);
+#else // #if ENGINE_MAJOR_VERSION < 5
+	void OnPackageSavedWithContext(const FString& PackageFileName, UPackage* Package, FObjectPostSaveContext ObjectSaveContext);
+#endif // #else // #if ENGINE_MAJOR_VERSION < 5
 
 protected:
 	UGenericGraphEditorSettings* GenricGraphEditorSettings;
