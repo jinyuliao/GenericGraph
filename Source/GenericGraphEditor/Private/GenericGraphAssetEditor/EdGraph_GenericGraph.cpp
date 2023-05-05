@@ -162,6 +162,7 @@ void UEdGraph_GenericGraph::SortNodes(UGenericGraphNode* RootNode)
 	int Level = 0;
 	TArray<UGenericGraphNode*> CurrLevelNodes = { RootNode };
 	TArray<UGenericGraphNode*> NextLevelNodes;
+	TSet<UGenericGraphNode*> Visited;
 
 	while (CurrLevelNodes.Num() != 0)
 	{
@@ -169,6 +170,7 @@ void UEdGraph_GenericGraph::SortNodes(UGenericGraphNode* RootNode)
 		for (int i = 0; i < CurrLevelNodes.Num(); ++i)
 		{
 			UGenericGraphNode* Node = CurrLevelNodes[i];
+			Visited.Add(Node);
 
 			auto Comp = [&](const UGenericGraphNode& L, const UGenericGraphNode& R)
 			{
@@ -182,7 +184,9 @@ void UEdGraph_GenericGraph::SortNodes(UGenericGraphNode* RootNode)
 
 			for (int j = 0; j < Node->ChildrenNodes.Num(); ++j)
 			{
-				NextLevelNodes.Add(Node->ChildrenNodes[j]);
+				UGenericGraphNode* ChildNode = Node->ChildrenNodes[j];
+				if(!Visited.Contains(ChildNode))
+					NextLevelNodes.Add(Node->ChildrenNodes[j]);
 			}
 		}
 
