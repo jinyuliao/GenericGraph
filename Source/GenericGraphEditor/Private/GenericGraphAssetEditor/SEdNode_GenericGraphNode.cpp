@@ -53,7 +53,7 @@ protected:
 
 	const FSlateBrush* GetPinBorder() const
 	{
-		return FEditorStyle::GetBrush(TEXT("Graph.StateNode.Body"));
+		return FAppStyle::GetBrush(TEXT("Graph.StateNode.Body"));
 	}
 
 	virtual TSharedRef<FDragDropOperation> SpawnPinDragEvent(const TSharedRef<class SGraphPanel>& InGraphPanel, const TArray< TSharedRef<SGraphPin> >& InStartingPins) override
@@ -108,7 +108,7 @@ void SEdNode_GenericGraphNode::UpdateGraphNode()
 		.VAlign(VAlign_Center)
 		[
 			SNew(SBorder)
-			.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.Body"))
+			.BorderImage(FAppStyle::GetBrush("Graph.StateNode.Body"))
 			.Padding(0.0f)
 			.BorderBackgroundColor(this, &SEdNode_GenericGraphNode::GetBorderBackgroundColor)
 			[
@@ -141,7 +141,7 @@ void SEdNode_GenericGraphNode::UpdateGraphNode()
 				.Padding(8.0f)
 				[
 					SNew(SBorder)
-					.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.ColorSpill"))
+					.BorderImage(FAppStyle::GetBrush("Graph.StateNode.ColorSpill"))
 					.BorderBackgroundColor(TitleShadowColor)
 					.HAlign(HAlign_Center)
 					.VAlign(VAlign_Center)
@@ -183,7 +183,7 @@ void SEdNode_GenericGraphNode::UpdateGraphNode()
 								.AutoHeight()
 								[
 									SAssignNew(InlineEditableText, SInlineEditableTextBlock)
-									.Style(FEditorStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
+									.Style(FAppStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
 									.Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
 									.OnVerifyTextChanged(this, &SEdNode_GenericGraphNode::OnVerifyNameTextChanged)
 									.OnTextCommitted(this, &SEdNode_GenericGraphNode::OnNameTextCommited)
@@ -330,7 +330,7 @@ EVisibility SEdNode_GenericGraphNode::GetDragOverMarkerVisibility() const
 
 const FSlateBrush* SEdNode_GenericGraphNode::GetNameIcon() const
 {
-	return FEditorStyle::GetBrush(TEXT("BTEditor.Graph.BTNode.Icon"));
+	return FAppStyle::GetBrush(TEXT("BTEditor.Graph.BTNode.Icon"));
 }
 
 #undef LOCTEXT_NAMESPACE

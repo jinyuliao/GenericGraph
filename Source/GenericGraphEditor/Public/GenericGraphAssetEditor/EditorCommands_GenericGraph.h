@@ -7,7 +7,7 @@ class GENERICGRAPHEDITOR_API FEditorCommands_GenericGraph : public TCommands<FEd
 public:
 	/** Constructor */
 	FEditorCommands_GenericGraph()
-		: TCommands<FEditorCommands_GenericGraph>("GenericGraphEditor", NSLOCTEXT("Contexts", "GenericGraphEditor", "Generic Graph Editor"), NAME_None, FEditorStyle::GetStyleSetName())
+		: TCommands<FEditorCommands_GenericGraph>("GenericGraphEditor", NSLOCTEXT("Contexts", "GenericGraphEditor", "Generic Graph Editor"), NAME_None, FAppStyle::GetAppStyleSetName())
 	{
 	}
 	
