@@ -3,6 +3,7 @@
 
 #include "ClassViewerModule.h"
 #include "ClassViewerFilter.h"
+#include "Kismet2/KismetEditorUtilities.h"
 #include "Kismet2/SClassPickerDialog.h"
 
 #define LOCTEXT_NAMESPACE "GenericGraphFactory"

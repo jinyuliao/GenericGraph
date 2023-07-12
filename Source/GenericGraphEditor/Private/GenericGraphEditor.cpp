@@ -49,5 +49,7 @@ void FGenericGraphEditor::RegisterAssetTypeAction(IAssetTools& AssetTools, TShar
 	CreatedAssetTypeActions.Add(Action);
 }
 
+IMPLEMENT_MODULE(FGenericGraphEditor, GenericGraphEditor)
+
 #undef LOCTEXT_NAMESPACE
 
