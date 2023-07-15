@@ -21,5 +21,3 @@ private:
 
 	TSharedPtr<FGraphPanelNodeFactory> GraphPanelNodeFactory_GenericGraph;
 };
-
-IMPLEMENT_MODULE(FGenericGraphEditor, GenericGraphEditor)
