@@ -10,6 +10,8 @@ UPlayerDialogueGraphNode::UPlayerDialogueGraphNode()
     CompatibleGraphType = UDialogueGraph::StaticClass();
     DialogueNodeType = EDialogueNodeType::Player;
     ContextMenuName = LOCTEXT("ContextMenuName", "Player Dialogue Graph Node");
+
+    DefaultNodeTitle = LOCTEXT("PlayerDialogueText", "PlayerDialogueText");
 }
 
 #endif

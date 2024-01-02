@@ -10,6 +10,8 @@ UNPCDialogueGraphNode::UNPCDialogueGraphNode()
     CompatibleGraphType = UDialogueGraph::StaticClass();
     DialogueNodeType = EDialogueNodeType::NPC;
     ContextMenuName = LOCTEXT("ContextMenuName", "NPC Dialogue Graph Node");
+
+    DefaultNodeTitle = LOCTEXT("NPCDialogueText", "NPCDialogueText");
 }
 
 #endif

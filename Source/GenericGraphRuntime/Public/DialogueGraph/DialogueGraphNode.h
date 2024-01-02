@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GenericGraphNode.h"
+#include "DialogueStructures.h"
 #include "DialogueGraphNode.generated.h"
 
 UENUM(BlueprintType)
@@ -22,11 +23,13 @@ public:
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DialogueGraph")
-    FText DialogueText;
+    FDialogueVisualData VisualData;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DialogueGraph")
     EDialogueNodeType DialogueNodeType;
-
+    
+    FText DefaultNodeTitle;
+    
 public:
     EDialogueNodeType GetDialogueNodeType() const { return DialogueNodeType; }
     

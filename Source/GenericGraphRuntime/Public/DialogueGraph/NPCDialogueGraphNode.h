@@ -11,5 +11,4 @@ class GENERICGRAPHRUNTIME_API UNPCDialogueGraphNode : public UDialogueGraphNode
     
 public:
     UNPCDialogueGraphNode();
-    
 };

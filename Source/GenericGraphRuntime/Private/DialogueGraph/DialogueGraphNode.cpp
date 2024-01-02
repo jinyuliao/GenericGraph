@@ -9,6 +9,8 @@ UDialogueGraphNode::UDialogueGraphNode()
 {
     CompatibleGraphType = UDialogueGraph::StaticClass();
     DialogueNodeType = EDialogueNodeType::None;
+
+    DefaultNodeTitle = LOCTEXT("DialogueText", "DialogueText");
 }
 
 #endif
@@ -17,13 +19,13 @@ UDialogueGraphNode::UDialogueGraphNode()
 
 FText UDialogueGraphNode::GetNodeTitle() const
 {
-    return DialogueText.IsEmpty() ? LOCTEXT("DialogueText", "(DialogueText)") : DialogueText;
+    return VisualData.DialogueText.IsEmpty() ? DefaultNodeTitle : VisualData.DialogueText;
 
 }
 
 void UDialogueGraphNode::SetNodeTitle(const FText& NewTitle)
 {
-    DialogueText = NodeTitle;
+    VisualData.DialogueText = NodeTitle;
 }
 
 FLinearColor UDialogueGraphNode::GetBackgroundColor() const

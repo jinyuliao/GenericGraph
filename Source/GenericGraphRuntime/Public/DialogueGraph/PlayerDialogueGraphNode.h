@@ -13,5 +13,10 @@ class GENERICGRAPHRUNTIME_API UPlayerDialogueGraphNode : public UDialogueGraphNo
 public:
     UPlayerDialogueGraphNode();
 
-    
+protected:
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DialogueGraph")
+    FDialogueConditionData ConditionData;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DialogueGraph")
+    FDialogueResultData ResultData;
 };
