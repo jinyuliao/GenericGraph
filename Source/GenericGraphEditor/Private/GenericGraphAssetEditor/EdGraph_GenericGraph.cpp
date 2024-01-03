@@ -22,6 +22,8 @@ void UEdGraph_GenericGraph::RebuildGenericGraph()
 
 	Clear();
 
+    int32 CurrentID = 0;
+    
 	for (int i = 0; i < Nodes.Num(); ++i)
 	{
 		if (UEdNode_GenericGraphNode* EdNode = Cast<UEdNode_GenericGraphNode>(Nodes[i]))
@@ -31,6 +33,9 @@ void UEdGraph_GenericGraph::RebuildGenericGraph()
 
 			UGenericGraphNode* GenericGraphNode = EdNode->GenericGraphNode;
 
+		    GenericGraphNode->ID = CurrentID;
+		    CurrentID++;
+		    
 			NodeMap.Add(GenericGraphNode, EdNode);
 
 			Graph->AllNodes.Add(GenericGraphNode);

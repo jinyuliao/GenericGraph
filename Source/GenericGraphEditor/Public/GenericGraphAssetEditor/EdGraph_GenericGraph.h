@@ -32,8 +32,10 @@ public:
 	UPROPERTY(Transient)
 	TMap<UGenericGraphEdge*, UEdNode_GenericGraphEdge*> EdgeMap;
 
+
 protected:
 	void Clear();
 
 	void SortNodes(UGenericGraphNode* RootNode);
+    
 };

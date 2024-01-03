@@ -24,6 +24,9 @@ public:
 	UGenericGraphNode();
 	virtual ~UGenericGraphNode();
 
+    UPROPERTY(VisibleDefaultsOnly, Category = "GenericGraphNode")
+    int32 ID;
+    
 	UPROPERTY(VisibleDefaultsOnly, Category = "GenericGraphNode")
 	UGenericGraph* Graph;
 
@@ -74,9 +77,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "GenericGraphNode_Editor" ,meta = (ClampMin = "0",EditCondition = "ChildrenLimitType == ENodeLimit::Limited", EditConditionHides))
 	int32 ChildrenLimit;
-	
-#endif
 
+#endif
+    
 #if WITH_EDITOR
 	virtual bool IsNameEditable() const;
 
