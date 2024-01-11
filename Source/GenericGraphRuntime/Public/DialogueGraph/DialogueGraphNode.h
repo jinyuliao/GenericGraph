@@ -31,7 +31,11 @@ protected:
     FText DefaultNodeTitle;
     
 public:
+    UFUNCTION(BlueprintCallable)
     EDialogueNodeType GetDialogueNodeType() const { return DialogueNodeType; }
+
+    UFUNCTION(BlueprintCallable)
+    FDialogueVisualData GetVisualData() const { return VisualData; }
     
 #if WITH_EDITOR
     virtual FText GetNodeTitle() const override;
