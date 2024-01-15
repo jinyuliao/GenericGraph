@@ -1,5 +1,6 @@
 #include "GenericGraph.h"
 #include "GenericGraphRuntimePCH.h"
+#include "Containers/Deque.h"
 #include "Engine/Engine.h"
 
 #define LOCTEXT_NAMESPACE "GenericGraph"
@@ -116,6 +117,59 @@ void UGenericGraph::GetNodesByLevel(int Level, TArray<UGenericGraphNode*>& Nodes
 	}
 }
 
+UGenericGraphNode* UGenericGraph::GetNodeByID(int32 ID) const
+{
+    // Create a set to store visited nodes
+    TSet<UGenericGraphNode*> VisitedNodes;
+
+    // Create a queue for breadth-first search
+    TQueue<UGenericGraphNode*> NodeQueue;
+
+    // Enqueue the root nodes to start the search
+    for (UGenericGraphNode* RootNode : RootNodes)
+    {
+        NodeQueue.Enqueue(RootNode);
+        VisitedNodes.Add(RootNode);
+    }
+
+    // Perform breadth-first search
+    while (!NodeQueue.IsEmpty())
+    {
+        UGenericGraphNode* CurrentNode;
+        NodeQueue.Dequeue(CurrentNode);
+
+        // Check if the current node has the desired ID
+        if (CurrentNode->ID == ID)
+        {
+            return CurrentNode; // Found the node with the specified ID
+        }
+
+        // Enqueue unvisited neighbors
+        for (UGenericGraphNode* Neighbor : CurrentNode->ChildrenNodes)
+        {
+            if (!VisitedNodes.Contains(Neighbor))
+            {
+                NodeQueue.Enqueue(Neighbor);
+                VisitedNodes.Add(Neighbor);
+            }
+        }
+    }
+
+    // Node with the specified ID not found
+    return nullptr;
+}
+
+UGenericGraphNode* UGenericGraph::GetFirstNode() const
+{
+    if (RootNodes.Num() > 0)
+    {
+        return RootNodes[0];
+    }
+
+    // Handle the case where RootNodes is empty (no nodes in the graph)
+    return nullptr;
+}
+
 void UGenericGraph::ClearGraph()
 {
 	for (int i = 0; i < AllNodes.Num(); ++i)
@@ -132,5 +186,7 @@ void UGenericGraph::ClearGraph()
 	AllNodes.Empty();
 	RootNodes.Empty();
 }
+
+
 
 #undef LOCTEXT_NAMESPACE
