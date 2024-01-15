@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "DialogueStructures.generated.h"
 
 USTRUCT(BlueprintType)
@@ -21,7 +22,7 @@ struct FDialogueConditionData
     GENERATED_USTRUCT_BODY()
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Conditions")
-    TArray<FString> ConditionTokens;
+    FGameplayTagContainer ConditionTags;
 };
 
 USTRUCT(BlueprintType)
@@ -30,5 +31,5 @@ struct FDialogueResultData
     GENERATED_USTRUCT_BODY()
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Results")
-    TArray<FString> ResultTokens;
+    FGameplayTagContainer ResultTags;
 };
