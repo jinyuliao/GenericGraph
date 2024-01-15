@@ -25,6 +25,9 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DialogueGraph")
     FDialogueVisualData VisualData;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DialogueGraph")
+    FDialogueConditionData ConditionData;
+    
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DialogueGraph")
     EDialogueNodeType DialogueNodeType;
     
@@ -36,6 +39,9 @@ public:
 
     UFUNCTION(BlueprintCallable)
     FDialogueVisualData GetVisualData() const { return VisualData; }
+
+    UFUNCTION(BlueprintCallable)
+    FDialogueConditionData GetConditionData() const { return ConditionData; }
     
 #if WITH_EDITOR
     virtual FText GetNodeTitle() const override;
