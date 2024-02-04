@@ -8,7 +8,6 @@
 UDialogueGraphNode::UDialogueGraphNode()
 {
     CompatibleGraphType = UDialogueGraph::StaticClass();
-    DialogueNodeType = EDialogueNodeType::None;
 
     DefaultNodeTitle = LOCTEXT("DialogueText", "DialogueText");
 }
@@ -16,6 +15,20 @@ UDialogueGraphNode::UDialogueGraphNode()
 #endif
 
 #if WITH_EDITOR
+
+TArray<UDialogueGraphNode*> UDialogueGraphNode::GetChildrenNodes() const
+{
+    TArray<UDialogueGraphNode*> DialogueNodes;
+
+    for (const auto& Node : ChildrenNodes)
+    {
+        if (const auto& DialogueNode = Cast<UDialogueGraphNode>(Node))
+        {
+            DialogueNodes.Add(DialogueNode);
+        }
+    }
+    return DialogueNodes;
+}
 
 FText UDialogueGraphNode::GetNodeTitle() const
 {
@@ -30,20 +43,7 @@ void UDialogueGraphNode::SetNodeTitle(const FText& NewTitle)
 
 FLinearColor UDialogueGraphNode::GetBackgroundColor() const
 {
-    UDialogueGraph* DialogueGraph = Cast<UDialogueGraph>(GetGraph());
-
-    if (DialogueGraph == nullptr)
-        return Super::GetBackgroundColor();
-
-    switch (DialogueNodeType)
-    {
-        case EDialogueNodeType::NPC:
-            return DialogueGraph->NPCDialogueNodeColor;
-        case EDialogueNodeType::Player:
-            return DialogueGraph->PlayerDialogueNodeColor;
-        default:
-            return FLinearColor::Black;
-    }
+    return FLinearColor::Black;
 }
 
 #endif

@@ -16,7 +16,7 @@ class GENERICGRAPHRUNTIME_API UDialogueGraph : public UGenericGraph
 
 public:
     UDialogueGraph();
-
+    
     UPROPERTY(EditDefaultsOnly, Category = "DialogueGraph")
     FLinearColor NPCDialogueNodeColor;
 
@@ -27,13 +27,37 @@ private:
     FGameplayTagContainer ValidationTags;
 
 public:
-    void InitializeValidationTags(const FGameplayTagContainer& GamePlayTags) { ValidationTags == GamePlayTags; }
+    /**
+     * Initialize tags before start working with dialogue graph
+     * @param GamePlayTags 
+     */
+    UFUNCTION(BlueprintCallable)
+    void InitializeValidationTags(const FGameplayTagContainer& GamePlayTags);
+    /**
+     * 
+     * @return 
+     */
+    UFUNCTION(BlueprintCallable)
     UNPCDialogueGraphNode* GetStartDialogueNode() const;
+    /**
+     * 
+     * @param SourceNode 
+     * @return 
+     */
+    UFUNCTION(BlueprintCallable)
     UNPCDialogueGraphNode* GetNPCDialogueNode(const UPlayerDialogueGraphNode* SourceNode) const;
+    /**
+     * 
+     * @param SourceNode 
+     * @return 
+     */
+    UFUNCTION(BlueprintCallable)
     TArray<UPlayerDialogueGraphNode*> GetPlayerDialogueNodes(const UNPCDialogueGraphNode* SourceNode) const;
     
 private:
     bool ValidateNodeByGamePlayTag(const UDialogueGraphNode* Node, const FGameplayTagContainer& GamePlayTags, bool bEmptyTagsNodeIsValid) const;
-    UDialogueGraphNode* GetValidRootNode(const TArray<UGenericGraphNode*>& RootNodes, const FGameplayTagContainer& GamePlayTags) const;
-    TArray<UDialogueGraphNode*> GetValidNodes(const TArray<UDialogueGraphNode*>& SourceNodes, const FGameplayTagContainer& GamePlayTags) const;
+    UDialogueGraphNode* GetValidRootNode(const TArray<UGenericGraphNode*>& Nodes, const FGameplayTagContainer& GamePlayTags) const;
+    TArray<UDialogueGraphNode*> GetValidNodes(const TArray<UGenericGraphNode*>& SourceNodes, const FGameplayTagContainer& GamePlayTags) const;
+
+
 };

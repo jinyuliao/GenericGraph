@@ -8,10 +8,20 @@
 UPlayerDialogueGraphNode::UPlayerDialogueGraphNode()
 {
     CompatibleGraphType = UDialogueGraph::StaticClass();
-    DialogueNodeType = EDialogueNodeType::Player;
+
     ContextMenuName = LOCTEXT("ContextMenuName", "Player Dialogue Graph Node");
 
     DefaultNodeTitle = LOCTEXT("PlayerDialogueText", "PlayerDialogueText");
+}
+
+FLinearColor UPlayerDialogueGraphNode::GetBackgroundColor() const
+{
+    if (const UDialogueGraph* DialogueGraph = Cast<UDialogueGraph>(GetGraph()))
+    {
+        return DialogueGraph->PlayerDialogueNodeColor;
+    }
+    
+    return Super::GetBackgroundColor();
 }
 
 #endif

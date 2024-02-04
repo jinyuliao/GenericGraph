@@ -14,7 +14,14 @@ public:
     UPlayerDialogueGraphNode();
 
 protected:
-
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DialogueGraph")
     FDialogueResultData ResultData;
+
+public:
+    UFUNCTION(BlueprintCallable)
+    FDialogueResultData GetResultData() const { return ResultData; }
+    
+#if WITH_EDITOR
+    virtual FLinearColor GetBackgroundColor() const override;
+#endif
 };

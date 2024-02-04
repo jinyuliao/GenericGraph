@@ -5,14 +5,6 @@
 #include "DialogueStructures.h"
 #include "DialogueGraphNode.generated.h"
 
-UENUM(BlueprintType)
-enum class EDialogueNodeType : uint8
-{
-    None,
-    NPC,
-    Player
-};
-
 UCLASS(Blueprintable)
 class GENERICGRAPHRUNTIME_API UDialogueGraphNode : public UGenericGraphNode
 {
@@ -28,20 +20,18 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DialogueGraph")
     FDialogueConditionData ConditionData;
     
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DialogueGraph")
-    EDialogueNodeType DialogueNodeType;
     
     FText DefaultNodeTitle;
     
 public:
     UFUNCTION(BlueprintCallable)
-    EDialogueNodeType GetDialogueNodeType() const { return DialogueNodeType; }
-
-    UFUNCTION(BlueprintCallable)
     FDialogueVisualData GetVisualData() const { return VisualData; }
 
     UFUNCTION(BlueprintCallable)
     FDialogueConditionData GetConditionData() const { return ConditionData; }
+
+    UFUNCTION(BlueprintCallable)
+    TArray<UDialogueGraphNode*> GetChildrenNodes() const;
     
 #if WITH_EDITOR
     virtual FText GetNodeTitle() const override;

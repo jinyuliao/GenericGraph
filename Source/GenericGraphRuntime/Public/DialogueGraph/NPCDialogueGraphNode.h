@@ -11,4 +11,8 @@ class GENERICGRAPHRUNTIME_API UNPCDialogueGraphNode : public UDialogueGraphNode
     
 public:
     UNPCDialogueGraphNode();
+
+#if WITH_EDITOR
+    virtual FLinearColor GetBackgroundColor() const override;
+#endif
 };
